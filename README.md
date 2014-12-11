@@ -15,4 +15,4 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 
 ## Thanks
 
-Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/bradp/vvv-site-wizard).
+Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
