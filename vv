@@ -161,6 +161,7 @@ get_vvv_path(){
 }
 
 list_sites() {
+	# @TODO refactor this if we need to
 	cd $path/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
@@ -172,6 +173,7 @@ list_sites() {
 }
 
 create_site() {
+	# @TODO refactor this if we need to
 	files_only_text=''
 	if [[ "$files_only" = true ]]; then
 		files_only_text=" (file creation only)"
@@ -379,6 +381,7 @@ create_site() {
 }
 
 remove_site() {
+	# @TODO refactor this if we need to
 	info "\nVVV Site Teardown"
 
 	# Get site dir name if not supplied as argument
@@ -432,9 +435,6 @@ remove_site() {
 }
 
 parse_the_args() {
-    if [ ! -z $example_one ]; then
-        info "Finally, Example One: \"$example_one\""
-    fi
 
     if [ ! -z $list ]; then
         info "Listing sites."
@@ -448,7 +448,6 @@ parse_the_args() {
         info "Removing site."
         remove_site
     fi
-
 }
 
 check_args() {
