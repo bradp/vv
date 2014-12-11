@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+# pass in a git repo for wp-content
+# pull in frameworks for plugins and themes
+# 	cmb2, wd_s
+# save defaults in a config file somewhere
+# 	json object of settings, named blueprints
+# a flag to change the username/password
+# be able to add dummy content
+# -r pass a site argument
+# allow overriding of htdocs folder/
+
 # =============================================================================
 # Variable VVV - A VVV Site Setup Script
 # By Brad Parbs <brad@bradparbs.com>
@@ -508,16 +518,12 @@ check_args() {
 				 version=$1
 				 shift
 				 ;;
-			-l|-s|--list|--show)
+			-l|-s|--list|--show|list)
 				list="true"
 				shift
 				;;
-			-c|-n|-m|--create|--new|--make)
+			-c|-n|-m|--create|--new|--make|create)
 				create="true"
-				shift
-				;;
-			-r|-rm|--remove|--delete|--rm|--teardown)
-				remove="true"
 				shift
 				;;
 			-f|--files)
