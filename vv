@@ -1,0 +1,563 @@
+#!/usr/bin/env bash
+
+# =============================================================================
+# Variable VVV - A VVV Site Setup Script
+# By Brad Parbs <brad@bradparbs.com>
+# Originally by Alison Barrett <alison@barre.tt>
+# https://github.com/bradp/vvv-site-wizard
+#
+# Version 1.0
+#
+# This script automates the creation & deletion of new WordPress sites using
+# Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
+#
+# =============================================================================
+
+normal=$(tput sgr0)
+bold=$(tput bold)
+red=$(tput setaf 1)
+green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+blue=$(tput setaf 4)
+magenta=$(tput setaf 5)
+cyan=$(tput setaf 6)
+
+
+# Usage: info "message"
+# Example: info "doing thing"
+# Output (to STDOUT): doing thing
+info () {
+    printf "%b" "${blue}$1${normal} \n"
+}
+
+# Usage: success "message"
+# Example: success "It's Working"
+# Output (to STDOUT): [...] It's Working
+success () {
+    printf "%b" "[${green}Success${normal}]${green}S $1 ${normal}\n"
+}
+
+# Usage: warning "message"
+# Example: warning "some warning"
+# Output (to STDOUT): [...] some warning
+warning () {
+    printf "%b" "${red} $1 ${normal}\n"
+}
+
+# Usage: prompt "question"
+# Example: prompt "Site name"
+# Output (to STDOUT): Site Name:
+prompt () {
+    printf "%b" "${yellow} $1: ${normal}"
+}
+
+# Usage: error ["message"]
+# Example: error "this is an error"
+# Output (to STDERR): [ERROR] this is an error
+error () {
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}\n" >&2
+}
+
+# Usage: fail "message" [exit_code]
+# Example: fail "Unknown Option" 254
+fail () {
+    error "$1"
+}
+
+# ask function https://gist.github.com/davejamesmiller/1965569
+# Usage: ask "Yes or No?" [default option]
+# Example: if "Yes or No?" Y; then
+ask () {
+    while true; do
+
+        if [ "${2:-}" = "Y" ]; then
+            prompt_tail="Y/n"
+            default=Y
+        elif [ "${2:-}" = "N" ]; then
+            prompt_tail="y/N"
+            default=N
+        else
+            prompt_tail="y/n"
+            default=
+        fi
+
+        # Ask the question
+        prompt "$1 [$prompt_tail]"
+        read REPLY
+
+        # Default?
+        if [ -z "$REPLY" ]; then
+            REPLY=$default
+        fi
+
+        # Check if the reply is valid
+        case "$REPLY" in
+            Y*|y*) return 0 ;;
+            N*|n*) return 1 ;;
+        esac
+
+    done
+}
+
+# Usage: show_help [exit_code]
+# Example: show_help 254
+show_help () {
+    cat <<HELP
+    Usage:
+        vv [OPTION]...
+
+    OPTIONS:
+        --help, -h: 	Show this help and exit
+
+        --list,	-l: 	List all VVV sites
+        --create, -c: 	Create a new site
+        --remove, -r: 	Remove a site
+
+        --path,	-p: 	Path to VVV installation
+
+    NEW SITE OPTIONS:
+        --domain, -d: 	Domain of new site
+        --live_url, -u: Live URL of site
+        --files, -f: 	Do not provision Vagrant, just create the site directory and files
+        --images, -i: 	Load images by proxy from the live site
+        --name, -n: 	Desired name for the site directory (e.g. mysite)
+        --version, -v: 	Version of WordPress to install
+        --debug, -x: 	Turn on WP_DEBUG and WP_DEBUG_LOG
+
+
+    Example:
+        vv --create --domain mysite.dev --name mysite --debug
+        vv -c -d mysite.dev -n mysite -x
+
+HELP
+}
+
+argument_expected() {
+    fail "$1 expected an argument"
+}
+
+get_vvv_path(){
+	if [ ! -z $path ]; then
+		path=$path
+	else
+		current_dir=`pwd`
+		if [ -e "$current_dir/Vagrantfile" ]; then
+			path=`pwd`
+		elif [ -e ~/Sites/Vagrantfile ]; then
+			path=~/Sites
+		else
+			while [ -z $path ]; do
+				read -e -p "VVV install directory: " path
+
+				# Make sure directory is actually a VVV root
+				if [ ! -e "$path/Vagrantfile" ]; then
+					error "Path specified is not a VVV root directory."
+					unset path
+				fi
+			done
+		fi
+	fi
+	path=${path%/}
+}
+
+list_sites() {
+	cd $path/www
+	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
+		filename=${filename:2}
+		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
+			echo $filename
+		fi
+	done
+	exit
+}
+
+create_site() {
+	files_only_text=''
+	if [[ "$files_only" = true ]]; then
+		files_only_text=" (file creation only)"
+	fi
+	info "\nNew VVV Site Setup$files_only_text"
+
+	# Prompt user for vars
+	# =============================================================================
+
+	# Get site dir name if not supplied as argument
+	if [ ! -z $site ]; then
+		if [ -d "$path/www/$site" ]; then
+			error "Directory $path/www/$site already exists."
+			unset site
+		fi
+	fi
+	while [ -z $site ]; do
+		prompt "Name of new site directory"
+		read site
+
+		if [ -z $site ]; then
+			error "You must enter a directory name."
+		elif [ -d "$path/www/$site" ]; then
+			error "Directory already exists."
+			unset site
+		fi
+	done
+
+	# Get database name
+	db_name=$site
+
+	# Get local URL
+	while [ -z $domain ]; do
+		prompt "Domain to use (leave blank for $site.dev)"
+		read domain
+		if [ -z $domain ]; then
+			domain="$site.dev"
+		fi
+	done
+
+	if [ ! -z $version ]; then
+		# Attempt to verify the existence of the version (hacky)
+		if curl -s http://codex.wordpress.org/Version_$version | grep 'currently no text' > /dev/null; then
+			error "Version $version not found, try again"
+			unset version
+		else
+			installversion=" --version=$version"
+		fi
+	fi
+
+	while [[ -z $version ]]; do
+		# Get WordPress version
+		prompt "WordPress version to install (leave blank for release version)"
+		read version
+		if [ -z $version ]; then
+			installversion=""
+			version="(release version)"
+		else
+			# Attempt to verify the existence of the version (hacky)
+			if curl -s http://codex.wordpress.org/Version_$version | grep 'currently no text' > /dev/null; then
+				error "Version $version not found, try again"
+				unset version
+			else
+				installversion=" --version=$version"
+			fi
+		fi
+	done
+
+	# Ask if WP_DEBUG should be turned on
+	while [ -z $wp_debug ]; do
+		prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/n)"
+		read wp_debug
+		if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
+			error "Answer y or n."
+			unset wp_debug
+		fi
+	done
+
+	# Ask if images should be loaded from the live site
+	while [ -z $image_proxy ]; do
+		prompt "Load images from live site (y/n)"
+		read image_proxy
+		if [[ $image_proxy != 'y' && $image_proxy != 'n' ]]; then
+			error "Answer y or n."
+			unset image_proxy
+		fi
+	done
+
+	if [[ $image_proxy == 'y' ]]; then
+		while [ -z $live_site_url ]; do
+			prompt "Live site URL (no http:// or trailing slash)"
+			read live_site_url
+		done
+	fi
+
+	# Inform the user of what's about to happen and give them a chance to back out
+	# =============================================================================
+	info "\nAbout to perform the following:"
+	# @ TODO
+	echo -e "* Halt Vagrant (if running)\n* Create directory $site in $path/www\n* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site\n* Create file $site.conf in $path/config/nginx-config/sites"
+	if [[ "$files_only" = false ]]; then
+		echo -e "* Run \`vagrant up --provision\` to initialize site"
+	else
+		warning "\nNote: You will need to run \`vagrant up --provision\` to initialize the new site before $domain will load in a browser."
+	fi
+
+	info "\nProvisioning Vagrant will do the following:"
+	echo -e "* Create database $site\n* Install WordPress $version in the htdocs directory\n* Make the site visible at $domain"
+
+	info "\n"
+	while [ -z $continue_create ]; do
+		prompt "Continue (y/n)? "
+		read continue_create
+
+		if [[ $continue_create = 'n' ]]; then
+			error "Site setup aborted."
+			exit
+		elif [[ $continue_create != 'y' ]]; then
+			error "Answer y or n."
+			unset continue_create
+		fi
+	done
+
+	# Start the par-tay
+	# =============================================================================
+	success "New VVV setup starting for site '$site'"
+	cd $path
+	vagrant halt
+
+	# Create site folder with vvv-init.sh file
+	# =============================================================================
+	cd $path/www
+	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
+	mkdir $site && cd $site
+
+	printf "path: htdocs" > wp-cli.yml
+
+	wp_debug_text=''
+	if [[ $wp_debug = 'y' ]]; then
+		wp_debug_text=" --extra-php <<PHP\ndefine('WP_DEBUG', true);\ndefine('WP_DEBUG_LOG', true);\nPHP"
+	fi
+
+	printf "echo \"Creating database '$site' (if it does not exist)...\"\n\n"\
+"mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\"\n"\
+"mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\"\n\n"\
+"if [ ! -d \"htdocs\" ]; then\n"\
+"\techo 'Installing WordPress $version in $site/htdocs...'\n"\
+"\tmkdir ./htdocs\ncd ./htdocs\n"\
+"\twp core download --allow-root $installversion\n"\
+"\twp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text\n"\
+"\twp core install --url=$domain --title=\"$site - A WordPress Site\" --admin_user=admin --admin_password=password --admin_email=demo@example.com --allow-root\n"\
+"\t\tcd -\n"\
+"else\n"\
+"\techo 'Updating WordPress in $site/htdocs...'\n"\
+"\twp core update --allow-root\n"\
+"\twp core update-db --allow-root\n"\
+"fi\n" > vvv-init.sh
+
+	echo "Done"
+
+	# Add vvv-hosts file for domain in the site's www root
+	# =============================================================================
+	cd $path/www/$site
+	info "Adding $domain to new vvv-hosts file... "
+	touch vvv-hosts
+	printf "$domain\n" >> vvv-hosts
+	echo "Done"
+
+	# Add site conf file to nginx-config
+	# =============================================================================
+	cd $path/config/nginx-config/sites
+	info "Creating nginx-config/sites/$site.conf... "
+	sed -e "s|testserver\.com|$domain|" \
+		-e "s|wordpress-local|$site/htdocs|" local-nginx-example.conf-sample > $site.conf
+
+	if [[ $image_proxy = 'y' ]]; then
+		sed -e $'s|\}|\\\n\\\t# Directives to send expires headers and turn off 404 error logging\.\\\n\\\tlocation ~\* \\.\(js\|css\|png\|jpg\|jpeg\|gif\|ico\)\$ \{\\\n\\\t\texpires 24h;\\\n\\\t\\\tlog_not_found off;\\\n\\\t\\\ttry_files \$uri \$uri\/ @production;\\\n\\\t\}\\\n\\\n\\\tlocation @production \{\\\n\\\t\\\tresolver 8\.8\.8\.8;\\\n\\\t\\\tproxy_pass http://LIVE_URL/$uri;\\\n\\\t\}\\\n\}|' -e "s|LIVE_URL|$live_site_url|" $site.conf > tmp.conf
+		rm $site.conf
+		mv tmp.conf $site.conf
+	fi
+
+	echo "Done"
+
+	# vagrant waaaaay up
+	# =============================================================================
+	cd $path
+	if [[ "$files_only" = false ]]; then
+		info "Running vagrant up --provision... "
+		vagrant up --provision
+	fi
+
+	# OMG we're done.
+	# =============================================================================
+	if [[ "$files_only" = true ]]; then
+		info "\nRemember to run \`vagrant up --provision\` to initialize the new site."
+	fi
+
+	success "\nNew VVV Site Setup: Done!"
+	echo "Directory: $path/www/$site"
+	echo "URL:       $domain"
+	echo "Username:  admin"
+	echo "Password:  password"
+
+	exit
+}
+
+remove_site() {
+	info "\nVVV Site Teardown"
+
+	# Get site dir name if not supplied as argument
+	while [ -z $site ]; do
+		prompt "Site directory to delete"
+		read site
+
+		if [[ -z $site || ! -d "$path/www/$site" ]]; then
+			error "You must enter a valid directory from $path/www/."
+			unset site
+		elif [[ $site = 'wordpress-default' || $site = 'wordpress-develop' || $site = 'wordpress-trunk' || $site = 'default' || $site = 'phpcs' || $site = 'vvv-hosts' || $site = 'wp-cli' || $site = '.gitshow' ]]; then
+			error "This script can't delete the default VVV folders."
+			unset site
+		fi
+	done
+
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n"
+	while [ -z $continue_delete ]; do
+		prompt "Continue (y/n) "
+		read continue_delete
+		if [ $continue_delete = 'y' ]; then
+			info "\nVVV teardown starting for site '$site'"
+			cd $path
+
+			vagrant halt
+
+			# Delete the site folder
+			info "Removing directory $site... "
+			rm -rf $path/www/$site
+			echo "Done"
+
+			# Remove the nginx conf file
+			info "Removing nginx config file $site.conf... "
+			rm $path/config/nginx-config/sites/$site.conf
+			echo "Done"
+
+			# Delorted.
+			success "\nVVV Site Teardown: Done!"
+			exit
+
+		elif [ $continue_delete = 'n' ]; then
+			eroor "Site teardown aborted."
+			exit
+		else
+			error "Answer y or n."
+			unset continue_delete
+		fi
+	done
+	exit
+
+}
+
+parse_the_args() {
+    if [ ! -z $example_one ]; then
+        info "Finally, Example One: \"$example_one\""
+    fi
+
+    if [ ! -z $list ]; then
+        info "Listing sites."
+        list_sites
+    fi
+    if [ ! -z $create ]; then
+        info "Creating site."
+        create_site
+    fi
+    if [ ! -z $remove ]; then
+        info "Removing site."
+        remove_site
+    fi
+
+}
+
+check_args() {
+    while [ ! -z "$1" ]; do
+        local arg="$1"
+        case "$1" in
+			-h|--help)
+				local help=0
+				shift
+				;;
+			-p|--path)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 path=$1
+				 shift
+				 ;;
+			-d|--domain)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 domain=$1
+				 shift
+				 ;;
+			-u|--live_url)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 live_site_url=$1
+				 shift
+				 ;;
+			-n|--name)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 site=$1
+				 shift
+				 ;;
+			-v|--version)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 version=$1
+				 shift
+				 ;;
+			-l|-s|--list|--show)
+				list="true"
+				shift
+				;;
+			-c|-n|-m|--create|--new|--make)
+				create="true"
+				shift
+				;;
+			-r|-rm|--remove|--delete|--rm|--teardown)
+				remove="true"
+				shift
+				;;
+			-f|--files)
+				files_only="true"
+				shift
+				;;
+			-i|--images)
+				image_proxy="true"
+				shift
+				;;
+			-x|--debug)
+				wp_debug="true"
+				shift
+				;;
+			*)
+				fail "Unknown option $1"
+				shift
+				;;
+        esac
+    done
+
+    if [ ! -z $help ]; then
+        show_help $help
+    fi
+
+    parse_the_args
+
+    exit 0
+}
+
+main() {
+
+	get_vvv_path
+
+    if [ -z $1 ]; then
+        show_help
+    fi
+
+    check_args "$@"
+}
+
+main "$@"
