@@ -1,5 +1,5 @@
 ### NOTE: The issues section is for bug reports and feature requests only.
-_Support is not guaranteed. If you need help, please use [stackoverflow](http://stackoverflow.com/search?q=cmb)._
+_Support is not guaranteed. If you need help, please use [stackoverflow](http://stackoverflow.com/search?q=Variable%20VVV)._
 
 Before reporting a bug
 ---
