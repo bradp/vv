@@ -18,6 +18,10 @@ Warning: This is currently in development and ~~may not~~ probably will work cor
 
 Put it in your $PATH and run ```vv```.
 
+Or you can simply run:
+
+``brew install bradp/vv/vv``
+
 ## Usage
 
 For now, ```vv --help``` should show you everything you need to know.
