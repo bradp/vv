@@ -1,27 +1,18 @@
-### NOTE: The issues section is for bug reports and feature requests only.
-_Support is not guaranteed. If you need help, please use [stackoverflow](http://stackoverflow.com/search?q=Variable%20VVV)._
-
 Before reporting a bug
 ---
 1. Search issue tracker for similar issues.
-2. Checkout trunk version and test there.
 
 How to report a bug
 ---
-1. Specify the version number fo VV.
+1. Specify the version number for vv.
 3. Describe the problem in detail. Explain what happened, and what you expected would happen.
 5. If helpful, include a screenshot. Annotate the screenshot for clarity.
 
-
-How to contribute to VV
+How to contribute to vv
 ---
 All contributions welcome. If you would like to submit a pull request, please follow the steps below.
 
 1. Make sure you have a GitHub account.
 2. Fork the repository on GitHub.
-3. Check out the trunk branch. If you submit to the master branch, the PR will be closed with a link back to this document.
-4. **Verify your issue still exists in the trunk branch.**
-5. Make changes to your clone of the repository.
-6. [Submit a pull request](https://help.github.com/articles/creating-a-pull-request/).
-
-**Note:** You may gain more ground and avoid unecessary effort if you first open an issue with the proposed changes, but this step is not necessary.
+3. Make changes to your clone of the repository.
+4. [Submit a pull request](https://help.github.com/articles/creating-a-pull-request/).
