@@ -219,6 +219,7 @@ function list_sites() {
 			else
 				# @ TODO only grab non-commented strings
 				url=$(<$path/www/$filename/vvv-hosts)
+				url="$(echo "$url" | sed -e's/#.*$//' -e '/^$/d')"
 				printf "%-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
 		fi
