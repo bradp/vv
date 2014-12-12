@@ -200,6 +200,7 @@ function get_vvv_path(){
 }
 
 function list_sites() {
+	path=`eval echo ${path//>}`
 	cd $path/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
@@ -215,6 +216,7 @@ function list_sites() {
 
 				printf "%-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
 			else
+				# @ TODO only grab non-commented strings
 				url=$(<$path/www/$filename/vvv-hosts)
 				printf "%-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
@@ -478,6 +480,7 @@ function creation_success_message() {
 }
 
 function create_site() {
+	path=`eval echo ${path//>}`
 	site_creation_questions
 	confirm_site_creation
 	create_site_files
@@ -497,6 +500,7 @@ function not_valid_site() {
 }
 
 function remove_site() { # @TODO refactor this if we need to
+path=`eval echo ${path//>}`
 	info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
