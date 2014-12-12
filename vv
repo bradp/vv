@@ -171,6 +171,7 @@ function load_config_values() {
 function get_vvv_path(){
 	if [ ! -z $path ]; then
 		path=$path
+		path=`eval echo ${path//>}`
 	else
 		current_dir=`pwd`
 		if [ -e "$current_dir/Vagrantfile" ]; then
@@ -200,7 +201,6 @@ function get_vvv_path(){
 }
 
 function list_sites() {
-	path=`eval echo ${path//>}`
 	cd $path/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
@@ -480,7 +480,6 @@ function creation_success_message() {
 }
 
 function create_site() {
-	path=`eval echo ${path//>}`
 	site_creation_questions
 	confirm_site_creation
 	create_site_files
@@ -500,7 +499,6 @@ function not_valid_site() {
 }
 
 function remove_site() { # @TODO refactor this if we need to
-path=`eval echo ${path//>}`
 	info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
