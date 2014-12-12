@@ -78,10 +78,10 @@ function fail () {
 }
 
 function check_for_update () {
-github_version=$(curl -s https://github.com/bradp/vv/tags | awk '/tag-name/{print $3;exit}' FS='[<>]')
-if [ ! $version_number = $github_version ]; then
-	info "Your version of vv does not match the current Github version. Please consider updating."
-fi
+	github_version=$(curl -s https://github.com/bradp/vv/tags | awk '/tag-name/{print $3;exit}' FS='[<>]')
+	if [ ! $version_number = $github_version ]; then
+		info "Your version of vv does not match the current Github version. Please consider updating."
+	fi
 }
 
 # ask function https://gist.github.com/davejamesmiller/1965569
@@ -610,7 +610,7 @@ function remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
@@ -639,7 +639,12 @@ function remove_site() { # @TODO refactor this if we need to
 			cd -
 			echo "Done"
 
-			# Delorted.
+			echo -en "Removing any set up deployments. "
+			remove_deployment_confirm="true"
+			remove_deployment
+			echo "Done"
+
+			# Deleted.
 			success "\nVVV Site Teardown: Done!"
 			exit
 
@@ -654,6 +659,124 @@ function remove_site() { # @TODO refactor this if we need to
 	exit
 }
 
+function deployment_setup_prompt() {
+	info "Setting up a deployment."
+
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Which site would you like to setup a deployment for? "
+		read -r site
+		not_valid_site
+	done
+
+}
+
+function deployment_removal_prompt() {
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Which site would you like to remove the deployment for? "
+		read -r site
+		not_valid_site
+	done
+
+	remove_deployment
+
+}
+
+function deployment_setup() {
+	deployment_setup_prompt
+	info "Setting up (S)FTP deployment for $site"
+
+
+	while [ -z "$host" ]; do
+		prompt "Host (if SFTP, define port as host:port) "
+		read -r host
+	done
+
+	while [ -z "$username" ]; do
+		prompt "FTP Username "
+		read -r username
+	done
+
+	while [ -z "$password" ]; do
+		prompt "FTP Password "
+		read -r password
+	done
+
+	if [ -z "$passive" ]; then
+		prompt "Use Passive transfer mode? (Y/n) "
+		read -r passive
+	fi
+	if [[ "$passive" = "n" ]]; then
+		passive="false"
+	else
+		passive="true"
+	fi
+
+
+	while [ -z "$secure" ]; do
+		prompt "Use SFTP? (y/N)"
+		read -r secure
+	done
+	if [[ "$secure" = "y" ]]; then
+		secure="true"
+	else
+		secure="false"
+	fi
+
+	while [ -z "$destination" ]; do
+		prompt "Destination path ( You probably want / or ~/public_html )"
+		read -r destination
+	done
+
+	dir="htdocs"
+
+	info "Setting up a deployment in your VVV Vagrantfile with the following information: "
+	echo "	Site: $site"
+	echo "	Host: $host"
+	echo "	Username: $username"
+	echo "	Password: $password"
+	echo "	Passive Mode: $passive"
+	echo "	Secure Mode: $secure"
+	echo "	destination: $destination"
+{
+	echo "# vv-$site-begin"
+	echo "config.push.define \"$site\", strategy: \"ftp\" do |push|"
+	echo "	push.host =\"$host\""
+	echo "	push.username =\"$username\""
+	echo "	push.password =\"$password\""
+	echo "	push.passive =\"$passive\""
+	echo "	push.secure =\"$secure\""
+	echo "	push.destination =\"$destination\""
+	echo "	push.dir = \"htdocs\""
+	echo "end"
+	echo "# vv-$site-end"
+} >> "$path/Vagrantfile"
+
+	success "Deployment setup finished. You can now deploy with a 'vv -v push <site_name>'"
+}
+
+function remove_deployment() {
+	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
+		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
+		read -r remove_deployment_confirm
+	done
+	sed "/\# vv-"$site"-begin/,/\# vv-"$site"-end/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
+	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
+
+	success "Deployment for $site removed."
+}
+
+
 function parse_the_args() {
 
     if [ ! -z "$list" ]; then
@@ -664,6 +787,12 @@ function parse_the_args() {
     fi
     if [ ! -z "$remove" ]; then
         remove_site
+    fi
+    if [ ! -z "$deployment_setup" ]; then
+    	deployment_setup
+    fi
+    if [ ! -z "$deployment_remove" ]; then
+    	deployment_removal_prompt
     fi
 }
 
@@ -775,6 +904,66 @@ function check_args() {
 				ms_type=$1
 				shift
 				;;
+			--host)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				host=$1
+				shift
+				;;
+			--username)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				username=$1
+				shift
+				;;
+			--password)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				password=$1
+				shift
+				;;
+			--passive)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				passive=$1
+				shift
+				;;
+			--secure)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				secure=$1
+				shift
+				;;
+			--destination)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				    exit
+				fi
+				destination=$1
+				shift
+				;;
 			v|-v|--vagrant)
 				shift
 
@@ -829,6 +1018,18 @@ function check_args() {
 				#check_for_update
 				about
 				exit
+				shift
+				;;
+			--deployment|--deploy)
+				deployment_setup="true"
+				shift
+				;;
+			--deployment-remove|--deploy-remove|--deployment_remove|--deploy_remove)
+				deployment_remove="true"
+				shift
+				;;
+			--confirm-removal)
+				remove_deployment_confirm="confirm"
 				shift
 				;;
 			*)

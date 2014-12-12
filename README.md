@@ -67,7 +67,13 @@ Deleting a site does the following:
 
 Note that it does not delete the site's database.
 
+## Deployments
 
+```vv --deployment-create```
+
+vv supports setting up deployments that work with "Vagrant Push". You'll need to be on version 1.7.0 or later of Vagrant. Simply run ```vv --deployment-create``` and walk through the wizard.
+
+When removing a deployment, your current Vagrantfile will be backed up as Vagrantfile-backup.
 
 ## Advanced Usage
 
@@ -96,6 +102,8 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--list``,	``-l``, ``list``|List all VVV sites|
 |``--create``, ``-c``, ``create``|Create a new site|
 |``--remove``, ``-r``, ``remove``|Remove a site|
+|``--deployment-create``|Set up deployment for a site|
+|``--deployment-remove``|Remove deployment for a site|
 |``--vagrant``, ``-v``|Pass vagrant command through to VVV.|
 |``--path``,	``-p``|Path to VVV installation|
 |``--force_path``, ``-fp``|Override vv auto-VVV locating|
@@ -127,6 +135,19 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
 |``--path``,	``-p``|Path to VVV installation|
 |``--force_path``, ``-fp``|Override vv auto-VVV locating|
+
+###Options for Deployment Setup###
+|Option |Description|
+|------|-----------
+|``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
+|``--host``|Host (if SFTP, define port as host:port) |
+|``--username``|FTP Username |
+|``--password``|FTP Password  |
+|``--passive``|Use Passive transfer mode? (y/n)  |
+|``--secure``|Use SFTP? (y/n) |
+|``--destination``|Destination path ( You probably want / or ~/public_html ) |
+|``--confirm-removal``|Used when removing a deployment to skip the confirmation prompt |
+
 
 ## .vv-config ##
 
