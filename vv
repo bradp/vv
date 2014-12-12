@@ -30,6 +30,9 @@ blue=$(tput setaf 4)
 magenta=$(tput setaf 5)
 cyan=$(tput setaf 6)
 
+function version () {
+echo "vv version 0.1.0"
+}
 
 # Usage: info "message"
 # Example: info "doing thing"
@@ -145,7 +148,7 @@ function show_help () {
         --files, -f 		Do not provision Vagrant, just create the site directory and files
         --images, -i 		Load images by proxy from the live site
         --name, -n 		Desired name for the site directory (e.g. mysite)
-        --version, -v 		Version of WordPress to install
+        --wp_version, -wv 	Version of WordPress to install
         --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
         --multisite, -m 	Install as a multisite
         --username  		Admin username
@@ -700,7 +703,7 @@ function check_args() {
 				 site=$1
 				 shift
 				 ;;
-			-v|--version)
+			-wv|--wp_version)
 				 shift
 
 				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
@@ -786,6 +789,10 @@ function check_args() {
 				;;
 			-fp|--force_path)
 				force_path="true"
+				shift
+				;;
+			-v|--version)
+				version
 				shift
 				;;
 			--porcelain)
