@@ -156,19 +156,19 @@ function getJsonVal () {
 
 function load_config_values() {
 	#Load path from config file
-	path="$(cat ~/.vv-config | getJsonVal "['path']")"
+	path="$( getJsonVal "['path']" < ~/.vv-config )"
 	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
 function get_vvv_path(){
 	# @TODO right now assumes this is a valid vagrant path, need to fix that
-	if [ ! -z $path ]; then
+	if [ ! -z "$path" ]; then
 		path=$path
-		path=`eval echo ${path//>}`
+		path=$(eval echo "${path//>}")
 	else
-		current_dir=`pwd`
+		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
-			path=`pwd`
+			path=$(pwd)
 		elif [ -e ~/Sites/Vagrantfile ]; then
 			path=~/Sites
 		elif [ -e ~/vagrant/Vagrantfile ]; then
@@ -186,11 +186,11 @@ function get_vvv_path(){
 				read -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
-				if [ ! -e "`eval echo ${path//>}`/Vagrantfile" ]; then
+				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
 					error "Path specified is not a VVV root directory."
 					unset path
 				fi
-				path=`eval echo ${path//>}`
+				path=$(eval echo "${path//>}")
 			done
 		fi
 	fi
@@ -198,7 +198,7 @@ function get_vvv_path(){
 }
 
 function list_sites() {
-	cd $path/www
+	cd "$path"/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
@@ -214,7 +214,7 @@ function list_sites() {
 				printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
 			else
 				# @TODO fix having Multiple URLs in vvv-hosts
-				url=$(<$path/www/$filename/vvv-hosts)
+				url=$(<"$path"/www/"$filename"/vvv-hosts)
 				url="$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')"
 				printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
@@ -234,17 +234,17 @@ function site_creation_questions() {
 	# =============================================================================
 
 	# Get site dir name if not supplied as argument
-	if [ ! -z $site ]; then
+	if [ ! -z "$site" ]; then
 		if [ -d "$path/www/$site" ]; then
 			error "Directory $path/www/$site already exists."
 			unset site
 		fi
 	fi
-	while [ -z $site ]; do
+	while [ -z "$site" ]; do
 		prompt "Name of new site directory"
 		read site
 
-		if [ -z $site ]; then
+		if [ -z "$site" ]; then
 			error "You must enter a directory name."
 		elif [ -d "$path/www/$site" ]; then
 			error "Directory already exists."
@@ -256,17 +256,17 @@ function site_creation_questions() {
 	db_name=$site
 
 	# Get local URL
-	while [ -z $domain ]; do
+	while [ -z "$domain" ]; do
 		prompt "Domain to use (leave blank for $site.dev)"
 		read domain
-		if [ -z $domain ]; then
+		if [ -z "$domain" ]; then
 			domain="$site.dev"
 		fi
 	done
 
-	if [ ! -z $version ]; then
+	if [ ! -z "$version" ]; then
 		# Attempt to verify the existence of the version (hacky)
-		if curl -s http://codex.wordpress.org/Version_$version | grep 'currently no text' > /dev/null; then
+		if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
 			error "Version $version not found, try again"
 			unset version
 		else
@@ -274,17 +274,17 @@ function site_creation_questions() {
 		fi
 	fi
 
-	while [[ -z $version ]]; do
+	while [[ -z "$version" ]]; do
 		# Get WordPress version
 		prompt "WordPress version to install (leave blank for latest version)"
 		read version
-		if [ -z $version ]; then
+		if [ -z "$version" ]; then
 			installversion=""
 			version="(release version)"
 		else
 			# Attempt to verify the existence of the version (hacky)
-			if curl -s http://codex.wordpress.org/Version_$version | grep 'currently no text' > /dev/null; then
-				error "Version $version not found, try again"
+			if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
+				error "Version \"$version\" not found, try again"
 				unset version
 			else
 				installversion=" --version=$version"
@@ -292,7 +292,7 @@ function site_creation_questions() {
 		fi
 	done
 
-	if [ -z $multisite ]; then
+	if [ -z "$multisite" ]; then
 		prompt "Install as multisite? (y/N)"
 		read multisite
 		if [[ $multisite = 'y' ]]; then
@@ -319,16 +319,16 @@ function site_creation_questions() {
 
 
 	git_clone_vvv_init="";
-	if [ -z $git_repo ]; then
+	if [ -z "$git_repo" ]; then
 		prompt "Git repo to clone as wp-content (leave blank to skip)"
 		read git_repo
-		if [ ! -z $git_repo ]; then
+		if [ ! -z "$git_repo" ]; then
 			git_clone_vvv_init="rm -rf wp-content && git clone --recursive $git_repo wp-content"
 		fi
 	fi
 
 	# Ask if WP_DEBUG should be turned on
-	while [ -z $wp_debug ]; do
+	while [ -z "$wp_debug" ]; do
 		prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/N)"
 		read wp_debug
 		if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
@@ -337,19 +337,19 @@ function site_creation_questions() {
 	done
 
 	if [[ $image_proxy == 'y' ]]; then
-		while [ -z $live_site_url ]; do
+		while [ -z "$live_site_url" ]; do
 			prompt "Live site URL (no http:// or trailing slash)"
 			read live_site_url
 		done
 	fi
 
-	if [ -z $username ]; then
+	if [ -z "$username" ]; then
 		username="admin"
 	fi
-	if [ -z $password ]; then
+	if [ -z "$password" ]; then
 		password="password"
 	fi
-	if [ -z $email ]; then
+	if [ -z "$email" ]; then
 		email="admin@localhost.dev"
 	fi
 }
@@ -370,7 +370,7 @@ function confirm_site_creation() {
 	echo -e "* Create database $site\n* Install WordPress $version in the htdocs directory\n* Make the site visible at $domain"
 
 	info "\n"
-	while [ -z $continue_create ]; do
+	while [ -z "$continue_create" ]; do
 		prompt "Continue (y/n)? "
 		read continue_create
 
@@ -384,16 +384,16 @@ function confirm_site_creation() {
 	done
 
 	success "New VVV setup starting for site '$site'"
-	cd $path
+	cd "$path"
 	vagrant halt
 }
 
 function create_site_files(){
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
-	cd $path/www
+	cd "$path"/www
 	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
-	mkdir $site && cd $site
+	mkdir "$site" && cd "$site"
 
 	printf "path: htdocs" > wp-cli.yml
 
@@ -404,36 +404,38 @@ function create_site_files(){
 
 	# Create SQL commands for database creation
     # =============================================================================
-    if [ ! -e $path/database/init-custom.sql ]; then
-		touch $path/database/init-custom.sql
+    if [ ! -e "$path"/database/init-custom.sql ]; then
+		touch "$path"/database/init-custom.sql
     fi
-    printf "CREATE DATABASE IF NOT EXISTS \`$db_name\`;\n"\
-"GRANT ALL PRIVILEGES ON \`$db_name\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" >> $path/database/init-custom.sql
+    printf "CREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
+"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" >> "$path"/database/init-custom.sql
 
-	echo "if [ ! -d \"htdocs/wp-admin\" ]; then" >> vvv-init.sh
-	echo "	echo 'Installing WordPress $version in $site/htdocs...'" >> vvv-init.sh
-	echo "	mkdir ./htdocs" >> vvv-init.sh
-	echo "	cd ./htdocs" >> vvv-init.sh
-	echo "	wp core download --allow-root $installversion" >> vvv-init.sh
-	echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text" >> vvv-init.sh
-	echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root" >> vvv-init.sh
-	echo "	$git_clone_vvv_init" >> vvv-init.sh
-	echo "	cd -" >> vvv-init.sh
-	echo "fi" >> vvv-init.sh
+	{
+		echo "if [ ! -d \"htdocs/wp-admin\" ]; then"
+		echo "	echo 'Installing WordPress $version in $site/htdocs...'"
+		echo "	mkdir ./htdocs"
+		echo "	cd ./htdocs"
+		echo "	wp core download --allow-root $installversion"
+		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
+		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
+		echo "	$git_clone_vvv_init"
+		echo "	cd -"
+		echo "fi"
+	} >> vvv-init.sh
 
 	echo "Done"
 
 	# Add vvv-hosts file for domain in the site's www root
 	# =============================================================================
-	cd $path/www/$site
+	cd "$path"/www/"$site"
 	info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
-	printf "$domain\n" >> vvv-hosts
+	printf "%s\n" "$domain" >> vvv-hosts
 	echo "Done"
 
 	# Add site conf file to nginx-config
 	# =============================================================================
-	cd $path/config/nginx-config/sites
+	cd "$path"/config/nginx-config/sites
 	info "Creating nginx-config/sites/$site.conf... "
 
 	nginx_domain_text="$domain"
@@ -442,12 +444,12 @@ function create_site_files(){
 	fi
 
 	sed -e "s/testserver\.com/$nginx_domain_text/" \
-		-e "s|wordpress-local|$site/htdocs|" local-nginx-example.conf-sample > $site.conf
+		-e "s|wordpress-local|$site/htdocs|" local-nginx-example.conf-sample > "$site".conf
 
 	if [[ $image_proxy = 'y' ]]; then
-		sed -e $'s|\}|\\\n\\\t# Directives to send expires headers and turn off 404 error logging\.\\\n\\\tlocation ~\* \\.\(js\|css\|png\|jpg\|jpeg\|gif\|ico\)\$ \{\\\n\\\t\texpires 24h;\\\n\\\t\\\tlog_not_found off;\\\n\\\t\\\ttry_files \$uri \$uri\/ @production;\\\n\\\t\}\\\n\\\n\\\tlocation @production \{\\\n\\\t\\\tresolver 8\.8\.8\.8;\\\n\\\t\\\tproxy_pass http://LIVE_URL/$uri;\\\n\\\t\}\\\n\}|' -e "s|LIVE_URL|$live_site_url|" $site.conf > tmp.conf
-		rm $site.conf
-		mv tmp.conf $site.conf
+		sed -e $'s|\}|\\\n\\\t# Directives to send expires headers and turn off 404 error logging\.\\\n\\\tlocation ~\* \\.\(js\|css\|png\|jpg\|jpeg\|gif\|ico\)\$ \{\\\n\\\t\texpires 24h;\\\n\\\t\\\tlog_not_found off;\\\n\\\t\\\ttry_files \$uri \$uri\/ @production;\\\n\\\t\}\\\n\\\n\\\tlocation @production \{\\\n\\\t\\\tresolver 8\.8\.8\.8;\\\n\\\t\\\tproxy_pass http://LIVE_URL/$uri;\\\n\\\t\}\\\n\}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
+		rm "$site".conf
+		mv tmp.conf "$site".conf
 	fi
 
 	echo "Done"
@@ -456,7 +458,7 @@ function create_site_files(){
 function run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
-	cd $path
+	cd "$path"
 	if [[ "$files_only" = false ]]; then
 		info "Running vagrant up --provision... "
 		vagrant up --provision
@@ -504,7 +506,7 @@ function remove_site() { # @TODO refactor this if we need to
 	fi
 
 	# Get site dir name if not supplied as argument
-	while [ -z $site ]; do
+	while [ -z "$site" ]; do
 		prompt "Site directory to delete"
 		read site
 
@@ -512,28 +514,28 @@ function remove_site() { # @TODO refactor this if we need to
 	done
 
 	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n"
-	while [ -z $continue_delete ]; do
+	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read continue_delete
-		if [ $continue_delete = 'y' ]; then
+		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
-			cd $path
+			cd "$path"
 
 			vagrant halt
 
 			# Delete the site folder
 			info "Removing directory $site... "
-			rm -rf $path/www/$site
+			rm -rf "$path"/www/"$site"
 			echo "Done"
 
 			# Remove the nginx conf file
 			info "Removing nginx config file $site.conf... "
-			rm $path/config/nginx-config/sites/$site.conf
+			rm "$path"/config/nginx-config/sites/"$site".conf
 			echo "Done"
 
 			# Remove the database creation from init-custom.sql
 			echo -en "Removing the database creation commands from init-custom.sql... "
-			cd $path/database
+			cd "$path"/database
 			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
 			rm init-custom.sql
 			mv init-custom.sql.tmp init-custom.sql
@@ -544,7 +546,7 @@ function remove_site() { # @TODO refactor this if we need to
 			success "\nVVV Site Teardown: Done!"
 			exit
 
-		elif [ $continue_delete = 'n' ]; then
+		elif [ "$continue_delete" = 'n' ]; then
 			error "Site teardown aborted."
 			exit
 		else
@@ -557,13 +559,13 @@ function remove_site() { # @TODO refactor this if we need to
 
 function parse_the_args() {
 
-    if [ ! -z $list ]; then
+    if [ ! -z "$list" ]; then
         list_sites
     fi
-    if [ ! -z $create ]; then
+    if [ ! -z "$create" ]; then
         create_site
     fi
-    if [ ! -z $remove ]; then
+    if [ ! -z "$remove" ]; then
         remove_site
     fi
 }
@@ -579,8 +581,8 @@ function check_args() {
 			-p|--path)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 path=$1
@@ -589,8 +591,8 @@ function check_args() {
 			-d|--domain)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 domain=$1
@@ -599,8 +601,8 @@ function check_args() {
 			-u|--live_url)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 live_site_url=$1
@@ -609,8 +611,8 @@ function check_args() {
 			-n|--name)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 site=$1
@@ -619,8 +621,8 @@ function check_args() {
 			-v|--version)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 version=$1
@@ -629,8 +631,8 @@ function check_args() {
 			--username)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 username=$1
@@ -639,8 +641,8 @@ function check_args() {
 			--password)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 password=$1
@@ -649,8 +651,8 @@ function check_args() {
 			--email)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 email=$1
@@ -659,8 +661,8 @@ function check_args() {
 			--git_repo)
 				 shift
 
-				 if [ -z $1 ] || [[ "$1" == -* ]]; then
-				     argument_expected $arg
+				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				     argument_expected "$arg"
 				 fi
 
 				 git_repo=$1
@@ -669,8 +671,8 @@ function check_args() {
 			-m|--multisite)
 				shift
 
-				if [ -z $1 ] || [[ "$1" == -* ]]; then
-				    argument_expected $arg
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
 				fi
 				multisite="y"
 				ms_type=$1
@@ -721,7 +723,7 @@ function main() {
 	check_for_config_file
 	get_vvv_path
 
-	if [ -z $1 ]; then
+	if [ -z "$1" ]; then
 	    show_help
 	fi
 
