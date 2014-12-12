@@ -1,15 +1,14 @@
-# Variable VVV - A VVV Site Wizard
+# Variable VVV - The Best VVV Site Wizard
 
-This bash script makes it easy to spin up a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV).
+```vv``` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV).
 
-Warning: This is currently in development and may not work correctly.
+Warning: This is currently in development and ~~may not~~ probably will work correctly.
 
-**Documentation is incoming when the tool gets a few more features and a bit more stable.**
+**Documentation is incoming!**
 
 ## Installation
 
-Put it somewhere in your $PATH.
-You can also copy .vv-config-sample to ~/.vv-config and modify the value to stop ```vv``` from prompting you for your VVV path.
+Put it in your $PATH and run ```vv```.
 
 ## Usage
 

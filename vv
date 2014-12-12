@@ -120,6 +120,7 @@ ${normal}
 ABOUT
 }
 
+
 # Usage: show_help [exit_code]
 # Example: show_help 254
 function show_help () {
