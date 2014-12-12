@@ -133,6 +133,9 @@ show_help () {
         --name, -n: 	Desired name for the site directory (e.g. mysite)
         --version, -v: 	Version of WordPress to install
         --debug, -x: 	Turn on WP_DEBUG and WP_DEBUG_LOG
+        --username : 	Admin username
+        --password : 	Admin password
+        --email : 	Admin email
 
 
     Example:
@@ -178,7 +181,6 @@ get_vvv_path(){
 }
 
 list_sites() {
-	# @TODO refactor this if we need to
 	cd $path/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
@@ -195,7 +197,6 @@ list_sites() {
 				printf "%-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
 			else
 				url=$(<$path/www/$filename/vvv-hosts)
-				#echo "	${green}$filename${normal} ${yellow}($url)${normal}"
 				printf "%-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
 		fi
@@ -300,6 +301,17 @@ create_site() {
 		done
 	fi
 
+	if [ ! -z $username ]; then
+		username=admin
+	fi
+	if [ ! -z $password ]; then
+		password=password
+	fi
+	if [ ! -z $email ]; then
+		email=admin@localhost
+	fi
+
+
 	# Inform the user of what's about to happen and give them a chance to back out
 	# =============================================================================
 	info "\nAbout to perform the following:"
@@ -355,7 +367,7 @@ create_site() {
 "\tmkdir ./htdocs\ncd ./htdocs\n"\
 "\twp core download --allow-root $installversion\n"\
 "\twp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text\n"\
-"\twp core install --url=$domain --title=\"$site - A WordPress Site\" --admin_user=admin --admin_password=password --admin_email=demo@example.com --allow-root\n"\
+"\twp core install --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root\n"\
 "\t\tcd -\n"\
 "else\n"\
 "\techo 'Updating WordPress in $site/htdocs...'\n"\
@@ -541,6 +553,36 @@ check_args() {
 				 fi
 
 				 version=$1
+				 shift
+				 ;;
+			--username)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 username=$1
+				 shift
+				 ;;
+			--password)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 password=$1
+				 shift
+				 ;;
+			--email)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 email=$1
 				 shift
 				 ;;
 			-r|-rm|--remove|--delete|--rm|--teardown)
