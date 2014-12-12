@@ -65,7 +65,7 @@ prompt () {
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
 error () {
-    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}\n" >&2
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
 }
 
 # Usage: fail "message" [exit_code]
@@ -119,9 +119,9 @@ show_help () {
     OPTIONS:
         --help, -h: 	Show this help and exit
 
-        --list,	-l: 	List all VVV sites
-        --create, -c: 	Create a new site
-        --remove, -r: 	Remove a site
+        --list,	-l, list: 	List all VVV sites
+        --create, -c, create: 	Create a new site
+        --remove, -r, remove: 	Remove a site
 
         --path,	-p: 	Path to VVV installation
 
@@ -155,15 +155,22 @@ get_vvv_path(){
 			path=`pwd`
 		elif [ -e ~/Sites/Vagrantfile ]; then
 			path=~/Sites
+		elif [ -e ~/vagrant/Vagrantfile ]; then
+			path=~/vagrant
+		elif [ -e ~/vagrant-local/Vagrantfile ]; then
+			path=~/vagrant-local
+		elif [ -e ~/vvv/Vagrantfile ]; then
+			path=~/vvv
 		else
 			while [ -z $path ]; do
 				read -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
-				if [ ! -e "$path/Vagrantfile" ]; then
+				if [ ! -e "`eval echo ${path//>}`/Vagrantfile" ]; then
 					error "Path specified is not a VVV root directory."
 					unset path
 				fi
+				path=`eval echo ${path//>}`
 			done
 		fi
 	fi
@@ -176,7 +183,21 @@ list_sites() {
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
-			echo $filename
+			if [[ $filename = 'wordpress-default' || $filename = 'wordpress-develop' || $filename = 'wordpress-trunk' ]]; then
+				if [[ $filename = 'wordpress-default' ]]; then
+					url=local.wordpress.dev
+				elif [[ $filename = 'wordpress-develop' ]]; then
+					url=src.wordpress-develop.dev
+				elif [[ $filename = 'wordpress-trunk' ]]; then
+					url=local.wordpress-trunk.dev
+				fi
+
+				printf "%-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
+			else
+				url=$(<$path/www/$filename/vvv-hosts)
+				#echo "	${green}$filename${normal} ${yellow}($url)${normal}"
+				printf "%-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
+			fi
 		fi
 	done
 	exit
@@ -390,22 +411,30 @@ create_site() {
 	exit
 }
 
+not_valid_site() {
+	if [[ -z $site || ! -d "$path/www/$site" ]]; then
+		error "You must enter a valid directory from $path/www/."
+		unset site
+	elif [[ $site = 'wordpress-default' || $site = 'wordpress-develop' || $site = 'wordpress-trunk' || $site = 'default' || $site = 'phpcs' || $site = 'vvv-hosts' || $site = 'wp-cli' || $site = '.gitshow' ]]; then
+		error "This script can't delete the default VVV folders."
+		unset site
+	fi
+}
+
 remove_site() {
-	# @TODO refactor this if we need to
-	info "\nVVV Site Teardown"
+# @TODO refactor this if we need to
+	info "VVV Site Removal"
+
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
 
 	# Get site dir name if not supplied as argument
 	while [ -z $site ]; do
 		prompt "Site directory to delete"
 		read site
 
-		if [[ -z $site || ! -d "$path/www/$site" ]]; then
-			error "You must enter a valid directory from $path/www/."
-			unset site
-		elif [[ $site = 'wordpress-default' || $site = 'wordpress-develop' || $site = 'wordpress-trunk' || $site = 'default' || $site = 'phpcs' || $site = 'vvv-hosts' || $site = 'wp-cli' || $site = '.gitshow' ]]; then
-			error "This script can't delete the default VVV folders."
-			unset site
-		fi
+		not_valid_site
 	done
 
 	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n"
@@ -433,7 +462,7 @@ remove_site() {
 			exit
 
 		elif [ $continue_delete = 'n' ]; then
-			eroor "Site teardown aborted."
+			error "Site teardown aborted."
 			exit
 		else
 			error "Answer y or n."
@@ -441,21 +470,17 @@ remove_site() {
 		fi
 	done
 	exit
-
 }
 
 parse_the_args() {
 
     if [ ! -z $list ]; then
-        info "Listing sites."
         list_sites
     fi
     if [ ! -z $create ]; then
-        info "Creating site."
         create_site
     fi
     if [ ! -z $remove ]; then
-        info "Removing site."
         remove_site
     fi
 }
@@ -518,6 +543,10 @@ check_args() {
 				 version=$1
 				 shift
 				 ;;
+			-r|-rm|--remove|--delete|--rm|--teardown)
+				remove="true"
+				shift
+				;;
 			-l|-s|--list|--show|list)
 				list="true"
 				shift
