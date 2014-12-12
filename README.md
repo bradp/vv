@@ -15,7 +15,7 @@
 
 If you have [Homebrew](http://brew.sh/) installed, you can do
 
-	``brew install bradp/vv/vv``
+	brew install bradp/vv/vv
 
 
 Otherwise you'll want to clone and place in your $PATH somewhere.
