@@ -721,11 +721,11 @@ function main() {
 	check_for_config_file
 	get_vvv_path
 
-    if [ -z $1 ]; then
-        show_help
-    fi
+	if [ -z $1 ]; then
+	    show_help
+	fi
 
-    check_args "$@"
+	check_args "$@"
 }
 
 main "$@"
