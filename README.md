@@ -1,6 +1,6 @@
 # Variable VVV - The Best VVV Site Wizard
 
-	#██    ██ ██    ██
+	 ██    ██ ██    ██
 	░██   ░██░██   ░██     Variable VVV 1.0.1
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
