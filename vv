@@ -257,7 +257,7 @@ function site_creation_questions() {
 
 	while [[ -z $version ]]; do
 		# Get WordPress version
-		prompt "WordPress version to install (leave blank for release version)"
+		prompt "WordPress version to install (leave blank for latest version)"
 		read version
 		if [ -z $version ]; then
 			installversion=""
@@ -273,23 +273,21 @@ function site_creation_questions() {
 		fi
 	done
 
+	git_clone_vvv_init="";
+	if [ -z $git_repo ]; then
+		prompt "Git repo to clone as wp-content (leave blank to skip)"
+		read git_repo
+		if [ ! -z $git_repo ]; then
+			git_clone_vvv_init="rm -rf wp-content && git clone --recursive $git_repo wp-content"
+		fi
+	fi
+
 	# Ask if WP_DEBUG should be turned on
 	while [ -z $wp_debug ]; do
-		prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/n)"
+		prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/N)"
 		read wp_debug
 		if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
-			error "Answer y or n."
-			unset wp_debug
-		fi
-	done
-
-	# Ask if images should be loaded from the live site
-	while [ -z $image_proxy ]; do
-		prompt "Load images from live site (y/n)"
-		read image_proxy
-		if [[ $image_proxy != 'y' && $image_proxy != 'n' ]]; then
-			error "Answer y or n."
-			unset image_proxy
+			wp_debug="n"
 		fi
 	done
 
@@ -300,14 +298,14 @@ function site_creation_questions() {
 		done
 	fi
 
-	if [ ! -z $username ]; then
-		username=admin
+	if [ -z $username ]; then
+		username="admin"
 	fi
-	if [ ! -z $password ]; then
-		password=password
+	if [ -z $password ]; then
+		password="password"
 	fi
-	if [ ! -z $email ]; then
-		email=admin@localhost
+	if [ -z $email ]; then
+		email="admin@localhost"
 	fi
 }
 
@@ -359,21 +357,25 @@ function create_site_files(){
 		wp_debug_text=" --extra-php <<PHP\ndefine('WP_DEBUG', true);\ndefine('WP_DEBUG_LOG', true);\nPHP"
 	fi
 
-	printf "echo \"Creating database '$site' (if it does not exist)...\"\n\n"\
-"mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\"\n"\
-"mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\"\n\n"\
-"if [ ! -d \"htdocs\" ]; then\n"\
-"\techo 'Installing WordPress $version in $site/htdocs...'\n"\
-"\tmkdir ./htdocs\ncd ./htdocs\n"\
-"\twp core download --allow-root $installversion\n"\
-"\twp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text\n"\
-"\twp core install --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root\n"\
-"\t\tcd -\n"\
-"else\n"\
-"\techo 'Updating WordPress in $site/htdocs...'\n"\
-"\twp core update --allow-root\n"\
-"\twp core update-db --allow-root\n"\
-"fi\n" > vvv-init.sh
+	echo "echo \"Creating database '$site' (if it does not exist)...\"" > vvv-init.sh
+	echo "	" >> vvv-init.sh
+	echo "mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\"" >> vvv-init.sh
+	echo "mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\"" >> vvv-init.sh
+	echo "	" >> vvv-init.sh
+	echo "if [ ! -d \"htdocs/wp-admin\" ]; then" >> vvv-init.sh
+	echo "	echo 'Installing WordPress $version in $site/htdocs...'" >> vvv-init.sh
+	echo "	mkdir ./htdocs" >> vvv-init.sh
+	echo "	cd ./htdocs" >> vvv-init.sh
+	echo "	wp core download --allow-root $installversion" >> vvv-init.sh
+	echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text" >> vvv-init.sh
+	echo "	wp core install --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root" >> vvv-init.sh
+	echo "	$git_clone_vvv_init" >> vvv-init.sh
+	echo "	cd -" >> vvv-init.sh
+	echo "else" >> vvv-init.sh
+	echo "	echo 'Updating WordPress in $site/htdocs...'" >> vvv-init.sh
+	echo "	wp core update --allow-root" >> vvv-init.sh
+	echo "	wp core update-db --allow-root" >> vvv-init.sh
+	echo "fi" >> vvv-init.sh
 
 	echo "Done"
 
@@ -595,7 +597,7 @@ function check_args() {
 				 email=$1
 				 shift
 				 ;;
-			-r|-rm|--remove|--delete|--rm|--teardown)
+			-r|-rm|--remove|--delete|--rm|--teardown|remove)
 				remove="true"
 				shift
 				;;
@@ -616,7 +618,7 @@ function check_args() {
 				shift
 				;;
 			-x|--debug)
-				wp_debug="true"
+				wp_debug="y"
 				shift
 				;;
 			*)
