@@ -4,10 +4,16 @@ This bash script makes it easy to spin up a new WordPress site using [Varying Va
 
 Warning: This is currently in development and may not work correctly.
 
+**Documentation is incoming when the tool gets a few more features and a bit more stable.**
+
 ## Installation
 
+Put it somewhere in your $PATH.
+You can also copy .vv-config-sample to ~/.vv-config and modify the value to stop ```vv``` from prompting you for your VVV path.
 
 ## Usage
+
+For now, ```vv --help``` should show you everything you need to know.
 
 ## Questions?
 
