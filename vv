@@ -1,14 +1,5 @@
 #!/usr/bin/env bash
 
-# pull in frameworks for plugins and themes
-# 	cmb2, wd_s
-# save defaults in a config file somewhere
-# 	json object of settings, named blueprints
-# be able to add dummy content
-# -r pass a site argument
-# allow overriding of htdocs folder/
-# support wp-skeleton from jaquith
-
 # =============================================================================
 # Variable VVV - A VVV Site Setup Script
 # By Brad Parbs <brad@bradparbs.com>
