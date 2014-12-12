@@ -141,7 +141,7 @@ function show_help () {
 
     ${bold} NEW SITE OPTIONS: ${normal}
         --domain, -d 		Domain of new site
-        --live_url, -u 	Live URL of site
+        --live_url, -u 		Live URL of site
         --files, -f 		Do not provision Vagrant, just create the site directory and files
         --images, -i 		Load images by proxy from the live site
         --name, -n 		Desired name for the site directory (e.g. mysite)
