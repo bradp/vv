@@ -149,6 +149,21 @@ function argument_expected() {
     fail "$1 expected an argument"
 }
 
+function check_for_config_file() {
+	test -f ~/.vv-config && got_config="home"
+	test -f $path/.vv-config && got_config="path"
+	test -f .vv-config && got_config="current_dir"
+
+	if [ ! -z $got_config ]; then
+		info "Found configuration file, loading it."
+		load_config_values
+	fi
+}
+
+function load_config_values() {
+
+}
+
 function get_vvv_path(){
 	if [ ! -z $path ]; then
 		path=$path
@@ -700,6 +715,7 @@ function check_args() {
 function main() {
 
 	get_vvv_path
+	check_for_config_file
 
     if [ -z $1 ]; then
         show_help
