@@ -169,6 +169,7 @@ function load_config_values() {
 }
 
 function get_vvv_path(){
+	# @TODO right now assumes this is a valid vagrant path, need to fix that
 	if [ ! -z $path ]; then
 		path=$path
 		path=`eval echo ${path//>}`
