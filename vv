@@ -6,7 +6,7 @@
 # Originally by Alison Barrett <alison@barre.tt>
 # https://github.com/bradp/vvv-site-wizard
 #
-# Version 0.1.0
+# Version 1.0.0
 #
 # This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
@@ -21,6 +21,8 @@
 #
 # =============================================================================
 
+version_number=1.0.0
+
 normal=$(tput sgr0)
 bold=$(tput bold)
 red=$(tput setaf 1)
@@ -31,7 +33,6 @@ magenta=$(tput setaf 5)
 cyan=$(tput setaf 6)
 
 function version () {
-echo "vv version 0.1.0"
 echo "vv version $version_number"
 }
 
@@ -141,7 +142,8 @@ function show_help () {
         vv [OPTION]...
 
     ${bold} OPTIONS: ${normal}
-        --help, -h 		Show this help and exit
+        --help, -h 		Show this help and usage
+        --version 		Show current vv version
 
         --list,	-l, list 	List all VVV sites
         --create, -c, create 	Create a new site
