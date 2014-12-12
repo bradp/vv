@@ -330,7 +330,7 @@ function site_creation_questions() {
 		password="password"
 	fi
 	if [ -z $email ]; then
-		email="admin@localhost"
+		email="admin@localhost.dev"
 	fi
 }
 
