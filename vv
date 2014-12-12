@@ -149,7 +149,7 @@ function argument_expected() {
     fail "$1 expected an argument"
 }
 
-get_vvv_path(){
+function get_vvv_path(){
 	if [ ! -z $path ]; then
 		path=$path
 	else
@@ -345,13 +345,7 @@ function confirm_site_creation() {
 	vagrant halt
 }
 
-function create_site() {
-	# @TODO refactor this if we need to
-
-	site_creation_questions
-
-	confirm_site_creation
-
+function create_site_files(){
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
 	cd $path/www
@@ -405,7 +399,9 @@ function create_site() {
 	fi
 
 	echo "Done"
+}
 
+function run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
 	cd $path
@@ -413,7 +409,9 @@ function create_site() {
 		info "Running vagrant up --provision... "
 		vagrant up --provision
 	fi
+}
 
+function creation_success_message() {
 	# OMG we're done.
 	# =============================================================================
 	if [[ "$files_only" = true ]]; then
@@ -425,7 +423,14 @@ function create_site() {
 	echo "URL:       $domain"
 	echo "Username:  $username"
 	echo "Password:  $password"
+}
 
+function create_site() {
+	site_creation_questions
+	confirm_site_creation
+	create_site_files
+	run_vagrant_up
+	creation_success_message
 	exit
 }
 
@@ -439,8 +444,7 @@ function not_valid_site() {
 	fi
 }
 
-function remove_site() {
-# @TODO refactor this if we need to
+function remove_site() { # @TODO refactor this if we need to
 	info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
