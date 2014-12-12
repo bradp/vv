@@ -814,16 +814,16 @@ function check_args() {
 				force_path="true"
 				shift
 				;;
-			--version)
+			--version|-version)
 				check_for_update
 				version
 				shift
 				;;
-			--porcelain)
+			--porcelain|-porcelain)
 				clean="true"
 				shift
 				;;
-			--about)
+			--about|-about)
 				check_for_update
 				about
 				exit
