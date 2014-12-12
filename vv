@@ -4,7 +4,6 @@
 # 	cmb2, wd_s
 # save defaults in a config file somewhere
 # 	json object of settings, named blueprints
-# a flag to change the username/password
 # be able to add dummy content
 # -r pass a site argument
 # allow overriding of htdocs folder/
