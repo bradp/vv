@@ -255,7 +255,9 @@ function list_sites() {
 					url=local.wordpress-trunk.dev
 				fi
 
-				printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
+				if [[ ! $clean = "true" ]]; then
+					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
+				fi
 			else
 				# @TODO fix having Multiple URLs in vvv-hosts
 				url=$(<"$path"/www/"$filename"/vvv-hosts)
@@ -264,7 +266,11 @@ function list_sites() {
 				if (( "$urls" > 1 )); then
 					url="$(echo "$url" | paste -d ' ' - -)"
 				fi
-				printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
+				if [[ ! $clean = "true" ]]; then
+					printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
+				else
+					printf "$filename\n"
+				fi
 			fi
 		fi
 	done
@@ -752,6 +758,10 @@ function check_args() {
 				;;
 			-fp|--force_path)
 				force_path="true"
+				shift
+				;;
+			--porcelain)
+				clean="true"
 				shift
 				;;
 			*)
