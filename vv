@@ -283,14 +283,16 @@ function site_creation_questions() {
 		fi
 	fi
 
-	while [ $multisite = "y" ] && [ -z $ms_type ]; do
-		prompt "Install as subdomain or subdirectory? "
-		read ms_type
-		if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
-			error "Type must be subdomain or subdirectory."
-			unset ms_type
-		fi
-	done
+	if [[ $multisite = "y" ]]; then
+		while [[ -z $ms_type ]]; do
+			prompt "Install as subdomain or subdirectory? "
+			read ms_type
+			if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
+				error "Type must be subdomain or subdirectory."
+				unset ms_type
+			fi
+		done
+	fi
 
 	if [[ $ms_type = 'subdomain' ]]; then
 		install_text='multisite-install --subdomains'
@@ -381,11 +383,14 @@ function create_site_files(){
 		wp_debug_text=" --extra-php <<PHP\ndefine('WP_DEBUG', true);\ndefine('WP_DEBUG_LOG', true);\nPHP"
 	fi
 
-	echo "echo \"Creating database '$site' (if it does not exist)...\"" > vvv-init.sh
-	echo "	" >> vvv-init.sh
-	echo "mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\"" >> vvv-init.sh
-	echo "mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\"" >> vvv-init.sh
-	echo "	" >> vvv-init.sh
+	# Create SQL commands for database creation
+    # =============================================================================
+    if [ ! -e $path/database/init-custom.sql ]; then
+		touch $path/database/init-custom.sql
+    fi
+    printf "CREATE DATABASE IF NOT EXISTS \`$db_name\`;\n"\
+"GRANT ALL PRIVILEGES ON \`$db_name\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" >> $path/database/init-custom.sql
+
 	echo "if [ ! -d \"htdocs/wp-admin\" ]; then" >> vvv-init.sh
 	echo "	echo 'Installing WordPress $version in $site/htdocs...'" >> vvv-init.sh
 	echo "	mkdir ./htdocs" >> vvv-init.sh
@@ -487,7 +492,7 @@ function remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n"
 	while [ -z $continue_delete ]; do
 		prompt "Continue (y/n) "
 		read continue_delete
@@ -505,6 +510,15 @@ function remove_site() { # @TODO refactor this if we need to
 			# Remove the nginx conf file
 			info "Removing nginx config file $site.conf... "
 			rm $path/config/nginx-config/sites/$site.conf
+			echo "Done"
+
+			# Remove the database creation from init-custom.sql
+			echo -en "Removing the database creation commands from init-custom.sql... "
+			cd $path/database
+			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
+			rm init-custom.sql
+			mv init-custom.sql.tmp init-custom.sql
+			cd -
 			echo "Done"
 
 			# Delorted.
