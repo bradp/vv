@@ -32,6 +32,7 @@ cyan=$(tput setaf 6)
 
 function version () {
 echo "vv version 0.1.0"
+echo "vv version $version_number"
 }
 
 # Usage: info "message"
@@ -73,6 +74,13 @@ function error () {
 # Example: fail "Unknown Option" 254
 function fail () {
     error "$1"
+}
+
+function check_for_update () {
+github_version=$(curl -s https://github.com/bradp/vv/tags | awk '/tag-name/{print $3;exit}' FS='[<>]')
+if [ ! $version_number = $github_version ]; then
+	info "Your version of vv does not match the current Github version. Please consider updating."
+fi
 }
 
 # ask function https://gist.github.com/davejamesmiller/1965569
@@ -807,6 +815,7 @@ function check_args() {
 				shift
 				;;
 			--version)
+				check_for_update
 				version
 				shift
 				;;
@@ -815,6 +824,7 @@ function check_args() {
 				shift
 				;;
 			--about)
+				check_for_update
 				about
 				exit
 				shift
