@@ -11,6 +11,14 @@
 # This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
+#	#██    ██ ██    ██
+#	░██   ░██░██   ░██ 	  ▓▓▓▓▓▓▓▓▓▓
+#	░░██ ░██ ░░██ ░██ 	 ░▓ author ▓ Brad Parbs <brad@bradparbs.com>
+#	 ░░████   ░░████     ░▓ github ▓ http://github.com/bradp/vv
+#	  ░░██     ░░██      ░▓▓▓▓▓▓▓▓▓▓
+#	   ░░       ░░   	 ░░░░░░░░░░
+#
+#
 # =============================================================================
 
 normal=$(tput sgr0)
@@ -97,6 +105,19 @@ function ask () {
         esac
 
     done
+}
+
+function about() {
+	cat <<ABOUT
+	${magenta}
+	#██    ██ ██    ██
+	░██   ░██░██   ░██ 	 ▓▓▓▓▓▓▓▓▓▓
+	░░██ ░██ ░░██ ░██  	░▓ author ▓  Brad Parbs <brad@bradparbs.com>
+	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
+	  ░░██     ░░██  	░▓▓▓▓▓▓▓▓▓▓
+	   ░░       ░░  	░░░░░░░░░░
+${normal}
+ABOUT
 }
 
 # Usage: show_help [exit_code]
@@ -768,6 +789,11 @@ function check_args() {
 				;;
 			--porcelain)
 				clean="true"
+				shift
+				;;
+			--about)
+				about
+				exit
 				shift
 				;;
 			*)
