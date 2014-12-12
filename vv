@@ -149,7 +149,7 @@ function show_help () {
         --create, -c, create 	Create a new site
         --remove, -r, remove 	Remove a site
 
-        --vagrant, -v 		Pass vagrant command through to VVV.
+        --vagrant, -v, v 	Pass vagrant command through to VVV.
 
         --path,	-p 		Path to VVV installation
         --force_path, -fp 	Override vv auto-VVV locating
@@ -775,7 +775,7 @@ function check_args() {
 				ms_type=$1
 				shift
 				;;
-			-v|--vagrant)
+			v|-v|--vagrant)
 				shift
 
 				if [ -z "$1" ] || [[ "$1" == -* ]]; then
