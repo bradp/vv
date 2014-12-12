@@ -151,8 +151,8 @@ function check_for_config_file() {
 	else
 		if [[ ! $showing_help = true ]]; then
 			info "	"
-			info "Looks like it's your first time running VV. "
-			info "VV couldn't find a config file, so we will create one now."
+			info "Looks like it's your first time running ${magenta}vv${normal}. "
+			info "${magenta}vv${normal} couldn't find a config file, so we will create one now."
 			info "This step only needs to be done once."
 			info "	"
 			get_vvv_path
