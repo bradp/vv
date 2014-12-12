@@ -136,6 +136,7 @@ function show_help () {
         --username : 	Admin username
         --password : 	Admin password
         --email : 	Admin email
+        --git_repo : 	Git repo to clone as wp-content
 
 
     Example:
@@ -513,7 +514,7 @@ function check_args() {
     while [ ! -z "$1" ]; do
         local arg="$1"
         case "$1" in
-			-h|--help)
+			-h|--help|help|h|what)
 				local help=0
 				shift
 				;;
@@ -595,6 +596,16 @@ function check_args() {
 				 fi
 
 				 email=$1
+				 shift
+				 ;;
+			--git_repo)
+				 shift
+
+				 if [ -z $1 ] || [[ "$1" == -* ]]; then
+				     argument_expected $arg
+				 fi
+
+				 git_repo=$1
 				 shift
 				 ;;
 			-r|-rm|--remove|--delete|--rm|--teardown|remove)
