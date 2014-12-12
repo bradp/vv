@@ -4,7 +4,7 @@ Before reporting a bug
 
 How to report a bug
 ---
-1. Specify the version number for vv.
+1. Specify the version number for vv. ( ```vv --version``` to get this.)
 3. Describe the problem in detail. Explain what happened, and what you expected would happen.
 5. If helpful, include a screenshot. Annotate the screenshot for clarity.
 
