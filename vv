@@ -7,6 +7,7 @@
 # be able to add dummy content
 # -r pass a site argument
 # allow overriding of htdocs folder/
+# support wp-skeleton from jaquith
 
 # =============================================================================
 # Variable VVV - A VVV Site Setup Script
@@ -111,10 +112,10 @@ function ask () {
 # Example: show_help 254
 function show_help () {
     cat <<HELP
-    Usage:
+   ${bold} Usage: ${normal}
         vv [OPTION]...
 
-    OPTIONS:
+    ${bold} OPTIONS: ${normal}
         --help, -h: 	Show this help and exit
 
         --list,	-l, list: 	List all VVV sites
@@ -123,7 +124,7 @@ function show_help () {
 
         --path,	-p: 	Path to VVV installation
 
-    NEW SITE OPTIONS:
+    ${bold} NEW SITE OPTIONS: ${normal}
         --domain, -d: 	Domain of new site
         --live_url, -u: Live URL of site
         --files, -f: 	Do not provision Vagrant, just create the site directory and files
@@ -138,7 +139,7 @@ function show_help () {
         --git_repo : 	Git repo to clone as wp-content
 
 
-    Example:
+    ${bold} Example:${normal}
         vv --create --domain mysite.dev --name mysite --debug
         vv -c -d mysite.dev -n mysite -x
 
@@ -183,6 +184,10 @@ function get_vvv_path(){
 			path=~/vagrant
 		elif [ -e ~/vagrant-local/Vagrantfile ]; then
 			path=~/vagrant-local
+		elif [ -e ~/projects/vvv/Vagrantfile ]; then
+			path=~/projects/vvv
+		elif [ -e ~/working/vvv/Vagrantfile ]; then
+			path=~/working/vvv
 		elif [ -e ~/vvv/Vagrantfile ]; then
 			path=~/vvv
 		else
@@ -215,12 +220,13 @@ function list_sites() {
 					url=local.wordpress-trunk.dev
 				fi
 
-				printf "%-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
+				printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
 			else
-				# @ TODO only grab non-commented strings
+				# @TODO only grab non-commented strings
+				# Multiple URLs in vvv-hosts
 				url=$(<$path/www/$filename/vvv-hosts)
-				url="$(echo "$url" | sed -e's/#.*$//' -e '/^$/d')"
-				printf "%-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
+				url="$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')"
+				printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
 		fi
 	done
