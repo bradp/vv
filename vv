@@ -161,10 +161,28 @@ function load_config_values() {
 }
 
 function get_vvv_path(){
-	# @TODO right now assumes this is a valid vagrant path, need to fix that
 	if [ ! -z "$path" ]; then
-		path=$path
-		path=$(eval echo "${path//>}")
+		if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+			error "Path specified is not a VVV root directory."
+			unset path
+
+			while [ -z $path ]; do
+				read -e -p "VVV install directory: " path
+
+				# Make sure directory is actually a VVV root
+				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+					error "Path specified is not a VVV root directory."
+					unset path
+				fi
+				path=$(eval echo "${path//>}")
+			done
+
+		else
+			path=$path
+			path=$(eval echo "${path//>}")
+		fi
+
+
 	else
 		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
@@ -717,6 +735,7 @@ function check_args() {
         show_help $help
     fi
 
+    get_vvv_path
     parse_the_args
 
     exit 0
@@ -725,7 +744,6 @@ function check_args() {
 function main() {
 
 	check_for_config_file
-	get_vvv_path
 
 	if [ -z "$1" ]; then
 	    show_help
