@@ -215,7 +215,11 @@ function list_sites() {
 			else
 				# @TODO fix having Multiple URLs in vvv-hosts
 				url=$(<"$path"/www/"$filename"/vvv-hosts)
-				url="$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')"
+				url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
+				urls=$(echo "$url" | wc -l)
+				if (( "$urls" > 1 )); then
+					url="$(echo "$url" | paste -d ' ' - -)"
+				fi
 				printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
 			fi
 		fi
