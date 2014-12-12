@@ -770,6 +770,7 @@ function check_args() {
 
 				if [ -z "$1" ] || [[ "$1" == -* ]]; then
 				    argument_expected "$arg"
+				    exit
 				fi
 				get_vvv_path
 				cd "$path"
