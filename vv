@@ -817,7 +817,7 @@ function check_args() {
 				shift
 				;;
 			--version|-version)
-				check_for_update
+				#check_for_update
 				version
 				shift
 				;;
@@ -826,7 +826,7 @@ function check_args() {
 				shift
 				;;
 			--about|-about)
-				check_for_update
+				#check_for_update
 				about
 				exit
 				shift
