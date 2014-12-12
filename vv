@@ -763,6 +763,18 @@ function check_args() {
 				ms_type=$1
 				shift
 				;;
+			-v)
+				shift
+
+				if [ -z "$1" ] || [[ "$1" == -* ]]; then
+				    argument_expected "$arg"
+				fi
+				get_vvv_path
+				cd "$path"
+				echo $(vagrant "$1")
+				exit
+				shift
+				;;
 			-r|-rm|--remove|--delete|--rm|--teardown|remove)
 				remove="true"
 				shift
@@ -791,7 +803,7 @@ function check_args() {
 				force_path="true"
 				shift
 				;;
-			-v|--version)
+			--version)
 				version
 				shift
 				;;
