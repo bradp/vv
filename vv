@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-# pass in a git repo for wp-content
 # pull in frameworks for plugins and themes
 # 	cmb2, wd_s
 # save defaults in a config file somewhere
