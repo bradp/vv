@@ -774,7 +774,7 @@ function check_args() {
 				fi
 				get_vvv_path
 				cd "$path"
-				echo $(vagrant "$1")
+				echo "$(vagrant "$1");"
 				exit
 				shift
 				;;
