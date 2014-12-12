@@ -36,48 +36,48 @@ cyan=$(tput setaf 6)
 # Usage: info "message"
 # Example: info "doing thing"
 # Output (to STDOUT): doing thing
-info () {
+function info () {
     printf "%b" "${blue}$1${normal} \n"
 }
 
 # Usage: success "message"
 # Example: success "It's Working"
 # Output (to STDOUT): [...] It's Working
-success () {
-    printf "%b" "[${green}Success${normal}]${green}S $1 ${normal}\n"
+function success () {
+    printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
 }
 
 # Usage: warning "message"
 # Example: warning "some warning"
 # Output (to STDOUT): [...] some warning
-warning () {
+function warning () {
     printf "%b" "${red} $1 ${normal}\n"
 }
 
 # Usage: prompt "question"
 # Example: prompt "Site name"
 # Output (to STDOUT): Site Name:
-prompt () {
+function prompt () {
     printf "%b" "${yellow} $1: ${normal}"
 }
 
 # Usage: error ["message"]
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
-error () {
+function error () {
     printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
 }
 
 # Usage: fail "message" [exit_code]
 # Example: fail "Unknown Option" 254
-fail () {
+function fail () {
     error "$1"
 }
 
 # ask function https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
 # Example: if "Yes or No?" Y; then
-ask () {
+function ask () {
     while true; do
 
         if [ "${2:-}" = "Y" ]; then
@@ -111,7 +111,7 @@ ask () {
 
 # Usage: show_help [exit_code]
 # Example: show_help 254
-show_help () {
+function show_help () {
     cat <<HELP
     Usage:
         vv [OPTION]...
@@ -145,7 +145,7 @@ show_help () {
 HELP
 }
 
-argument_expected() {
+function argument_expected() {
     fail "$1 expected an argument"
 }
 
@@ -180,7 +180,7 @@ get_vvv_path(){
 	path=${path%/}
 }
 
-list_sites() {
+function list_sites() {
 	cd $path/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
 		filename=${filename:2}
@@ -204,13 +204,12 @@ list_sites() {
 	exit
 }
 
-create_site() {
-	# @TODO refactor this if we need to
+function site_creation_questions() {
 	files_only_text=''
 	if [[ "$files_only" = true ]]; then
 		files_only_text=" (file creation only)"
 	fi
-	info "\nNew VVV Site Setup$files_only_text"
+	info "New VVV Site Setup$files_only_text"
 
 	# Prompt user for vars
 	# =============================================================================
@@ -310,8 +309,9 @@ create_site() {
 	if [ ! -z $email ]; then
 		email=admin@localhost
 	fi
+}
 
-
+function confirm_site_creation() {
 	# Inform the user of what's about to happen and give them a chance to back out
 	# =============================================================================
 	info "\nAbout to perform the following:"
@@ -340,11 +340,17 @@ create_site() {
 		fi
 	done
 
-	# Start the par-tay
-	# =============================================================================
 	success "New VVV setup starting for site '$site'"
 	cd $path
 	vagrant halt
+}
+
+function create_site() {
+	# @TODO refactor this if we need to
+
+	site_creation_questions
+
+	confirm_site_creation
 
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
@@ -414,16 +420,16 @@ create_site() {
 		info "\nRemember to run \`vagrant up --provision\` to initialize the new site."
 	fi
 
-	success "\nNew VVV Site Setup: Done!"
+	success "New VVV Site Setup: Done!"
 	echo "Directory: $path/www/$site"
 	echo "URL:       $domain"
-	echo "Username:  admin"
-	echo "Password:  password"
+	echo "Username:  $username"
+	echo "Password:  $password"
 
 	exit
 }
 
-not_valid_site() {
+function not_valid_site() {
 	if [[ -z $site || ! -d "$path/www/$site" ]]; then
 		error "You must enter a valid directory from $path/www/."
 		unset site
@@ -433,7 +439,7 @@ not_valid_site() {
 	fi
 }
 
-remove_site() {
+function remove_site() {
 # @TODO refactor this if we need to
 	info "VVV Site Removal"
 
@@ -484,7 +490,7 @@ remove_site() {
 	exit
 }
 
-parse_the_args() {
+function parse_the_args() {
 
     if [ ! -z $list ]; then
         list_sites
@@ -497,7 +503,7 @@ parse_the_args() {
     fi
 }
 
-check_args() {
+function check_args() {
     while [ ! -z "$1" ]; do
         local arg="$1"
         case "$1" in
@@ -625,7 +631,7 @@ check_args() {
     exit 0
 }
 
-main() {
+function main() {
 
 	get_vvv_path
 
