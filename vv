@@ -83,7 +83,7 @@ function ask () {
 
         # Ask the question
         prompt "$1 [$prompt_tail]"
-        read REPLY
+        read -r REPLY
 
         # Default?
         if [ -z "$REPLY" ]; then
@@ -104,35 +104,35 @@ function ask () {
 function show_help () {
     cat <<HELP
 
-   ${bold} Usage: ${normal}
+   ${bold} USAGE: ${normal}
         vv [OPTION]...
 
     ${bold} OPTIONS: ${normal}
-        --help, -h: 		Show this help and exit
+        --help, -h 		Show this help and exit
 
-        --list,	-l, list: 	List all VVV sites
-        --create, -c, create: 	Create a new site
-        --remove, -r, remove: 	Remove a site
+        --list,	-l, list 	List all VVV sites
+        --create, -c, create 	Create a new site
+        --remove, -r, remove 	Remove a site
 
-        --path,	-p: 		Path to VVV installation
-        --force_path, -fp: 	Override vv auto-VVV locating
+        --path,	-p 		Path to VVV installation
+        --force_path, -fp 	Override vv auto-VVV locating
 
     ${bold} NEW SITE OPTIONS: ${normal}
-        --domain, -d: 		Domain of new site
-        --live_url, -u: 	Live URL of site
-        --files, -f: 		Do not provision Vagrant, just create the site directory and files
-        --images, -i: 		Load images by proxy from the live site
-        --name, -n: 		Desired name for the site directory (e.g. mysite)
-        --version, -v: 		Version of WordPress to install
-        --debug, -x: 		Turn on WP_DEBUG and WP_DEBUG_LOG
-        --multisite, -m: 	Install as a multisite
-        --username : 		Admin username
-        --password : 		Admin password
-        --email : 		Admin email
-        --git_repo : 		Git repo to clone as wp-content
+        --domain, -d 		Domain of new site
+        --live_url, -u 	Live URL of site
+        --files, -f 		Do not provision Vagrant, just create the site directory and files
+        --images, -i 		Load images by proxy from the live site
+        --name, -n 		Desired name for the site directory (e.g. mysite)
+        --version, -v 		Version of WordPress to install
+        --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
+        --multisite, -m 	Install as a multisite
+        --username  		Admin username
+        --password  		Admin password
+        --email  		Admin email
+        --git_repo  		Git repo to clone as wp-content
 
 
-    ${bold} Example:${normal}
+    ${bold} EXAMPLE:${normal}
         vv --create --domain mysite.dev --name mysite --debug
         vv -c -d mysite.dev -n mysite -x
 
@@ -193,7 +193,7 @@ function get_vvv_path(){
 			unset path
 
 			while [ -z $path ]; do
-				read -e -p "VVV install directory: " path
+				read -r -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
 				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
@@ -227,7 +227,7 @@ function get_vvv_path(){
 			path=~/vvv
 		else
 			while [ -z $path ]; do
-				read -e -p "VVV install directory: " path
+				read -r -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
 				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
@@ -241,9 +241,16 @@ function get_vvv_path(){
 	path=${path%/}
 }
 
+function get_list_sites() {
+	clean_saved=$clean
+	clean="true"
+	sites=$(list_sites)
+	clean=$clean_saved
+}
+
 function list_sites() {
 	cd "$path"/www
-	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -d '' filename; do
+	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
 			if [[ $filename = 'wordpress-default' || $filename = 'wordpress-develop' || $filename = 'wordpress-trunk' ]]; then
@@ -290,18 +297,18 @@ function site_creation_questions() {
 	# Get site dir name if not supplied as argument
 	if [ ! -z "$site" ]; then
 		if [ -d "$path/www/$site" ]; then
-			error "Directory $path/www/$site already exists."
+			error "Directory $path/www/$site alread -ry exists."
 			unset site
 		fi
 	fi
 	while [ -z "$site" ]; do
 		prompt "Name of new site directory"
-		read site
+		read -r site
 
 		if [ -z "$site" ]; then
 			error "You must enter a directory name."
 		elif [ -d "$path/www/$site" ]; then
-			error "Directory already exists."
+			error "Directory alread -ry exists."
 			unset site
 		fi
 	done
@@ -312,7 +319,7 @@ function site_creation_questions() {
 	# Get local URL
 	while [ -z "$domain" ]; do
 		prompt "Domain to use (leave blank for $site.dev)"
-		read domain
+		read -r domain
 		if [ -z "$domain" ]; then
 			domain="$site.dev"
 		fi
@@ -331,7 +338,7 @@ function site_creation_questions() {
 	while [[ -z "$version" ]]; do
 		# Get WordPress version
 		prompt "WordPress version to install (leave blank for latest version)"
-		read version
+		read -r version
 		if [ -z "$version" ]; then
 			installversion=""
 			version="(release version)"
@@ -348,7 +355,7 @@ function site_creation_questions() {
 
 	if [ -z "$multisite" ]; then
 		prompt "Install as multisite? (y/N)"
-		read multisite
+		read -r multisite
 		if [[ $multisite = 'y' ]]; then
 			install_text='multisite-install'
 		else
@@ -359,7 +366,7 @@ function site_creation_questions() {
 	if [[ $multisite = "y" ]]; then
 		while [[ -z $ms_type ]]; do
 			prompt "Install as subdomain or subdirectory? "
-			read ms_type
+			read -r ms_type
 			if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
 				error "Type must be subdomain or subdirectory."
 				unset ms_type
@@ -375,7 +382,7 @@ function site_creation_questions() {
 	git_clone_vvv_init="";
 	if [ -z "$git_repo" ]; then
 		prompt "Git repo to clone as wp-content (leave blank to skip)"
-		read git_repo
+		read -r git_repo
 		if [ ! -z "$git_repo" ]; then
 			git_clone_vvv_init="rm -rf wp-content && git clone --recursive $git_repo wp-content"
 		fi
@@ -384,7 +391,7 @@ function site_creation_questions() {
 	# Ask if WP_DEBUG should be turned on
 	while [ -z "$wp_debug" ]; do
 		prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/N)"
-		read wp_debug
+		read -r wp_debug
 		if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
 			wp_debug="n"
 		fi
@@ -393,7 +400,7 @@ function site_creation_questions() {
 	if [[ $image_proxy == 'y' ]]; then
 		while [ -z "$live_site_url" ]; do
 			prompt "Live site URL (no http:// or trailing slash)"
-			read live_site_url
+			read -r live_site_url
 		done
 	fi
 
@@ -426,7 +433,7 @@ function confirm_site_creation() {
 	info "\n"
 	while [ -z "$continue_create" ]; do
 		prompt "Continue (y/n)? "
-		read continue_create
+		read -r continue_create
 
 		if [[ $continue_create = 'n' ]]; then
 			error "Site setup aborted."
@@ -562,15 +569,14 @@ function remove_site() { # @TODO refactor this if we need to
 	# Get site dir name if not supplied as argument
 	while [ -z "$site" ]; do
 		prompt "Site directory to delete"
-		read site
-
+		read -r site
 		not_valid_site
 	done
 
 	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
-		read continue_delete
+		read -r continue_delete
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path"
