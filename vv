@@ -115,6 +115,7 @@ function show_help () {
         --remove, -r, remove: 	Remove a site
 
         --path,	-p: 		Path to VVV installation
+        --force_path, -fp: 	Override vv auto-VVV locating
 
     ${bold} NEW SITE OPTIONS: ${normal}
         --domain, -d: 		Domain of new site
@@ -146,9 +147,29 @@ function check_for_config_file() {
 	test -f ~/.vv-config && got_config="true"
 
 	if [ ! -z $got_config ]; then
-		info "Found configuration file, loading it."
 		load_config_values
+	else
+		if [[ ! $showing_help = true ]]; then
+			info "	"
+			info "Looks like it's your first time running VV. "
+			info "VV couldn't find a config file, so we will create one now."
+			info "This step only needs to be done once."
+			info "	"
+			get_vvv_path
+			create_config_file
+		fi
 	fi
+}
+
+function create_config_file() {
+{
+	echo "{"
+	echo "	\"path\": \"$path\""
+	echo "}"
+} >> ~/.vv-config
+info "$HOME/.vv-config was created."
+info "	"
+
 }
 
 function getJsonVal () {
@@ -162,6 +183,10 @@ function load_config_values() {
 }
 
 function get_vvv_path(){
+	if [ ! -z "$force_path" ]; then
+		unset path
+	fi
+
 	if [ ! -z "$path" ]; then
 		if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
 			error "Path specified is not a VVV root directory."
@@ -188,17 +213,17 @@ function get_vvv_path(){
 		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
 			path=$(pwd)
-		elif [ -e ~/Sites/Vagrantfile ]; then
+		elif [ -e ~/Sites/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/Sites
-		elif [ -e ~/vagrant/Vagrantfile ]; then
+		elif [ -e ~/vagrant/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/vagrant
-		elif [ -e ~/vagrant-local/Vagrantfile ]; then
+		elif [ -e ~/vagrant-local/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/vagrant-local
-		elif [ -e ~/projects/vvv/Vagrantfile ]; then
+		elif [ -e ~/projects/vvv/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/projects/vvv
-		elif [ -e ~/working/vvv/Vagrantfile ]; then
+		elif [ -e ~/working/vvv/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/working/vvv
-		elif [ -e ~/vvv/Vagrantfile ]; then
+		elif [ -e ~/vvv/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/vvv
 		else
 			while [ -z $path ]; do
@@ -725,6 +750,10 @@ function check_args() {
 				wp_debug="y"
 				shift
 				;;
+			-fp|--force_path)
+				force_path="true"
+				shift
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -744,11 +773,12 @@ function check_args() {
 
 function main() {
 
-	check_for_config_file
-
 	if [ -z "$1" ]; then
 	    show_help
+		showing_help="true"
 	fi
+
+	check_for_config_file
 
 	check_args "$@"
 }
