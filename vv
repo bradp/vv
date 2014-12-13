@@ -603,6 +603,12 @@ function create_site_files(){
 		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
 		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
 		echo "	$git_clone_vvv_init"
+		echo "	$add_placeholder_content"
+		echo "	echo \"Creating database '$site' (if it does not exist)...\""
+		echo "	"
+		echo "	mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\""
+		echo "	mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\""
+		echo "	"
 		echo "	cd -"
 		echo "fi"
 	} >> vvv-init.sh
@@ -696,7 +702,7 @@ function remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove any deployments set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
@@ -714,15 +720,6 @@ function remove_site() { # @TODO refactor this if we need to
 			# Remove the nginx conf file
 			info "Removing nginx config file $site.conf... "
 			rm "$path"/config/nginx-config/sites/"$site".conf
-			echo "Done"
-
-			# Remove the database creation from init-custom.sql
-			echo -en "Removing the database creation commands from init-custom.sql... "
-			cd "$path"/database
-			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
-			rm init-custom.sql
-			mv init-custom.sql.tmp init-custom.sql
-			cd -
 			echo "Done"
 
 			echo -en "Removing any set up deployments. "
