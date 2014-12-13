@@ -149,6 +149,10 @@ function show_help () {
         --create, -c, create 	Create a new site
         --remove, -r, remove 	Remove a site
 
+	--deployment-create 	Create a deployment
+	--deployment-remove 	Remove a deployment
+        --deployment-config 	Manually configure deployment
+
         --vagrant, -v, v 	Pass vagrant command through to VVV.
 
         --path,	-p 		Path to VVV installation
@@ -798,6 +802,10 @@ function remove_deployment() {
 	success "Deployment for $site removed."
 }
 
+function deployment_config() {
+	$EDITOR "$path/Vagrantfile"
+}
+
 function parse_the_args() {
 
     if [ ! -z "$list" ]; then
@@ -815,6 +823,10 @@ function parse_the_args() {
     if [ ! -z "$deployment_remove" ]; then
     	deployment_removal_prompt
     fi
+   	if [ ! -z "$deployment_config" ]; then
+   		deployment_config
+   	fi
+
 }
 
 function check_args() {
@@ -1061,6 +1073,10 @@ function check_args() {
 				;;
 			--confirm-removal)
 				remove_deployment_confirm="confirm"
+				shift
+				;;
+			--deployment-config)
+				deployment_config="true"
 				shift
 				;;
 			*)

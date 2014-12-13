@@ -69,13 +69,14 @@ Note that it does not delete the site's database.
 
 ## Deployments
 
-```vv --deployment-create```
+```vv --deployment-create```, ```vv --deployment-remove```, ```vv --deployment-config```
 
 vv supports setting up deployments that work with [Vagrant Push](https://docs.vagrantup.com/v2/push/index.html). You'll need to be on version 1.7.0 or later of Vagrant. Simply run ```vv --deployment-create``` and walk through the wizard.
 
 To deploy a site, you can do ```vvv --vagrant push <sitename><deployment_name>```.
 
 When removing a deployment, your current Vagrantfile will be backed up as Vagrantfile-backup.
+
 
 ## Advanced Usage
 
@@ -106,6 +107,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--remove``, ``-r``, ``remove``|Remove a site|
 |``--deployment-create``|Set up deployment for a site|
 |``--deployment-remove``|Remove deployment for a site|
+|``--deployment-config``|Manually edit deployment configuration|
 |``--vagrant``, ``-v``|Pass vagrant command through to VVV.|
 |``--path``,	``-p``|Path to VVV installation|
 |``--force_path``, ``-fp``|Override vv auto-VVV locating|
