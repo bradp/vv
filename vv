@@ -79,7 +79,7 @@ function fail () {
 
 function check_for_update () {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-	if [ ! $version_number = $github_version ]; then
+	if [[ ! $version_number = $github_version ]]; then
 		info "Your version of vv does not match the current Github version. Please update with vv --update"
 	fi
 }
@@ -123,6 +123,36 @@ function vv_bootstrap_update () {
 	success "vv has been updated to the latest version. Thanks!"
 }
 
+function auto_update_main () {
+
+	if [ ! -f ~/.vv-update ]; then
+		_update_vv_update
+	else
+		source ~/.vv-update
+
+		epoch_diff=$(($(_current_epoch) - $DAYS_SINCE_UPDATE_CHECK))
+		epoch_target=7
+		if [[ $epoch_diff -gt $epoch_target ]]; then
+			info "vv is out of date. Checking for update."
+			github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+			if [[ ! $version_number = $github_version ]]; then
+				update_vv
+				rm ~/.vv-update
+				_update_vv_update
+			fi
+		fi
+	fi
+}
+
+function _current_epoch() {
+  seconds=$(date +%s)
+  echo $(($seconds/60/60/24))
+}
+
+function _update_vv_update() {
+	touch ~/.vv-update
+	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > ~/.vv-update
+}
 
 # ask function https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
@@ -1146,6 +1176,7 @@ function check_args() {
 }
 
 function main() {
+	auto_update_main
 
 	if [ -z "$1" ]; then
 	    show_help
