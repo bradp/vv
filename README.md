@@ -142,7 +142,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |Option |Description|
 |------|-----------
 |``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
-|``--deployment-name``,|Name of deployment (production, staging, other, etc)|
+|``--deployment-name``|Name of deployment (production, staging, other, etc)|
 |``--host``|Host (if SFTP, define port as host:port) |
 |``--username``|FTP Username |
 |``--password``|FTP Password  |
