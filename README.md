@@ -17,13 +17,13 @@ If you have [Homebrew](http://brew.sh/) installed, you can do
 
 	brew install bradp/vv/vv
 
-
 Otherwise you'll want to clone and place in your $PATH somewhere.
 
 ## Updating
 
 vv is currently under development, and you'll probably want the latest and greatest version at all time.
-If installed with Homebrew, you can do `` brew upgrade vv`` to grab the latest tagged release. If you've cloned it down, a simple ``git pull origin master`` will get you rocking.
+
+You can run ```vv --update``` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will boostrap an update on where ever you've installed it.
 
 ## Usage
 
@@ -101,6 +101,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--help``, ``-h``| Show help and usage|
 |``--version``|Show current vv version number.|
 |``--about``|Show about screen.|
+|``--update``|Updates vv to the latest stable version|
 | |
 |``--list``,	``-l``, ``list``|List all VVV sites|
 |``--create``, ``-c``, ``create``|Create a new site|

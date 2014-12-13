@@ -6,7 +6,7 @@
 # Originally by Alison Barrett <alison@barre.tt>
 # https://github.com/bradp/vvv-site-wizard
 #
-# Version 1.1.0
+# Version 1.2.0
 #
 # This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
@@ -21,7 +21,7 @@
 #
 # =============================================================================
 
-version_number=1.1.0
+version_number=1.2.0
 
 normal=$(tput sgr0)
 bold=$(tput bold)
@@ -78,13 +78,51 @@ function fail () {
 }
 
 function check_for_update () {
-	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 )
-	github_version=$(echo "$github_version" | sed 's/"name": "//')
-	github_version=$(echo "$github_version" | sed 's/",//')
+	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	if [ ! $version_number = $github_version ]; then
-		info "Your version of vv does not match the current Github version. Please consider updating."
+		info "Your version of vv does not match the current Github version. Please update with vv --update"
 	fi
 }
+
+function check_how_installed () {
+	if [[ ! -z $(which brew) ]]; then
+		brew_install_location=$(brew --prefix)
+		if [[ -f $brew_install_location"/bin/vv" ]]; then
+
+			installed_with_brew="true"
+		else
+			installed_with_brew="false"
+		fi
+	fi
+}
+
+function install_update () {
+	check_how_installed
+	update_vv
+}
+
+function update_vv () {
+	if [[ $installed_with_brew = "true" ]]; then
+		info "Updating vv via Brew..."
+		brew upgrade vv
+	else
+		info "Updating vv..."
+		vv_bootstrap_update
+	fi
+}
+
+function vv_bootstrap_update () {
+	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+	download_link="https://github.com/bradp/vv/archive/"$github_version".tar.gz"
+	vv_install_location=$(which vv)
+	curl -L -o ~/"$github_version".tar.gz "$download_link" 2>/dev/null
+	tar -C ~/ -zxvf ~/"$github_version".tar.gz 2>/dev/null
+	rm ~/"$github_version".tar.gz
+	echo "$(cat ~/vv-"$github_version"/vv)" > "$vv_install_location"
+	rm -rf ~/vv-"$github_version"
+	success "vv has been updated to the latest version. Thanks!"
+}
+
 
 # ask function https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
@@ -828,6 +866,11 @@ function parse_the_args() {
    	if [ ! -z "$deployment_config" ]; then
    		deployment_config
    	fi
+   	if [ ! -z "$lets_update" ]; then
+   		install_update
+   	else
+   		check_for_update
+   	fi
 
 }
 
@@ -1079,6 +1122,10 @@ function check_args() {
 				;;
 			--deployment-config)
 				deployment_config="true"
+				shift
+				;;
+			update|--update)
+				lets_update="true"
 				shift
 				;;
 			*)
