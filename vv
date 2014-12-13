@@ -239,7 +239,7 @@ function show_help () {
         --wp_version, -wv 	Version of WordPress to install
         --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
         --multisite, -m 	Install as a multisite
-        -sc|--sample-content 	Add sample content to site
+        --sample-content, -sc 	Add sample content to site
         --username  		Admin username
         --password  		Admin password
         --email  		Admin email
