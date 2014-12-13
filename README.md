@@ -127,8 +127,8 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
 |``--wp_version``, ``-wv``|Version of WordPress to install|
 |``--debug``, ``-x``|Turn on WP_DEBUG and WP_DEBUG_LOG|
-|``--multisite``, ``-m``|Install as a multisite|
 |``--multisite``, ``-m``|Install as a multisite Can also pass in "subdomain" or "subdirectory"|
+|``-sc``,``--sample-content``|Adds sample content to site.|
 |``--username``|Admin username|
 |``--password``|Admin password|
 |``--email``|Admin email|

@@ -239,6 +239,7 @@ function show_help () {
         --wp_version, -wv 	Version of WordPress to install
         --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
         --multisite, -m 	Install as a multisite
+        -sc|--sample-content 	Add sample content to site
         --username  		Admin username
         --password  		Admin password
         --email  		Admin email
@@ -508,6 +509,15 @@ function site_creation_questions() {
 		read -r git_repo
 		if [ ! -z "$git_repo" ]; then
 			git_clone_vvv_init="rm -rf wp-content && git clone --recursive $git_repo wp-content"
+		fi
+	fi
+
+	add_placeholder_content="";
+	if [ -z "$placeholder_content" ]; then
+		prompt "Add sample content to site (y/N)"
+		read -r placeholder_content
+		if [ $placeholder_content = "y" ]; then
+			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp import import.xml -authors=skip && rm import.xml"
 		fi
 	fi
 
@@ -1146,6 +1156,10 @@ function check_args() {
 				;;
 			--porcelain|-porcelain)
 				clean="true"
+				shift
+				;;
+			-sc|--sample-content)
+				placeholder_content="y"
 				shift
 				;;
 			--about|-about)
