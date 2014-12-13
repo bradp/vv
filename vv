@@ -243,7 +243,7 @@ function show_help () {
         --username  		Admin username
         --password  		Admin password
         --email  		Admin email
-        --git_repo  		Git repo to clone as wp-content
+        --git-repo  		Git repo to clone as wp-content
 
 
     ${bold} EXAMPLE:${normal}
@@ -981,7 +981,7 @@ function check_args() {
 				 site=$1
 				 shift
 				 ;;
-			-wv|--wp_version)
+			-wv|--wp-version|--wp_version)
 				 shift
 
 				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
@@ -1021,7 +1021,7 @@ function check_args() {
 				 email=$1
 				 shift
 				 ;;
-			--git_repo)
+			--git-repo|--git_repo)
 				 shift
 
 				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
@@ -1148,7 +1148,7 @@ function check_args() {
 				wp_debug="y"
 				shift
 				;;
-			-fp|--force_path)
+			-fp|--force-path|--force_path)
 				force_path="true"
 				shift
 				;;

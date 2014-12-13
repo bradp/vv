@@ -113,7 +113,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--deployment-config``|Manually edit deployment configuration|
 |``--vagrant``, ``-v``|Pass vagrant command through to VVV.|
 |``--path``,	``-p``|Path to VVV installation|
-|``--force_path``, ``-fp``|Override vv auto-VVV locating|
+|``--force-path``, ``-fp``|Override vv auto-VVV locating|
 
 
 ###Options for Site Creation###
@@ -125,16 +125,16 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--files``, ``-f``|Do not provision Vagrant, just create the site directory and files|
 |``--images``, ``-i``|Load images by proxy from the live site|
 |``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
-|``--wp_version``, ``-wv``|Version of WordPress to install|
+|``--wp-version``, ``-wv``|Version of WordPress to install|
 |``--debug``, ``-x``|Turn on WP_DEBUG and WP_DEBUG_LOG|
 |``--multisite``, ``-m``|Install as a multisite Can also pass in "subdomain" or "subdirectory"|
 |``--sample-content``,``-sc``|Adds sample content to site.|
 |``--username``|Admin username|
 |``--password``|Admin password|
 |``--email``|Admin email|
-|``--git_repo``|Git repo to clone as wp-content|
+|``--git-repo``|Git repo to clone as wp-content|
 |``--path``,	``-p``|Path to VVV installation|
-|``--force_path``, ``-fp``|Override vv auto-VVV locating|
+|``--force-path``, ``-fp``|Override vv auto-VVV locating|
 
 
 ###Options for Site Removal###
