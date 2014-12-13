@@ -73,7 +73,7 @@ Note that it does not delete the site's database.
 
 vv supports setting up deployments that work with [Vagrant Push](https://docs.vagrantup.com/v2/push/index.html). You'll need to be on version 1.7.0 or later of Vagrant. Simply run ```vv --deployment-create``` and walk through the wizard.
 
-To deploy a site, you can do ```vvv --vagrant push <sitename>```.
+To deploy a site, you can do ```vvv --vagrant push <sitename><deployment_name>```.
 
 When removing a deployment, your current Vagrantfile will be backed up as Vagrantfile-backup.
 
@@ -142,6 +142,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |Option |Description|
 |------|-----------
 |``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
+|``--deployment-name``,|Name of deployment (production, staging, other, etc)|
 |``--host``|Host (if SFTP, define port as host:port) |
 |``--username``|FTP Username |
 |``--password``|FTP Password  |
