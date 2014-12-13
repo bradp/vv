@@ -841,8 +841,6 @@ function deployment_setup() {
 		read -r destination
 	done
 
-	dir="htdocs"
-
 	info "Setting up a deployment in your VVV Vagrantfile with the following information: "
 	echo "	Site: $site"
 	echo "	Deployment name: $deployment_name"
