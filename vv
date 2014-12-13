@@ -593,7 +593,10 @@ function create_site_files(){
 
 	wp_debug_text=''
 	if [[ $wp_debug = 'y' ]]; then
-		wp_debug_text=" --extra-php <<PHP\ndefine('WP_DEBUG', true);\ndefine('WP_DEBUG_LOG', true);\nPHP"
+		wp_debug_text=" --extra-php <<PHP
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+PHP"
 	fi
 
 	# Create SQL commands for database creation
@@ -612,7 +615,7 @@ function create_site_files(){
 		echo "	wp core download --allow-root $installversion"
 		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
 		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
-		echo "	$git_clone_vvv_init"
+		echo "$git_clone_vvv_init"
 		echo "	$add_placeholder_content"
 		echo "	echo \"Creating database '$site' (if it does not exist)...\""
 		echo "	"
