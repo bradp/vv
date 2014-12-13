@@ -173,6 +173,9 @@ Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com
 
 ## Change Log
 
+#### 1.2.0 - *2014-12-13* ####
+ Adds auto-update functionality.
+
 #### 1.1.0 - *2014-12-13* ####
  Add deployment configuration using Vagrant push.
 
