@@ -125,20 +125,22 @@ function vv_bootstrap_update () {
 
 function auto_update_main () {
 
-	if [ ! -f ~/.vv-update ]; then
-		_update_vv_update
-	else
-		source ~/.vv-update
+	if [[ ! $auto_update_disable = "true" ]]; then
+		if [ ! -f ~/.vv-update ]; then
+			_update_vv_update
+		else
+			source ~/.vv-update
 
-		epoch_diff=$(($(_current_epoch) - $DAYS_SINCE_UPDATE_CHECK))
-		epoch_target=7
-		if [[ $epoch_diff -gt $epoch_target ]]; then
-			info "vv is out of date. Checking for update."
-			github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-			if [[ ! $version_number = $github_version ]]; then
-				update_vv
-				rm ~/.vv-update
-				_update_vv_update
+			epoch_diff=$(($(_current_epoch) - $DAYS_SINCE_UPDATE_CHECK))
+			epoch_target=7
+			if [[ $epoch_diff -gt $epoch_target ]]; then
+				info "vv is out of date. Checking for update."
+				github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+				if [[ ! $version_number = $github_version ]]; then
+					update_vv
+					rm ~/.vv-update
+					_update_vv_update
+				fi
 			fi
 		fi
 	fi
@@ -292,6 +294,16 @@ function load_config_values() {
 	path="$( getJsonVal "['path']" < ~/.vv-config )"
 	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
 }
+
+function load_config_autopdate_config_values() {
+	#Load path from config file
+	auto_update_disable_config="$( getJsonVal "['auto_update_disable']" < ~/.vv-config )"
+	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
+	if [[ $auto_update_disable = "true" ]]; then
+		auto_update_disable="true"
+	fi
+}
+
 
 function get_vvv_path(){
 	if [ ! -z "$force_path" ]; then

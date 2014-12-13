@@ -25,6 +25,8 @@ vv is currently under development, and you'll probably want the latest and great
 
 You can run ```vv --update``` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will boostrap an update on where ever you've installed it.
 
+vv will check for automatically check for updates and update itself once a week. You can disble this by adding "auto_update_disable: false" to the JSON config in ~/.vv-config.
+
 ## Usage
 
 Once installed, you can run ``vv`` anywhere you'd like. If vv can't automatically find your VVV installation, you will be prompted for the path. It will also save this into a configuration file in ```~/.vv-config```, so you won't be prompted again.
