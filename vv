@@ -726,8 +726,7 @@ function remove_site() { # @TODO refactor this if we need to
 			echo "Done"
 
 			echo -en "Removing any set up deployments. "
-			remove_deployment_confirm="true"
-			remove_all_deployment
+			remove_site_remove_all_deployment
 			echo "Done"
 
 			# Deleted.
@@ -865,6 +864,14 @@ function remove_all_deployment() {
 		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
 		read -r remove_deployment_confirm
 	done
+	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
+	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
+
+	success "Deployment for $site removed."
+}
+
+function remove_site_remove_all_deployment() {
 	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
