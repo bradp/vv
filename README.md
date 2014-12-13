@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.3.0
+	░██   ░██░██   ░██     Variable VVV 1.3.1
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -173,6 +173,9 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
 
 ## Change Log
+
+#### 1.3.1 - *2014-12-13* ####
+ Fixes bug in site creation.
 
 #### 1.3.0 - *2014-12-13* ####
  Adds sample content import to new site.
