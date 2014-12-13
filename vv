@@ -78,7 +78,9 @@ function fail () {
 }
 
 function check_for_update () {
-	github_version=$(curl -s https://github.com/bradp/vv/tags | awk '/tag-name/{print $3;exit}' FS='[<>]')
+	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 )
+	github_version=$(echo "$github_version" | sed 's/"name": "//')
+	github_version=$(echo "$github_version" | sed 's/",//')
 	if [ ! $version_number = $github_version ]; then
 		info "Your version of vv does not match the current Github version. Please consider updating."
 	fi
@@ -1049,7 +1051,7 @@ function check_args() {
 				shift
 				;;
 			--version|-version)
-				#check_for_update
+				check_for_update
 				version
 				shift
 				;;
@@ -1058,7 +1060,7 @@ function check_args() {
 				shift
 				;;
 			--about|-about)
-				#check_for_update
+				check_for_update
 				about
 				exit
 				shift
