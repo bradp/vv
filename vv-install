@@ -61,7 +61,7 @@ function add_option( $option ) {
 function add_define( $object ) {
 	$object = explode( "::", $object );
 	exec( '		echo "$(sed "34a\\
-define("'. $object[0] . '","' . $object[1] . '.")
+define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 " ./htdocs/wp-config.php);" > ./htdocs/wp-config.php' );
 }
 
