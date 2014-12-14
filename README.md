@@ -1,15 +1,14 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.3.1
+	░██   ░██░██   ░██     Variable VVV 1.4.0
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
 	   ░░       ░░
 
 
-```vv``` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV).
-
+```vv``` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV). ```vv``` supports site creation with many different options; site blueprints to set up all your plugins, themes, and more; deployments; and lots more features.
 
 ## Installation
 
@@ -92,6 +91,43 @@ Or, the more readable version with all expanded flags.
 
 ```vv --create --domain mysite.dev --name mysite --multisite subdomains --debug```
 
+## Blueprints ##
+
+Blueprints allow you to set up different plugins, themes, mu-plugins, options, or constants that will be installed to a new site you create. First, run ```vv --blueprint-init``` to have vv create a ```vv-blueprints.json``` file in your VVV directory. You can edit this file to create and set up different blueprints.
+
+The blueprint should look like this:
+```
+{
+  "sample": {
+    "themes": [
+      "automattic/_s"
+    ],
+    "mu_plugins": [
+      "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+    ],
+    "plugins": [
+      "https://github.com/clef/wordpress/archive/master.zip",
+      "cmb2"
+    ],
+    "options": [
+      "active_theme::_s"
+    ],
+    "defines": [
+      "WP_CACHE::false"
+    ]
+  }
+}
+```
+For themes, plugins, and mu-plugins, you can use:
+	* Github username/repo
+	* Full git url (If a private git link, you'll need to create a public key in Vagrant and authenticate)
+	* Url to zip file
+	* WordPress.org slug
+For options and constants, please note the ```::``` as a seperator between the key and value.
+
+You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
+
+
 ### Vagrant Proxy ###
 
 Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into ``vv --vagrant <command>`` to your VVV location. So ``vv --vagrant halt`` will halt your VVV vagrant, no matter where you run it.
@@ -111,6 +147,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |``--deployment-create``|Set up deployment for a site|
 |``--deployment-remove``|Remove deployment for a site|
 |``--deployment-config``|Manually edit deployment configuration|
+|``--blueprint-init``|Initalize blueprint file|
 |``--vagrant``, ``-v``|Pass vagrant command through to VVV.|
 |``--path``,	``-p``|Path to VVV installation|
 |``--force-path``, ``-fp``|Override vv auto-VVV locating|
@@ -120,11 +157,12 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 
 |Option |Description|
 |------|-----------
+|``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
 |``--domain, -d``|Domain of new site|
+|``--blueprint``, ``-b``|Name of blueprint to use|
 |``--live_url``, ``-u``|Live URL of site|
 |``--files``, ``-f``|Do not provision Vagrant, just create the site directory and files|
 |``--images``, ``-i``|Load images by proxy from the live site|
-|``--name``, ``-n``|Desired name for the site directory (e.g. mysite)|
 |``--wp-version``, ``-wv``|Version of WordPress to install|
 |``--debug``, ``-x``|Turn on WP_DEBUG and WP_DEBUG_LOG|
 |``--multisite``, ``-m``|Install as a multisite Can also pass in "subdomain" or "subdirectory"|
@@ -173,6 +211,9 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
 
 ## Change Log
+
+#### 1.4.0 - *2014-12-14* ####
+ Adds blueprints for site creation.
 
 #### 1.3.1 - *2014-12-13* ####
  Fixes bug in site creation.
