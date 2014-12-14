@@ -8,7 +8,7 @@
     ],
     "plugins": [
       "https://github.com/clef/wordpress/archive/master.zip",
-      "webdevstudios/CMB2"
+      "CMB2"
     ],
     "options": [
       "active_theme::_s"
