@@ -203,6 +203,8 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 
 The first time you run `vv`, it will attempt to locate your VVV installation location. If it can't find it, you will be prompted for it. This will be written to a .vv-config file in your home directory. (`~/.vv-config`) You can also edit this file if you need to change your VVV path.
 
+You can also add `"auto_update_disable": false` to this file to disable auto-update functionality.
+
 In the future, any additional settings and defaults will be stored here, along with VVV installation path.
 
 ## Questions?
