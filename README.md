@@ -91,7 +91,7 @@ Or, the more readable version with all expanded flags.
 
 `vv --create --domain mysite.dev --name mysite --multisite subdomains --debug`
 
-## Blueprints ##
+## Blueprints
 
 Blueprints allow you to set up different plugins, themes, mu-plugins, options, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
 
@@ -131,11 +131,11 @@ For options and constants, please note the `::` as a seperator between the key a
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
 
-### Vagrant Proxy ###
+## Vagrant Proxy
 
 Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv --vagrant <command>` to your VVV location. So `vv --vagrant halt` will halt your VVV vagrant, no matter where you run it.
 
-###vv Options###
+## vv Options
 
 |Option |Description|
 |------|-----------
@@ -156,7 +156,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 
 
-###Options for Site Creation###
+### Options for Site Creation
 
 |Option |Description|
 |------|-----------
@@ -178,14 +178,14 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 
 
-###Options for Site Removal###
+### Options for Site Removal
 |Option |Description|
 |------|-----------
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force_path`, `-fp`|Override vv auto-VVV locating|
 
-###Options for Deployment Setup###
+### Options for Deployment Setup
 |Option |Description|
 |------|-----------
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
@@ -199,11 +199,11 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--confirm-removal`|Used when removing a deployment to skip the confirmation prompt |
 
 
-## .vv-config ##
+## .vv-config
 
 The first time you run `vv`, it will attempt to locate your VVV installation location. If it can't find it, you will be prompted for it. This will be written to a .vv-config file in your home directory. (`~/.vv-config`) You can also edit this file if you need to change your VVV path.
 
-In the future, more settings and defaults will be stored here, but for now, it is just the path.
+In the future, any additional settings and defaults will be stored here, along with VVV installation path.
 
 ## Questions?
 
