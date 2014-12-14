@@ -35,7 +35,7 @@ At any time, you can run ``vv`` or ``vv --help`` to see a list of all possible o
 
 Anything you do that you don't pass in required value as an argument will prompt you for it.
 
-The main commands are ``list``, ``create``, ``delete``. These will list your sites, create a site, and delete a site. All of these have a few different aliases, so if you run ```vvv show```, vv will know you meant ```vvv list```.
+The main commands are ``list``, ``create``, ``delete``. These will list your sites, create a site, and delete a site. All of these have a few different aliases, so if you run ```vv show```, vv will know you meant ```vv list```.
 
 To start creating a site, simply do ``vv create`` ( you can also do ```vv --create```, or simply ``vv -c``). You will then be prompted for all required options.
 
