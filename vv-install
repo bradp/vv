@@ -1,0 +1,68 @@
+<?php
+#/usr/bin/php
+function main( $blueprint ) {
+	echo "Setting up blueprint $blueprint...\n";
+	$blueprints = json_decode( file_get_contents( "vv-blueprints.json") );
+
+	if ( ! empty( $blueprints->$blueprint->themes ) ) {
+		echo "Installing themes...";
+		foreach( $blueprints->$blueprint->themes as $theme ) {
+			install( 'theme', $theme );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
+		echo "Installing plugins...";
+		foreach( $blueprints->$blueprint->plugins as $plugin ) {
+			install( 'plugin', $plugin );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
+		echo "Installing mu-plugins...";
+		foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
+			install( 'mu_plugin', $mu_plugin );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->options ) ) {
+		echo "setting up options...";
+		foreach( $blueprints->$blueprint->options as $option ) {
+			add_option( $option );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->defines ) ) {
+		echo "Adding constants to wp-config.php...";
+		foreach( $blueprints->$blueprint->defines as $define ) {
+	 		add_define( $define );
+	 	}
+	}
+	echo "Blueprint set up.";
+}
+
+function install ( $type, $object ) {
+	if ( strpos( $object, '.git' ) !== false ) {
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && git clone $object && cd -" );
+	} elseif ( strpos( $object, '.zip' ) !== false ) {
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install $object && cd -" );
+	} elseif ( strpos( $object, '/' ) !== false ) {
+		$exploded = explode( "/", $object ); $folder = $exploded[1];
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install https://github.com/$object/archive/master.zip && pwd && mv $folder-master $folder && cd -" );
+	} else {
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install $object && cd -" );
+	}
+}
+
+function add_option( $option ) {
+	$object = explode("::", $option );
+	$a = $object[0];
+	$b = $object[1];
+	exec( "wp option delete $a" );
+	exec( "wp option add $a $b" );
+}
+
+function add_define( $object ) {
+	$object = explode( "::", $object );
+	exec( '		echo "$(sed "34a\\
+define("'. $object[0] . '","' . $object[1] . '.")
+" ./htdocs/wp-config.php);" > ./htdocs/wp-config.php' );
+}
+
+main( $argv[1] );

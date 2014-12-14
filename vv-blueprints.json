@@ -1,0 +1,17 @@
+{
+  "sample": {
+    "themes": [
+      "automattic/_s"
+    ],
+    "mu_plugins": [
+      "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+    ],
+    "plugins": [
+      "https://github.com/clef/wordpress/archive/master.zip",
+      "webdevstudios/CMB2"
+    ],
+    "options": [
+      "active_theme::_s"
+    ]
+  }
+}
