@@ -957,7 +957,7 @@ function parse_the_args() {
    	if [ ! -z "$deployment_config" ]; then
    		deployment_config
    	fi
-    if [ ! -z "blueprint_init" ]; then
+    if [ ! -z "$blueprint_init" ]; then
     	create_blueprints
     fi
    	if [ ! -z "$lets_update" ]; then
