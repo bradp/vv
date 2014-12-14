@@ -445,6 +445,17 @@ function site_creation_questions() {
 	# Get database name
 	db_name=$site
 
+	if [[ -f "$path"/vv-blueprints.json ]]; then
+		# Get local URL
+		while [ -z "$blueprint" ]; do
+			prompt "blueprint to use (leave blank for none)"
+			read -r blueprint
+			if [ -z "$blueprint" ]; then
+				unset blueprint
+			fi
+		done
+	fi
+
 	# Get local URL
 	while [ -z "$domain" ]; do
 		prompt "Domain to use (leave blank for $site.dev)"
@@ -604,6 +615,12 @@ define('WP_DEBUG_LOG', true);
 PHP"
 	fi
 
+	blueprint_text=''
+	if [[ ! -z "$blueprint" ]]; then
+		cp "$path"/vv-blueprints.json "$path"/www/"$site"/vv-blueprints.json
+		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint && rm vv-blueprints.json"
+	fi
+
 	# Create SQL commands for database creation
     # =============================================================================
     if [ ! -e "$path"/database/init-custom.sql ]; then
@@ -628,6 +645,7 @@ PHP"
 		echo "	echo \"Creating database '$site' (if it does not exist)...\""
 		echo "	"
 		echo "	cd -"
+		echo "$blueprint_text"
 		echo "fi"
 	} >> vvv-init.sh
 
@@ -908,6 +926,15 @@ function deployment_config() {
 	$EDITOR "$path/Vagrantfile"
 }
 
+function create_blueprints() {
+	if [[ ! -f "$path"/vv-blueprints.json ]]; then
+		curl -o "$path"/vv-blueprints.json -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-blueprints.json
+		success "Created sample blueprints file at $path/vv-blueprints.json."
+	else
+		info "You already have a vv-blueprints.json file created."
+	fi
+}
+
 function parse_the_args() {
 
     if [ ! -z "$list" ]; then
@@ -928,6 +955,9 @@ function parse_the_args() {
    	if [ ! -z "$deployment_config" ]; then
    		deployment_config
    	fi
+    if [ ! -z "blueprint_init" ]; then
+    	create_blueprints
+    fi
    	if [ ! -z "$lets_update" ]; then
    		install_update
    	else
@@ -1192,6 +1222,10 @@ function check_args() {
 				;;
 			update|--update)
 				lets_update="true"
+				shift
+				;;
+			-bi|--blueprint-init)
+				blueprint_init="true"
 				shift
 				;;
 			*)
