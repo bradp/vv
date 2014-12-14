@@ -301,7 +301,7 @@ function load_config_autopdate_config_values() {
 	#Load path from config file
 	auto_update_disable_config="$( getJsonVal "['auto_update_disable']" < ~/.vv-config )"
 	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
-	if [[ $auto_update_disable = "true" ]]; then
+	if [[ $auto_update_disable_config = "true" ]]; then
 		auto_update_disable="true"
 	fi
 }
