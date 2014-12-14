@@ -449,13 +449,13 @@ function site_creation_questions() {
 
 	if [[ -f "$path"/vv-blueprints.json ]]; then
 		# Get local URL
-		while [ -z "$blueprint" ]; do
+		if [ -z "$blueprint" ]; then
 			prompt "blueprint to use (leave blank for none)"
 			read -r blueprint
 			if [ -z "$blueprint" ]; then
 				unset blueprint
 			fi
-		done
+		fi
 	fi
 
 	# Get local URL
