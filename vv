@@ -11,7 +11,7 @@
 # This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
-#	#██    ██ ██    ██
+#	 ██    ██ ██    ██
 #	░██   ░██░██   ░██ 	  ▓▓▓▓▓▓▓▓▓▓
 #	░░██ ░██ ░░██ ░██ 	 ░▓ author ▓ Brad Parbs <brad@bradparbs.com>
 #	 ░░████   ░░████     ░▓ github ▓ http://github.com/bradp/vv
@@ -194,7 +194,7 @@ function ask () {
 function about() {
 	cat <<ABOUT
 	${magenta}
-	#██    ██ ██    ██
+	 ██    ██ ██    ██
 	░██   ░██░██   ░██ 	 ▓▓▓▓▓▓▓▓▓▓
 	░░██ ░██ ░░██ ░██  	░▓ author ▓  Brad Parbs <brad@bradparbs.com>
 	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
@@ -216,6 +216,7 @@ function show_help () {
     ${bold} OPTIONS: ${normal}
         --help, -h 		Show this help and usage
         --version 		Show current vv version
+        --about 		Show project info
 
         --list,	-l, list 	List all VVV sites
         --create, -c, create 	Create a new site
