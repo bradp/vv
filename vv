@@ -104,7 +104,7 @@ function install_update () {
 function update_vv () {
 	if [[ $installed_with_brew = "true" ]]; then
 		info "Updating vv via Brew..."
-		brew upgrade vv
+		brew reinstall vv
 	else
 		info "Updating vv..."
 		vv_bootstrap_update
