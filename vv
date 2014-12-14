@@ -306,6 +306,10 @@ function load_config_autopdate_config_values() {
 	fi
 }
 
+function load_default_values() {
+	defaults="$( getJsonVal "['defaults']" < ~/.vv-config )"
+	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
+}
 
 function get_vvv_path(){
 	if [ ! -z "$force_path" ]; then
