@@ -12,6 +12,9 @@
     ],
     "options": [
       "active_theme::_s"
+    ],
+    "defines": [
+      "WP_CACHE::false"
     ]
   }
 }
