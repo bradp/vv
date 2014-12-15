@@ -6,7 +6,7 @@
 # Originally by Alison Barrett <alison@barre.tt>
 # https://github.com/bradp/vvv-site-wizard
 #
-# Version 1.4.4
+# Version 1.4.5
 #
 # This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
@@ -21,7 +21,7 @@
 #
 # =============================================================================
 
-version_number=1.4.4
+version_number=1.4.5
 
 normal=$(tput sgr0)
 bold=$(tput bold)
