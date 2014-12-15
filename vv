@@ -520,8 +520,6 @@ function site_creation_questions() {
 		install_text='multisite-install --subdomains'
 	fi
 
-
-	git_clone_vvv_init="";
 	if [ -z "$git_repo" ]; then
 		prompt "Git repo to clone as wp-content (leave blank to skip)"
 		read -r git_repo
@@ -640,7 +638,6 @@ PHP"
 		echo "	wp core download --allow-root $installversion"
 		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
 		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
-		echo "$git_clone_vvv_init"
 		echo "	$add_placeholder_content"
 		echo "	"
 		echo "	cd -"
