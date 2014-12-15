@@ -450,7 +450,7 @@ function site_creation_questions() {
 	if [[ -f "$path"/vv-blueprints.json ]]; then
 		# Get local URL
 		if [ -z "$blueprint" ]; then
-			prompt "blueprint to use (leave blank for none)"
+			prompt "Blueprint to use (leave blank for none)"
 			read -r blueprint
 			if [ -z "$blueprint" ]; then
 				unset blueprint
@@ -525,9 +525,6 @@ function site_creation_questions() {
 	if [ -z "$git_repo" ]; then
 		prompt "Git repo to clone as wp-content (leave blank to skip)"
 		read -r git_repo
-		if [ ! -z "$git_repo" ]; then
-			git_clone_vvv_init="rm -rf wp-content && git clone --recursive $git_repo wp-content"
-		fi
 	fi
 
 	add_placeholder_content="";
@@ -660,6 +657,10 @@ PHP"
 	touch vvv-hosts
 	printf "%s\n" "$domain" >> vvv-hosts
 	echo "Done"
+
+	if [ ! -z "$git_repo" ]; then
+		git clone --recursive $git_repo htdocs/wp-content
+	fi
 
 	# Add site conf file to nginx-config
 	# =============================================================================
