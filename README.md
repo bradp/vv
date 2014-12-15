@@ -38,6 +38,8 @@ The main commands are `list`, `create`, `delete`. These will list your sites, cr
 
 To start creating a site, simply do `vv create` ( you can also do `vv --create`, or simply `vv -c`). You will then be prompted for all required options.
 
+Note: if using a git repo as wp-content, it needs to be either over HTTPS, or Vagrant's SSH key needs to be added to the provider if it is a private repo or over SSH.
+
 All options and flags are [listed below](#options).
 
 ## Site Creation
