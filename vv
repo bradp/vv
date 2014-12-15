@@ -885,6 +885,7 @@ function deployment_setup() {
 	echo "	push.secure =\"$secure\""
 	echo "	push.destination =\"$destination\""
 	echo "	push.dir = \"htdocs\""
+	echo "	push.exclude = \"wp-config.php\""
 	echo "end"
 	echo "# end-vv-$site-$deployment_name"
 } >> "$path/Vagrantfile"
