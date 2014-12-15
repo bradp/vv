@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.4.3
+	░██   ░██░██   ░██     Variable VVV 1.4.4
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -218,6 +218,14 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
 
 ## Change Log
+
+#### 1.4.4 - *2014-12-15* ####
+  Exclude wp-config.php when doing a deployment
+  update readme to clarify git repo usage
+  Fix order of output in vvv-init.sh
+  Add note about auto-update disabling to vv-config section of readme
+  Make headings consistent, & represent proper hierarchy, & update outdated info.
+  Doc Tweaks. Make headings consistent, and represent proper hierarchy, and update outdated info.
 
 #### 1.4.3 - *2014-12-14* ####
  Fix blueprint breaking site creation.
