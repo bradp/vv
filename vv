@@ -632,6 +632,7 @@ PHP"
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" >> "$path"/database/init-custom.sql
 
 	{
+		echo "	echo \"Creating database '$site' (if it does not exist)...\""
 		echo "mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\""
 		echo "mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\""
 		echo "	"
@@ -644,7 +645,6 @@ PHP"
 		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
 		echo "$git_clone_vvv_init"
 		echo "	$add_placeholder_content"
-		echo "	echo \"Creating database '$site' (if it does not exist)...\""
 		echo "	"
 		echo "	cd -"
 		echo "$blueprint_text"
