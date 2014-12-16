@@ -41,12 +41,12 @@ function install ( $type, $object ) {
 	if ( strpos( $object, '.git' ) !== false ) {
 		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && git clone $object && cd -" );
 	} elseif ( strpos( $object, '.zip' ) !== false ) {
-		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install $object --allow-root && cd -" );
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
 	} elseif ( strpos( $object, '/' ) !== false ) {
 		$exploded = explode( "/", $object ); $folder = $exploded[1];
-		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install https://github.com/$object/archive/master.zip --allow-root && pwd && mv $folder-master $folder && cd -" );
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object/archive/master.zip && pwd && mv $folder-master $folder && cd -" );
 	} else {
-		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp $type install $object --allow-root && cd -" );
+		exec( "mkdir -p htdocs/wp-content/{$type}s && cd htdocs/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
 	}
 }
 
