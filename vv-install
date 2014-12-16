@@ -19,7 +19,7 @@ function main( $blueprint ) {
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
 		echo "Installing mu-plugins...";
 		foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-			install( 'mu_plugin', $mu_plugin );
+			install( 'mu-plugin', $mu_plugin );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->options ) ) {
