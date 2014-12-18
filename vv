@@ -267,7 +267,7 @@ function check_for_config_file() {
 	if [ ! -z $got_config ]; then
 		load_config_values
 	else
-		if [[ ! $showing_help = true ]]; then
+		if [[ ! $showing_help = "true" ]]; then
 			info "	"
 			info "Looks like it's your first time running ${magenta}vv${normal}. "
 			info "${magenta}vv${normal} couldn't find a config file, so we will create one now."
@@ -418,7 +418,7 @@ function list_sites() {
 
 function site_creation_questions() {
 	files_only_text=''
-	if [[ "$files_only" = true ]]; then
+	if [[ "$files_only" = "true" ]]; then
 		files_only_text=" (file creation only)"
 	fi
 	info "New VVV Site Setup$files_only_text"
@@ -568,7 +568,7 @@ function confirm_site_creation() {
 	info "\nAbout to perform the following:"
 	# @ TODO
 	echo -e "* Halt Vagrant (if running)\n* Create directory $site in $path/www\n* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site\n* Create file $site.conf in $path/config/nginx-config/sites"
-	if [[ "$files_only" = false ]]; then
+	if [[ -z "$files_only" ]]; then
 		echo -e "* Run \`vagrant up --provision\` to initialize site"
 	else
 		warning "\nNote: You will need to run \`vagrant up --provision\` to initialize the new site before $domain will load in a browser."
@@ -686,7 +686,7 @@ function run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
 	cd "$path"
-	if [[ "$files_only" = false ]]; then
+	if [[ -z "$files_only" ]]; then
 		info "Running vagrant up --provision... "
 		vagrant up --provision
 	fi
@@ -695,7 +695,7 @@ function run_vagrant_up() {
 function creation_success_message() {
 	# OMG we're done.
 	# =============================================================================
-	if [[ "$files_only" = true ]]; then
+	if [[ "$files_only" = "true" ]]; then
 		info "\nRemember to run \`vagrant up --provision\` to initialize the new site."
 	fi
 
