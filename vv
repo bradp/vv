@@ -450,13 +450,9 @@ function site_creation_questions() {
 	db_name=$site
 
 	# Get web root of site
-	while [ -z "$web_root" ]; do
-		prompt "Subdirectory to use as web server root and where to install WordPress (leave blank for htdocs)"
-		read -r web_root
-		if [ -z "$web_root" ]; then
-			web_root="htdocs"
-		fi
-	done
+	if [ -z "$web_root" ]; then
+		web_root="htdocs"
+	fi
 
 	if [[ -f "$path"/vv-blueprints.json ]]; then
 		# Get local URL
@@ -626,7 +622,7 @@ PHP"
 	blueprint_text=''
 	if [[ ! -z "$blueprint" ]]; then
 		cp "$path"/vv-blueprints.json "$path"/www/"$site"/vv-blueprints.json
-		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint && rm vv-blueprints.json"
+		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
 	fi
 
 	# Create SQL commands for database creation
@@ -1002,7 +998,7 @@ function check_args() {
 				 path=$1
 				 shift
 				 ;;
-			-wr|--web-root|--web_root)
+			-wr|--web-root|--web_root|--directory|--file-path)
 				 shift
 
 				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
