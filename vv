@@ -429,9 +429,11 @@ function site_creation_questions() {
 
 	# Get site dir name if not supplied as argument
 	if [ ! -z "$site" ]; then
-		if [ -d "$path/www/$site" ]; then
-			error "Directory $path/www/$site alread -ry exists."
+		if [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
+			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
 			unset site
+		elif [ -d "$path/www/$site" ]; then
+			warning "Directory $path/www/$site already exists. Existing VVV configuration files will be overwritten."
 		fi
 	fi
 	while [ -z "$site" ]; do
@@ -440,9 +442,11 @@ function site_creation_questions() {
 
 		if [ -z "$site" ]; then
 			error "You must enter a directory name."
-		elif [ -d "$path/www/$site" ]; then
-			error "Directory alread -ry exists."
+		elif [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
+			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
 			unset site
+		elif [ -d "$path/www/$site" ]; then
+			warning "Directory $path/www/$site already exists. Existing VVV configuration files will be overwritten."
 		fi
 	done
 
@@ -527,7 +531,10 @@ function site_creation_questions() {
 		install_text='multisite-install --subdomains'
 	fi
 
-	if [ -z "$git_repo" ]; then
+	if [[ ! -z $git_repo && -d "$path/www/$site" ]]; then
+		error "$path/www/$site already exists. Skipping git clone."
+		unset git_repo
+	elif [[ -z "$git_repo" && ! -d "$path/www/$site" ]]; then
 		prompt "Git repo to clone as wp-content (leave blank to skip)"
 		read -r git_repo
 	fi
@@ -607,7 +614,10 @@ function create_site_files(){
 	# =============================================================================
 	cd "$path"/www
 	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
-	mkdir "$site" && cd "$site"
+	if [ ! -d "$site" ]; then
+		mkdir $site
+	fi
+	cd "$site"
 
 	printf "path: $web_root" > wp-cli.yml
 
@@ -640,7 +650,9 @@ PHP"
 		echo "	"
 		echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 		echo "	echo 'Installing WordPress $version in $site/$web_root...'"
-		echo "	mkdir ./$web_root"
+		echo "	if [ ! -d \"./$web_root\" ]; then"
+		echo "		mkdir ./$web_root"
+		echo "	fi"
 		echo "	cd ./$web_root"
 		echo "	wp core download --allow-root $installversion"
 		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
