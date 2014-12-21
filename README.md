@@ -135,7 +135,7 @@ You can create as many named blueprints in this file as you would like, all with
 
 Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv --vagrant <command>` to your VVV location. So `vv --vagrant halt` will halt your VVV vagrant, no matter where you run it.
 
-## vv Options
+## `vv` Options
 
 |Option |Description|
 |------|-----------
@@ -199,7 +199,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--confirm-removal`|Used when removing a deployment to skip the confirmation prompt |
 
 
-## .vv-config
+## `.vv-config`
 
 The first time you run `vv`, it will attempt to locate your VVV installation location. If it can't find it, you will be prompted for it. This will be written to a .vv-config file in your home directory. (`~/.vv-config`) You can also edit this file if you need to change your VVV path.
 
