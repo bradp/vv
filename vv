@@ -322,7 +322,7 @@ function get_vvv_path(){
 
 	if [ ! -z "$path" ]; then
 		if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
-			error "Path specified is not a VVV root directory."
+			error "Path specified is not a VVV root directory. Where is VVV installed?"
 			unset path
 
 			while [ -z $path ]; do
@@ -330,7 +330,7 @@ function get_vvv_path(){
 
 				# Make sure directory is actually a VVV root
 				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
-					error "Path specified is not a VVV root directory."
+					error "Path specified is not a VVV root directory. Where is VVV installed?"
 					unset path
 				fi
 				path=$(eval echo "${path//>}")
@@ -364,7 +364,7 @@ function get_vvv_path(){
 
 				# Make sure directory is actually a VVV root
 				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
-					error "Path specified is not a VVV root directory."
+					error "Path specified is not a VVV root directory. Where is VVV installed?"
 					unset path
 				fi
 				path=$(eval echo "${path//>}")
