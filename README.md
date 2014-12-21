@@ -12,9 +12,9 @@
 
 ## Installation
 
-If you have [Homebrew](http://brew.sh/) installed, you can do
+If you have [Homebrew](http://brew.sh/) installed, you run the following in your terminal application:
 
-	brew install bradp/vv/vv
+	$ brew install bradp/vv/vv
 
 Otherwise you'll want to clone and edit your `$PATH` to include the vv core file.
 
