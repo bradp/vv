@@ -32,59 +32,59 @@ blue=$(tput setaf 4)
 magenta=$(tput setaf 5)
 cyan=$(tput setaf 6)
 
-function version () {
+version () {
 echo "vv version $version_number"
 }
 
 # Usage: info "message"
 # Example: info "doing thing"
 # Output (to STDOUT): doing thing
-function info () {
+info () {
     printf "%b" "${blue}$1${normal} \n"
 }
 
 # Usage: success "message"
 # Example: success "It's Working"
 # Output (to STDOUT): [...] It's Working
-function success () {
+success () {
     printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
 }
 
 # Usage: warning "message"
 # Example: warning "some warning"
 # Output (to STDOUT): [...] some warning
-function warning () {
+warning () {
     printf "%b" "${red} $1 ${normal}\n"
 }
 
 # Usage: prompt "question"
 # Example: prompt "Site name"
 # Output (to STDOUT): Site Name:
-function prompt () {
+prompt () {
     printf "%b" "${yellow} $1: ${normal}"
 }
 
 # Usage: error ["message"]
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
-function error () {
+error () {
     printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
 }
 
 # Usage: fail "message" [exit_code]
 # Example: fail "Unknown Option" 254
-function fail () {
+fail () {
     error "$1"
 }
 
-function check_for_update () {
+check_for_update () {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	if [[ ! $version_number = $github_version ]]; then
 		info "Your version of vv does not match the current Github version. Please update with vv --update"
 	fi
 }
 
-function check_how_installed () {
+check_how_installed () {
 	if [[ ! -z $(which brew) ]]; then
 		brew_install_location=$(brew --prefix)
 		if [[ -f $brew_install_location"/bin/vv" ]]; then
@@ -95,12 +95,12 @@ function check_how_installed () {
 	fi
 }
 
-function install_update () {
+install_update () {
 	check_how_installed
 	update_vv
 }
 
-function update_vv () {
+update_vv () {
 	if [[ $installed_with_brew = "true" ]]; then
 		info "Updating vv via Brew..."
 		brew cleanup
@@ -111,7 +111,7 @@ function update_vv () {
 	fi
 }
 
-function vv_bootstrap_update () {
+vv_bootstrap_update () {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link="https://github.com/bradp/vv/archive/"$github_version".tar.gz"
 	vv_install_location=$(which vv)
@@ -123,7 +123,7 @@ function vv_bootstrap_update () {
 	success "vv has been updated to the latest version. Thanks!"
 }
 
-function auto_update_main () {
+auto_update_main () {
 
 	if [[ ! $auto_update_disable = "true" ]]; then
 		if [ ! -f ~/.vv-update ]; then
@@ -138,28 +138,29 @@ function auto_update_main () {
 				github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 				if [[ ! $version_number = $github_version ]]; then
 					update_vv
-					rm ~/.vv-update
-					_update_vv_update
 				fi
+
+				rm ~/.vv-update
+				_update_vv_update
 			fi
 		fi
 	fi
 }
 
-function _current_epoch() {
+_current_epoch() {
   seconds=$(date +%s)
   echo $(($seconds/60/60/24))
 }
 
-function _update_vv_update() {
+_update_vv_update() {
 	touch ~/.vv-update
 	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > ~/.vv-update
 }
 
-# ask function https://gist.github.com/davejamesmiller/1965569
+# https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
 # Example: if "Yes or No?" Y; then
-function ask () {
+ask () {
     while true; do
 
         if [ "${2:-}" = "Y" ]; then
@@ -191,7 +192,7 @@ function ask () {
     done
 }
 
-function about() {
+about() {
 	cat <<ABOUT
 	${magenta}
 	 ██    ██ ██    ██
@@ -207,7 +208,7 @@ ABOUT
 
 # Usage: show_help [exit_code]
 # Example: show_help 254
-function show_help () {
+show_help () {
     cat <<HELP
 
    ${bold} USAGE: ${normal}
@@ -258,11 +259,11 @@ function show_help () {
 HELP
 }
 
-function argument_expected() {
+argument_expected() {
     fail "$1 expected an argument"
 }
 
-function check_for_config_file() {
+check_for_config_file() {
 	test -f ~/.vv-config && got_config="true"
 
 	if [ ! -z $got_config ]; then
@@ -280,7 +281,7 @@ function check_for_config_file() {
 	fi
 }
 
-function create_config_file() {
+create_config_file() {
 {
 	echo "{"
 	echo "	\"path\": \"$path\""
@@ -291,17 +292,17 @@ info "	"
 
 }
 
-function getJsonVal () {
+getJsonVal () {
     python -c "import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)$1))";
 }
 
-function load_config_values() {
+load_config_values() {
 	#Load path from config file
 	path="$( getJsonVal "['path']" < ~/.vv-config )"
 	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
-function load_config_autopdate_config_values() {
+load_config_autopdate_config_values() {
 	#Load path from config file
 	auto_update_disable_config="$( getJsonVal "['auto_update_disable']" < ~/.vv-config )"
 	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
@@ -310,12 +311,12 @@ function load_config_autopdate_config_values() {
 	fi
 }
 
-function load_default_values() {
+load_default_values() {
 	defaults="$( getJsonVal "['defaults']" < ~/.vv-config )"
 	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
-function get_vvv_path(){
+get_vvv_path(){
 	if [ ! -z "$force_path" ]; then
 		unset path
 	fi
@@ -374,14 +375,14 @@ function get_vvv_path(){
 	path=${path%/}
 }
 
-function get_list_sites() {
+get_list_sites() {
 	clean_saved=$clean
 	clean="true"
 	sites=$(list_sites)
 	clean=$clean_saved
 }
 
-function list_sites() {
+list_sites() {
 	cd "$path"/www
 	find . -maxdepth 1 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
 		filename=${filename:2}
@@ -417,7 +418,7 @@ function list_sites() {
 	exit
 }
 
-function site_creation_questions() {
+site_creation_questions() {
 	files_only_text=''
 	if [[ "$files_only" = "true" ]]; then
 		files_only_text=" (file creation only)"
@@ -568,7 +569,7 @@ function site_creation_questions() {
 	fi
 }
 
-function confirm_site_creation() {
+confirm_site_creation() {
 	# Inform the user of what's about to happen and give them a chance to back out
 	# =============================================================================
 	info "\nAbout to perform the following:"
@@ -602,7 +603,7 @@ function confirm_site_creation() {
 	vagrant halt
 }
 
-function create_site_files(){
+create_site_files(){
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
 	cd "$path"/www
@@ -688,7 +689,7 @@ PHP"
 	echo "Done"
 }
 
-function run_vagrant_up() {
+run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
 	cd "$path"
@@ -698,7 +699,7 @@ function run_vagrant_up() {
 	fi
 }
 
-function creation_success_message() {
+creation_success_message() {
 	# OMG we're done.
 	# =============================================================================
 	if [[ "$files_only" = "true" ]]; then
@@ -712,7 +713,7 @@ function creation_success_message() {
 	echo "Password:  $password"
 }
 
-function create_site() {
+create_site() {
 	site_creation_questions
 	confirm_site_creation
 	create_site_files
@@ -721,7 +722,7 @@ function create_site() {
 	exit
 }
 
-function not_valid_site() {
+not_valid_site() {
 	if [[ -z $site || ! -d "$path/www/$site" ]]; then
 		error "You must enter a valid directory from $path/www/."
 		unset site
@@ -731,7 +732,7 @@ function not_valid_site() {
 	fi
 }
 
-function remove_site() { # @TODO refactor this if we need to
+remove_site() { # @TODO refactor this if we need to
 	info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
@@ -784,7 +785,7 @@ function remove_site() { # @TODO refactor this if we need to
 	exit
 }
 
-function deployment_setup_prompt() {
+deployment_setup_prompt() {
 	info "Setting up a deployment."
 
 	if [[ ! -z $site ]]; then
@@ -800,7 +801,7 @@ function deployment_setup_prompt() {
 
 }
 
-function deployment_removal_prompt() {
+deployment_removal_prompt() {
 	if [[ ! -z $site ]]; then
 		not_valid_site
 	fi
@@ -821,7 +822,7 @@ function deployment_removal_prompt() {
 
 }
 
-function deployment_setup() {
+deployment_setup() {
 	deployment_setup_prompt
 	info "Setting up (S)FTP deployment for $site"
 
@@ -901,7 +902,7 @@ function deployment_setup() {
 	success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
 }
 
-function remove_all_deployment() {
+remove_all_deployment() {
 	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
 		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
 		read -r remove_deployment_confirm
@@ -913,7 +914,7 @@ function remove_all_deployment() {
 	success "Deployment for $site removed."
 }
 
-function remove_site_remove_all_deployment() {
+remove_site_remove_all_deployment() {
 	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
@@ -921,7 +922,7 @@ function remove_site_remove_all_deployment() {
 	success "Deployment for $site removed."
 }
 
-function remove_deployment() {
+remove_deployment() {
 	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
 		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
 		read -r remove_deployment_confirm
@@ -933,11 +934,11 @@ function remove_deployment() {
 	success "Deployment for $site removed."
 }
 
-function deployment_config() {
+deployment_config() {
 	$EDITOR "$path/Vagrantfile"
 }
 
-function create_blueprints() {
+create_blueprints() {
 	if [[ ! -f "$path"/vv-blueprints.json ]]; then
 		curl -o "$path"/vv-blueprints.json -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-blueprints.json
 		success "Created sample blueprints file at $path/vv-blueprints.json."
@@ -946,7 +947,7 @@ function create_blueprints() {
 	fi
 }
 
-function parse_the_args() {
+parse_the_args() {
 
     if [ ! -z "$list" ]; then
         list_sites
@@ -980,7 +981,7 @@ function parse_the_args() {
 
 }
 
-function check_args() {
+check_args() {
     while [ ! -z "$1" ]; do
         local arg="$1"
         case "$1" in
@@ -1284,7 +1285,7 @@ function check_args() {
     exit 0
 }
 
-function main() {
+main() {
 	auto_update_main
 
 	if [ -z "$1" ]; then
