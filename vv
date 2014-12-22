@@ -538,7 +538,7 @@ site_creation_questions() {
 		prompt "Add sample content to site (y/N)"
 		read -r placeholder_content
 		if [[ $placeholder_content = "y" ]]; then
-			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp import import.xml -authors=skip --allow-root && rm import.xml"
+			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp import import.xml --authors=skip --allow-root && rm import.xml"
 		fi
 	fi
 
