@@ -163,7 +163,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--domain, -d`|Domain of new site|
 |`--blueprint`, `-b`|Name of blueprint to use|
-|`--live_url`, `-u`|Live URL of site|
+|`--live-url`, `-u`|Live URL of site|
 |`--files`, `-f`|Do not provision Vagrant, just create the site directory and files|
 |`--images`, `-i`|Load images by proxy from the live site|
 |`--wp-version`, `-wv`|Version of WordPress to install|

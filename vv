@@ -236,7 +236,7 @@ show_help () {
 
     ${bold} NEW SITE OPTIONS: ${normal}
         --domain, -d 		Domain of new site
-        --live_url, -u 		Live URL of site
+        --live-url, -u 		Live URL of site
         --files, -f 		Do not provision Vagrant, just create the site directory and files
         --images, -i 		Load images by proxy from the live site
         --name, -n 		Desired name for the site directory (e.g. mysite)
@@ -1031,7 +1031,7 @@ check_args() {
 				 domain=$1
 				 shift
 				 ;;
-			-u|--live_url)
+			-u|--live_url|--live-url)
 				 shift
 
 				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
