@@ -168,7 +168,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--images`, `-i`|Load images by proxy from the live site|
 |`--wp-version`, `-wv`|Version of WordPress to install|
 |`--debug`, `-x`|Turn on WP_DEBUG and WP_DEBUG_LOG|
-|`--multisite`, `-m`|Install as a multisite Can also pass in "subdomain" or "subdirectory"|
+|`--multisite`, `-m`|Install as a multisite. Can also pass in "subdomain" or "subdirectory"|
 |`--sample-content`,`-sc`|Adds sample content to site.|
 |`--username`|Admin username|
 |`--password`|Admin password|
