@@ -1161,9 +1161,9 @@ check_args() {
 				shift
 				;;
 			--deployment-remove|deployment-remove|--deploy-remove|deploy-remove|--deployment-teardown|deployment-teardown|--deploy-teardown|deploy-teardown|--deployment-delete|deployment-delete|--deploy-delete|deploy-delete)
-					deployment_remove="true"
-					shift
-					;;
+				deployment_remove="true"
+				shift
+				;;
 			--confirm-removal|--confirm_removal|--confirmremoval)
 				remove_deployment_confirm="confirm"
 				shift

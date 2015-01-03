@@ -135,7 +135,7 @@ You can create as many named blueprints in this file as you would like, all with
 
 Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv vagrant <command>` to your VVV location. So `vv vagrant halt` will halt your VVV vagrant, no matter where you run it.
 
-## vv Options
+## `vv` Options
 
 |Option|Description|
 |------|-----------|
