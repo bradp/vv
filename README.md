@@ -122,7 +122,7 @@ The blueprint should look like this:
 For themes, plugins, and mu-plugins, you can use:
 
 * Github username/repo
-* Full git url (If a private git link, you'll need to create a public key in Vagrant and authenticate)
+* Full git url
 * Url to zip file
 * WordPress.org slug
 
