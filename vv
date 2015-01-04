@@ -923,18 +923,6 @@ deployment_setup() {
 	success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
 }
 
-remove_all_deployment() {
-	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
-		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
-		read -r remove_deployment_confirm
-	done
-	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
-	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
-	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
-
-	success "Deployment for $site removed."
-}
-
 remove_site_remove_all_deployment() {
 	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
