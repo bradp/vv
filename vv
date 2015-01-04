@@ -637,12 +637,12 @@ PHP"
 	fi
 
 	# Create SQL commands for database creation
-    # =============================================================================
-    if [ ! -e "$path"/database/init-custom.sql ]; then
+	# =============================================================================
+	if [ ! -e "$path"/database/init-custom.sql ]; then
 		touch "$path"/database/init-custom.sql
-    fi
-    printf "CREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
-"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" >> "$path"/database/init-custom.sql
+	fi
+	printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
+"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
 	{
 		echo "	echo \"Creating database '$site' (if it does not exist)...\""
