@@ -758,7 +758,7 @@ remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove any deployments set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
@@ -778,7 +778,16 @@ remove_site() { # @TODO refactor this if we need to
 			rm "$path"/config/nginx-config/sites/"$site".conf
 			echo "Done"
 
-			echo -en "Removing any set up deployments. "
+			# Remove the database creation from init-custom.sql
+			info "Removing the database creation commands from init-custom.sql... "
+			cd "$path"/database
+			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
+			rm init-custom.sql
+			mv init-custom.sql.tmp init-custom.sql
+			cd "$path"
+			echo "Done"
+
+			info "Removing any set up deployments. "
 			remove_site_remove_all_deployment
 			echo "Done"
 
