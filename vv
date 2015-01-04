@@ -645,10 +645,6 @@ PHP"
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
 	{
-		echo "	echo \"Creating database '$site' (if it does not exist)...\""
-		echo "mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\""
-		echo "mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\""
-		echo "	"
 		echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 		echo "	echo 'Installing WordPress $version in $site/$web_root...'"
 		echo "	if [ ! -d \"./$web_root\" ]; then"
