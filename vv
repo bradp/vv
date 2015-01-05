@@ -71,10 +71,11 @@ error () {
     printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
 }
 
-# Usage: fail "message" [exit_code]
+# Usage: fail "message"
 # Example: fail "Unknown Option" 254
 fail () {
     error "$1"
+    exit 1
 }
 
 check_for_update () {
@@ -211,56 +212,56 @@ ABOUT
 show_help () {
     cat <<HELP
 
-   ${bold} USAGE: ${normal}
-        vv [OPTION]...
+${bold} USAGE: ${normal}
+    vv [--help|-h] [--version] [--about] [--path|-p <path>] [--force-path|-fp] <command> [<site-options>] ...
 
-    ${bold} OPTIONS: ${normal}
-        --help, -h 		Show this help and usage
-        --version 		Show current vv version
-        --about 		Show project info
+${bold} OPTIONS: ${normal}
+    --help, -h 			Show this help and usage
+    --version 			Show current vv version
+    --about 			Show project info
+    --path, -p 			Path to VVV installation
+    --force_path, -fp 		Override vv auto-VVV locating
 
-        --list,	-l, list 	List all VVV sites
-        --create, -c, create 	Create a new site
-        --remove, -r, remove 	Remove a site
+${bold} COMMANDS: ${normal}
 
-        --blueprint-init 	Initialize blueprint file
+    list 			List all VVV sites
+    create 			Create a new site
+    remove 			Remove a site
+    vagrant, v 			Pass vagrant command through to VVV
+    deployment-create		Create a deployment
+    deployment-remove 		Remove a deployment
+    deployment-config 		Manually configure deployment
+    blueprint-init 		Initialize blueprint file
 
-	--deployment-create 	Create a deployment
-	--deployment-remove 	Remove a deployment
-        --deployment-config 	Manually configure deployment
-
-        --vagrant, -v, v 	Pass vagrant command through to VVV.
-
-        --path,	-p 		Path to VVV installation
-        --force_path, -fp 	Override vv auto-VVV locating
-
-    ${bold} NEW SITE OPTIONS: ${normal}
-        --domain, -d 		Domain of new site
-        --live-url, -u 		Live URL of site
-        --files, -f 		Do not provision Vagrant, just create the site directory and files
-        --images, -i 		Load images by proxy from the live site
-        --name, -n 		Desired name for the site directory (e.g. mysite)
-        --web_root, -wr 		Subdirectory used for web server root
-        --wp_version, -wv 	Version of WordPress to install
-        --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
-        --multisite, -m 	Install as a multisite
-        --sample-content, -sc 	Add sample content to site
-        --username  		Admin username
-        --password  		Admin password
-        --email  		Admin email
-        --git-repo  		Git repo to clone as wp-content
-        --blueprint, -b 	Name of blueprint to use
+${bold} SITE OPTIONS: ${normal}
+    --domain, -d 		Domain of new site
+    --live-url, -u 		Live URL of site
+    --files, -f 		Do not provision Vagrant, just create the site directory and files
+    --images, -i 		Load images by proxy from the live site
+    --name, -n 			Desired name for the site directory (e.g. mysite)
+    --web-root, -wr 		Subdirectory used for web server root
+    --wp-version, -wv 		Version of WordPress to install
+    --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
+    --multisite, -m 		Install as a multisite
+    --sample-content, -sc 	Add sample content to site
+    --username  		Admin username
+    --password  		Admin password
+    --email  			Admin email
+    --git-repo  		Git repo to clone as wp-content
+    --blueprint, -b 		Name of blueprint to use
 
 
-    ${bold} EXAMPLE:${normal}
-        vv --create --domain mysite.dev --name mysite --debug
-        vv -c -d mysite.dev -n mysite -x
+${bold} EXAMPLE:${normal}
+    vv create --domain mysite.dev --name mysite --debug
+    vv create -d mysite.dev -n mysite -x
 
 HELP
 }
 
 argument_expected() {
-    fail "$1 expected an argument"
+    if [ -z "$2" ] || [[ "$2" == -* ]]; then
+        fail "$1 expected an argument"
+    fi
 }
 
 check_for_config_file() {
@@ -994,225 +995,124 @@ parse_the_args() {
 }
 
 check_args() {
-    while [ ! -z "$1" ]; do
-        local arg="$1"
-        case "$1" in
+	while [ ! -z "$1" ]; do
+		case "$1" in
 			-h|--help|help|h|what)
 				local help=0
 				shift
 				;;
 			-p|--path)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 path=$1
-				 shift
-				 ;;
-			-wr|--web-root|--web_root|--directory|--file-path)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 web_root=$1
-				 shift
-				 ;;
+				argument_expected "$1" "$2"
+				path=$2
+				shift 2
+				;;
+			-wr|--wr|--web-root|--web_root|--webroot|--directory|--file-path|--filepath)
+				argument_expected "$1" "$2"
+				web_root=$2
+				shift 2
+				;;
 			-d|--domain)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 domain=$1
-				 shift
-				 ;;
-			-u|--live_url|--live-url)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 live_site_url=$1
-				 shift
-				 ;;
+				argument_expected "$1" "$2"
+				domain=$2
+				shift 2
+				;;
+			-u|--live-url|--live_url|--liveurl)
+				argument_expected "$1" "$2"
+				live_site_url=$2
+				shift 2
+				;;
 			-n|--name)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 site=$1
-				 shift
-				 ;;
-			-wv|--wp-version|--wp_version)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 version=$1
-				 shift
-				 ;;
+				argument_expected "$1" "$2"
+				site=$2
+				shift 2
+				;;
+			-wv|--wv|--wp-version|--wp_version|--wpversion)
+				argument_expected "$1" "$2"
+				version=$2
+				shift 2
+				;;
 			--username)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 username=$1
-				 shift
-				 ;;
+				argument_expected "$1" "$2"
+				username=$2
+				shift 2
+				;;
 			--password)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 password=$1
-				 shift
-				 ;;
+				argument_expected "$1" "$2"
+				password=$2
+				shift 2
+				;;
 			--email)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 email=$1
-				 shift
-				 ;;
-			--git-repo|--git_repo)
-				 shift
-
-				 if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				     argument_expected "$arg"
-				 fi
-
-				 git_repo=$1
-				 shift
-				 ;;
-			-m|--multisite)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				fi
-				multisite="y"
-				ms_type=$1
-				shift
+				argument_expected "$1" "$2"
+				email=$2
+				shift 2
+				;;
+			--git-repo|--git_repo|--gitrepo)
+				argument_expected "$1" "$2"
+				git_repo=$2
+				shift 2
+				;;
+			-m|--multi-site|--multi_site|--multisite)
+				argument_expected "$1" "$2"
+				ms_type=$2
+				shift 2
 				;;
 			--host)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				host=$1
-				shift
+				argument_expected "$1" "$2"
+				host=$2
+				shift 2
 				;;
 			--username)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				username=$1
-				shift
+				argument_expected "$1" "$2"
+				username=$2
+				shift 2
 				;;
 			--password)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				password=$1
-				shift
+				argument_expected "$1" "$2"
+				password=$2
+				shift 2
 				;;
 			--passive)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				passive=$1
-				shift
+				argument_expected "$1" "$2"
+				passive=$2
+				shift 2
 				;;
 			--secure)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				secure=$1
-				shift
+				argument_expected "$1" "$2"
+				secure=$2
+				shift 2
 				;;
 			--destination)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				destination=$1
-				shift
+				argument_expected "$1" "$2"
+				destination=$2
+				shift 2
 				;;
-			--deployment-name)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				deployment_name=$1
-				shift
+			--deployment-name|--deployment_name|--deploymentname)
+				argument_expected "$1" "$2"
+				deployment_name=$2
+				shift 2
 				;;
-			--blueprint|-b)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
-				blueprint=$1
-				shift
+			-b|--blue-print|--blue_print|--blueprint)
+				argument_expected "$1" "$2"
+				blueprint=$2
+				shift 2
 				;;
-			v|-v|--vagrant)
-				shift
-
-				if [ -z "$1" ] || [[ "$1" == -* ]]; then
-				    argument_expected "$arg"
-				    exit
-				fi
+			-v|v|--vagrant|vagrant)
+				argument_expected "$1" "$2"
 				get_vvv_path
 				cd "$path"
-				echo "$(vagrant "$1");"
+				echo "$(vagrant "$2");"
 				exit
-				shift
+				shift 2
 				;;
-			-r|-rm|--remove|--delete|--rm|--teardown|remove)
+			-r|-rm|--rm|rm|--remove|remove|--delete|delete|--teardown|teardown)
 				remove="true"
 				shift
 				;;
-			-l|-s|--list|--show|list)
+			-l|--list|list|-s|--show|show)
 				list="true"
 				shift
 				;;
-			-c|-n|-m|--create|--new|--make|create)
+			-c|--create|create|-n|--new|new|-m|--make|make)
 				create="true"
 				shift
 				;;
@@ -1228,42 +1128,42 @@ check_args() {
 				wp_debug="y"
 				shift
 				;;
-			-fp|--force-path|--force_path)
+			-fp|--fp|--force-path|--force_path|--forcepath)
 				force_path="true"
 				shift
 				;;
-			--version|-version)
+			--version)
 				check_for_update
 				version
 				shift
 				;;
-			--porcelain|-porcelain)
+			--porcelain)
 				clean="true"
 				shift
 				;;
-			-sc|--sample-content)
+			-sc|--sc|--sample-content|--sample_content|--samplecontent)
 				placeholder_content="y"
 				shift
 				;;
-			--about|-about)
+			--about|about)
 				check_for_update
 				about
 				exit
 				shift
 				;;
-			--deployment|--deploy|--deployment-create|--deploy-create)
+			--deploy|deploy|--deployment|deployment|--deployment-create|deployment-create|--deploy-create|deploy-create|--deployment-setup|deployment-setup|--deploy-setup|deploy-setup)
 				deployment_setup="true"
 				shift
 				;;
-			--deployment-remove|--deploy-remove|--deployment_remove|--deploy_remove)
+			--deployment-remove|deployment-remove|--deploy-remove|deploy-remove|--deployment-teardown|deployment-teardown|--deploy-teardown|deploy-teardown|--deployment-delete|deployment-delete|--deploy-delete|deploy-delete)
 				deployment_remove="true"
 				shift
 				;;
-			--confirm-removal)
+			--confirm-removal|--confirm_removal|--confirmremoval)
 				remove_deployment_confirm="confirm"
 				shift
 				;;
-			--deployment-config)
+			--deployment-config|deployment-config|--deploy-config|deploy-config|--deployment-edit|deployment-edit|--deploy-edit|deploy-edit)
 				deployment_config="true"
 				shift
 				;;
@@ -1271,12 +1171,12 @@ check_args() {
 				lets_update="true"
 				shift
 				;;
-			--force-update)
+			--force-update|--force_update|--forceupdate)
 				force_update="true"
 				info "Forcing boostrapped update..."
 				shift
 				;;
-			-bi|--blueprint-init)
+			-bi|--bi|bi|--blueprint-init|blueprint-init|--blueprintinit|blueprintinit)
 				blueprint_init="true"
 				shift
 				;;
@@ -1284,17 +1184,17 @@ check_args() {
 				fail "Unknown option $1"
 				shift
 				;;
-        esac
-    done
+		esac
+	done
 
-    if [ ! -z $help ]; then
-        show_help $help
-    fi
+	if [ ! -z $help ]; then
+		show_help $help
+	fi
 
-    get_vvv_path
-    parse_the_args
+	get_vvv_path
+	parse_the_args
 
-    exit 0
+	exit 0
 }
 
 main() {

@@ -70,11 +70,11 @@ Note that it does not delete the site's database.
 
 ## Deployments
 
-`vv --deployment-create`, `vv --deployment-remove`, `vv --deployment-config`
+`vv deployment-create`, `vv deployment-remove`, `vv deployment-config`
 
 vv supports setting up deployments that work with [Vagrant Push](https://docs.vagrantup.com/v2/push/index.html). You'll need to be on version 1.7.0 or later of Vagrant. Simply run `vv --deployment-create` and walk through the wizard.
 
-To deploy a site, you can do `vv --vagrant push <sitename><deployment_name>`.
+To deploy a site, you can do `vv vagrant push <sitename><deployment_name>`.
 
 When removing a deployment, your current Vagrantfile will be backed up as Vagrantfile-backup.
 
@@ -85,11 +85,11 @@ Anything that vv prompts you for, you can pass in as an argument. Most of this i
 
 To create a new site named 'mysite' that has the domain 'mysite.dev' and is a multisite with subdomains, with `WP_Debug` turned on would be:
 
-`vv -c -d mysite.dev -n mysite -m subdomains -x`
+`vv create -d mysite.dev -n mysite -m subdomains -x`
 
 Or, the more readable version with all expanded flags.
 
-`vv --create --domain mysite.dev --name mysite --multisite subdomains --debug`
+`vv create --domain mysite.dev --name mysite --multisite subdomains --debug`
 
 ## Blueprints
 
@@ -133,35 +133,39 @@ You can create as many named blueprints in this file as you would like, all with
 
 ## Vagrant Proxy
 
-Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv --vagrant <command>` to your VVV location. So `vv --vagrant halt` will halt your VVV vagrant, no matter where you run it.
+Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv vagrant <command>` to your VVV location. So `vv vagrant halt` will halt your VVV vagrant, no matter where you run it.
 
 ## `vv` Options
 
-|Option |Description|
-|------|-----------
+|Option|Description|
+|------|-----------|
 |`--help`, `-h`| Show help and usage|
 |`--version`|Show current vv version number.|
 |`--about`|Show about screen.|
 |`--update`|Updates vv to the latest stable version|
-| |
-|`--list`,	`-l`, `list`|List all VVV sites|
-|`--create`, `-c`, `create`|Create a new site|
-|`--remove`, `-r`, `remove`|Remove a site|
-|`--deployment-create`|Set up deployment for a site|
-|`--deployment-remove`|Remove deployment for a site|
-|`--deployment-config`|Manually edit deployment configuration|
-|`--blueprint-init`|Initalize blueprint file|
-|`--vagrant`, `-v`|Pass vagrant command through to VVV.|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 
+### Commands
+
+|Command|Description|
+|-------|-----------|
+|`list`, `--list`,  `-l`|List all VVV sites|
+|`create`, `--create`, `-c`|Create a new site|
+|`remove`, `--remove`, `-r`|Remove a site|
+|`deployment-create`, `--deployment-create`|Set up deployment for a site|
+|`deployment-remove`, `--deployment-remove`|Remove deployment for a site|
+|`deployment-config`, `--deployment-config`|Manually edit deployment configuration|
+|`blueprint-init`, `--blueprint-init`|Initalize blueprint file|
+|`vagrant`, `v`, `--vagrant`, `-v`|Pass vagrant command through to VVV.|
 
 ### Options for Site Creation
 
-|Option |Description|
-|------|-----------
+|Option|Description|
+|------|-----------|
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--domain, -d`|Domain of new site|
+|`--webroot`, `-wr`|Subdirectory used for web server root|
 |`--blueprint`, `-b`|Name of blueprint to use|
 |`--live-url`, `-u`|Live URL of site|
 |`--files`, `-f`|Do not provision Vagrant, just create the site directory and files|
@@ -177,17 +181,16 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 
-
 ### Options for Site Removal
-|Option |Description|
-|------|-----------
+|Option|Description|
+|------|-----------|
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force_path`, `-fp`|Override vv auto-VVV locating|
 
 ### Options for Deployment Setup
-|Option |Description|
-|------|-----------
+|Option|Description|
+|------|-----------|
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--deployment-name`|Name of deployment (production, staging, other, etc)|
 |`--host`|Host (if SFTP, define port as host:port) |
