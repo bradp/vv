@@ -235,7 +235,7 @@ Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com
   Make headings consistent, & represent proper hierarchy, & update outdated info.
   Doc Tweaks. Make headings consistent, and represent proper hierarchy, and update outdated info.
 
-#### 1.4.3 - *2015-1-5* ####
+#### 1.5.0 - *2015-1-5* ####
  Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
 
 #### 1.4.3 - *2014-12-14* ####
