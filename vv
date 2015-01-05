@@ -638,18 +638,14 @@ PHP"
 	fi
 
 	# Create SQL commands for database creation
-    # =============================================================================
-    if [ ! -e "$path"/database/init-custom.sql ]; then
+	# =============================================================================
+	if [ ! -e "$path"/database/init-custom.sql ]; then
 		touch "$path"/database/init-custom.sql
-    fi
-    printf "CREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
-"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" >> "$path"/database/init-custom.sql
+	fi
+	printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
+"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
 	{
-		echo "	echo \"Creating database '$site' (if it does not exist)...\""
-		echo "mysql -u root --password=root -e \"CREATE DATABASE IF NOT EXISTS \\\`$db_name\\\`\""
-		echo "mysql -u root --password=root -e \"GRANT ALL PRIVILEGES ON \\\`$db_name\\\`.* TO wp@localhost IDENTIFIED BY 'wp';\""
-		echo "	"
 		echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 		echo "	echo 'Installing WordPress $version in $site/$web_root...'"
 		echo "	if [ ! -d \"./$web_root\" ]; then"
@@ -759,7 +755,7 @@ remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove any deployments set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/www\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
@@ -779,7 +775,16 @@ remove_site() { # @TODO refactor this if we need to
 			rm "$path"/config/nginx-config/sites/"$site".conf
 			echo "Done"
 
-			echo -en "Removing any set up deployments. "
+			# Remove the database creation from init-custom.sql
+			info "Removing the database creation commands from init-custom.sql... "
+			cd "$path"/database
+			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
+			rm init-custom.sql
+			mv init-custom.sql.tmp init-custom.sql
+			cd "$path"
+			echo "Done"
+
+			info "Removing any set up deployments. "
 			remove_site_remove_all_deployment
 			echo "Done"
 
@@ -915,24 +920,10 @@ deployment_setup() {
 	success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
 }
 
-remove_all_deployment() {
-	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
-		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
-		read -r remove_deployment_confirm
-	done
-	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
-	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
-	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
-
-	success "Deployment for $site removed."
-}
-
 remove_site_remove_all_deployment() {
 	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
-
-	success "Deployment for $site removed."
 }
 
 remove_deployment() {
