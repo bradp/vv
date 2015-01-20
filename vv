@@ -23,14 +23,16 @@
 
 version_number=1.5.0
 
-normal=$(tput sgr0)
-bold=$(tput bold)
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-yellow=$(tput setaf 3)
-blue=$(tput setaf 4)
-magenta=$(tput setaf 5)
-cyan=$(tput setaf 6)
+if [[ ! -z $(which tput) ]]; then
+	normal=$(tput sgr0)
+	bold=$(tput bold)
+	red=$(tput setaf 1)
+	green=$(tput setaf 2)
+	yellow=$(tput setaf 3)
+	blue=$(tput setaf 4)
+	magenta=$(tput setaf 5)
+	cyan=$(tput setaf 6)
+fi
 
 version () {
 echo "vv version $version_number"
