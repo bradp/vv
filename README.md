@@ -220,6 +220,9 @@ Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com
 
 ## Change Log
 
+#### 1.5.0 - *2015-1-5* ####
+ Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
+
 #### 1.4.6 - *2014-12-15* ####
  Fix git repo setup
  Fix brew update procedure
@@ -234,9 +237,6 @@ Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com
   Add note about auto-update disabling to vv-config section of readme
   Make headings consistent, & represent proper hierarchy, & update outdated info.
   Doc Tweaks. Make headings consistent, and represent proper hierarchy, and update outdated info.
-
-#### 1.5.0 - *2015-1-5* ####
- Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
 
 #### 1.4.3 - *2014-12-14* ####
  Fix blueprint breaking site creation.
