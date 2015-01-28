@@ -19,7 +19,6 @@ function main( $blueprint, $path = 'htdocs' ) {
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
 		echo "Installing mu-plugins...";
 		foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-			install( 'mu-plugin', $mu_plugin );
 			install( 'mu-plugin', $mu_plugin, $path );
 		}
 	}
@@ -32,7 +31,7 @@ function main( $blueprint, $path = 'htdocs' ) {
 	if ( ! empty( $blueprints->$blueprint->defines ) ) {
 		echo "Adding constants to wp-config.php...";
 		foreach( $blueprints->$blueprint->defines as $define ) {
-	 		add_define( $define );
+	 		add_define( $define, $path );
 	 	}
 	}
 	echo "Blueprint set up.";
