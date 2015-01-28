@@ -565,7 +565,7 @@ site_creation_questions() {
 			read -r placeholder_content
 		fi
 		if [[ $placeholder_content = "y" ]]; then
-			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp import import.xml --authors=skip --allow-root && rm import.xml"
+			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp plugin install wordpress-importer --allow-root  && wp plugin activate wordpress-importer --allow-root  && wp import import.xml --authors=skip --allow-root && rm import.xml"
 		fi
 	fi
 
