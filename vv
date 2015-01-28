@@ -29,7 +29,7 @@ if [[ ! -z $(which tput) ]]; then
 	red=$(tput setaf 1)
 	green=$(tput setaf 2)
 	yellow=$(tput setaf 3)
-	blue=$(tput setaf 4)
+	blue=$(tput setaf 6)
 	magenta=$(tput setaf 5)
 	cyan=$(tput setaf 6)
 fi
@@ -42,7 +42,7 @@ echo "vv version $version_number"
 # Example: info "doing thing"
 # Output (to STDOUT): doing thing
 info () {
-    printf "%b" "${blue}$1${normal} \n"
+    printf "%b" "${bold}${yellow}$1${normal} \n"
 }
 
 # Usage: success "message"
@@ -63,7 +63,7 @@ warning () {
 # Example: prompt "Site name"
 # Output (to STDOUT): Site Name:
 prompt () {
-    printf "%b" "${yellow} $1: ${normal}"
+    printf "%b" "${magenta} $1: ${normal}"
 }
 
 # Usage: error ["message"]
