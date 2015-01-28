@@ -1,0 +1,58 @@
+## Change Log
+
+
+#### 1.5.0 - *2015-1-5* ####
+ Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
+
+#### 1.4.6 - *2014-12-15* ####
+ Fix git repo setup
+ Fix brew update procedure
+
+#### 1.4.5 - *2014-12-15* ####
+ Fixes deployment setup
+
+#### 1.4.4 - *2014-12-15* ####
+  Exclude wp-config.php when doing a deployment
+  update readme to clarify git repo usage
+  Fix order of output in vvv-init.sh
+  Add note about auto-update disabling to vv-config section of readme
+  Make headings consistent, & represent proper hierarchy, & update outdated info.
+  Doc Tweaks. Make headings consistent, and represent proper hierarchy, and update outdated info.
+
+#### 1.5.0 - *2015-1-5* ####
+ Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
+
+#### 1.4.3 - *2014-12-14* ####
+ Fix blueprint breaking site creation.
+
+#### 1.4.2 - *2014-12-14* ####
+ Fix extra info being output on all commands.
+
+#### 1.4.1 - *2014-12-14* ####
+ Fix issue with update procedure when installed with brew.
+ Added flag to force update.
+
+#### 1.4.0 - *2014-12-14* ####
+ Adds blueprints for site creation.
+
+#### 1.3.1 - *2014-12-13* ####
+ Fixes bug in site creation.
+
+#### 1.3.0 - *2014-12-13* ####
+ Adds sample content import to new site.
+ Fixes bugs in site database creation.
+
+#### 1.2.0 - *2014-12-13* ####
+ Adds auto-update functionality.
+
+#### 1.1.0 - *2014-12-13* ####
+ Add deployment configuration using Vagrant push.
+
+#### 1.0.1 - *2014-12-12* ####
+ Removed version checking, as it was throwing errors.
+
+#### 1.0.0 - *2014-12-12* ####
+ Initial documented, stable release.
+
+#### 0.1.0 - *2014-12-11* ####
+ Initial release.
