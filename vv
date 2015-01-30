@@ -846,6 +846,10 @@ remove_site() { # @TODO refactor this if we need to
 			cd "$path"
 			echo "Done"
 
+			info "Removing database"
+			rm -rf "$path"/database/data/"$site"
+			echo "Done"
+
 			info "Removing any set up deployments. "
 			remove_site_remove_all_deployment
 			echo "Done"
