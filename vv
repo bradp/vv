@@ -465,14 +465,16 @@ site_creation_questions() {
 		web_root="htdocs"
 	fi
 
-	if [[ -f "$path"/vv-blueprints.json ]]; then
-		# Get local URL
-		if [ "$use_defaults" = "false" ]; then
-			if [ -z "$blueprint" ]; then
-				prompt "Blueprint to use (leave blank for none)"
-				read -r blueprint
+	if [ "$no_wp" = "false" ]; then
+		if [[ -f "$path"/vv-blueprints.json ]]; then
+			# Get local URL
+			if [ "$use_defaults" = "false" ]; then
 				if [ -z "$blueprint" ]; then
-					unset blueprint
+					prompt "Blueprint to use (leave blank for none)"
+					read -r blueprint
+					if [ -z "$blueprint" ]; then
+						unset blueprint
+					fi
 				fi
 			fi
 		fi
@@ -489,104 +491,107 @@ site_creation_questions() {
 		fi
 	done
 
-	if [ ! -z "$version" ]; then
-		# Attempt to verify the existence of the version (hacky)
-		if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
-			error "Version $version not found, try again"
-			unset version
-		else
-			installversion=" --version=$version"
-		fi
-	fi
-
-	while [[ -z "$version" ]]; do
-		# Get WordPress version
-		if [ "$use_defaults" = "false" ]; then
-			prompt "WordPress version to install (leave blank for latest version)"
-			read -r version
-		fi
-		if [ -z "$version" ]; then
-			installversion=""
-			version="(release version)"
-		else
+	if [ "$no_wp" = "false" ]; then
+		if [ ! -z "$version" ]; then
 			# Attempt to verify the existence of the version (hacky)
 			if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
-				error "Version \"$version\" not found, try again"
+				error "Version $version not found, try again"
 				unset version
 			else
 				installversion=" --version=$version"
 			fi
 		fi
-	done
 
-	if [ -z "$multisite" ]; then
-		if [ "$use_defaults" = "false" ]; then
-			prompt "Install as multisite? (y/N)"
-			read -r multisite
-		fi
-		if [[ $multisite = 'y' ]]; then
-			install_text='multisite-install'
-		else
-			install_text='install'
-		fi
-	fi
-
-	if [[ $multisite = "y" ]]; then
-		while [[ -z $ms_type ]]; do
+		while [[ -z "$version" ]]; do
+			# Get WordPress version
 			if [ "$use_defaults" = "false" ]; then
-				prompt "Install as subdomain or subdirectory? "
-				read -r ms_type
+				prompt "WordPress version to install (leave blank for latest version)"
+				read -r version
 			fi
-			if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
-				error "Type must be subdomain or subdirectory."
-				unset ms_type
+			if [ -z "$version" ]; then
+				installversion=""
+				version="(release version)"
+			else
+				# Attempt to verify the existence of the version (hacky)
+				if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
+					error "Version \"$version\" not found, try again"
+					unset version
+				else
+					installversion=" --version=$version"
+				fi
 			fi
 		done
-	fi
 
-	if [[ $ms_type = 'subdomain' ]]; then
-		install_text='multisite-install --subdomains'
-	fi
-
-	if [[ ! -z $git_repo && -d "$path/www/$site" ]]; then
-		error "$path/www/$site already exists. Skipping git clone."
-		unset git_repo
-	elif [[ -z "$git_repo" && ! -d "$path/www/$site" ]]; then
-		if [ "$use_defaults" = "false" ]; then
-			prompt "Git repo to clone as wp-content (leave blank to skip)"
-			read -r git_repo
-		fi
-	fi
-
-	add_placeholder_content="";
-	if [ -z "$placeholder_content" ]; then
-		if [ "$use_defaults" = "false" ]; then
-			prompt "Add sample content to site (y/N)"
-			read -r placeholder_content
-		fi
-		if [[ $placeholder_content = "y" ]]; then
-			add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp plugin install wordpress-importer --allow-root  && wp plugin activate wordpress-importer --allow-root  && wp import import.xml --authors=skip --allow-root && rm import.xml"
-		fi
-	fi
-
-	# Ask if WP_DEBUG should be turned on
-	while [ -z "$wp_debug" ]; do
-		if [ "$use_defaults" = "false" ]; then
-			prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/N)"
-			read -r wp_debug
-		fi
-		if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
-			wp_debug="n"
-		fi
-	done
-
-	if [[ $image_proxy = "true" ]]; then
-		while [ -z "$live_site_url" ]; do
+		if [ -z "$multisite" ]; then
 			if [ "$use_defaults" = "false" ]; then
-				prompt "Live site URL (no http:// or trailing slash)"
-				read -r live_site_url
+				prompt "Install as multisite? (y/N)"
+				read -r multisite
+			fi
+			if [[ $multisite = 'y' ]]; then
+				install_text='multisite-install'
+			else
+				install_text='install'
+			fi
+		fi
+
+		if [[ $multisite = "y" ]]; then
+			while [[ -z $ms_type ]]; do
+				if [ "$use_defaults" = "false" ]; then
+					prompt "Install as subdomain or subdirectory? "
+					read -r ms_type
+				fi
+				if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
+					error "Type must be subdomain or subdirectory."
+					unset ms_type
+				fi
+			done
+		fi
+
+		if [[ $ms_type = 'subdomain' ]]; then
+			install_text='multisite-install --subdomains'
+		fi
+
+		if [[ ! -z $git_repo && -d "$path/www/$site" ]]; then
+			error "$path/www/$site already exists. Skipping git clone."
+			unset git_repo
+		elif [[ -z "$git_repo" && ! -d "$path/www/$site" ]]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Git repo to clone as wp-content (leave blank to skip)"
+				read -r git_repo
+			fi
+		fi
+
+		add_placeholder_content="";
+		if [ -z "$placeholder_content" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Add sample content to site (y/N)"
+				read -r placeholder_content
+			fi
+			if [[ $placeholder_content = "y" ]]; then
+				add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp plugin install wordpress-importer --allow-root  && wp plugin activate wordpress-importer --allow-root  && wp import import.xml --authors=skip --allow-root && rm import.xml"
+			fi
+		fi
+
+
+		# Ask if WP_DEBUG should be turned on
+		while [ -z "$wp_debug" ]; do
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Enable WP_DEBUG and WP_DEBUG_LOG (y/N)"
+				read -r wp_debug
+			fi
+			if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
+				wp_debug="n"
 			fi
 		done
+
+		if [[ $image_proxy = "true" ]]; then
+			while [ -z "$live_site_url" ]; do
+				if [ "$use_defaults" = "false" ]; then
+					prompt "Live site URL (no http:// or trailing slash)"
+					read -r live_site_url
+				fi
+			done
+		fi
 	fi
 
 	if [ -z "$username" ]; then
@@ -613,7 +618,9 @@ confirm_site_creation() {
 	fi
 
 	info "\nProvisioning Vagrant will do the following:"
-	echo -e "* Create database $site\n* Install WordPress $version in the $web_root directory\n* Make the site visible at $domain"
+	if [ "$no_wp" = "false" ]; then
+		echo -e "* Create database $site\n* Install WordPress $version in the $web_root directory\n* Make the site visible at $domain"
+	fi
 
 	info "\n"
 	while [ -z "$continue_create" ]; do
@@ -644,7 +651,9 @@ create_site_files(){
 	fi
 	cd "$site"
 
-	printf "path: $web_root" > wp-cli.yml
+	if [ "$no_wp" = "false" ]; then
+		printf "path: $web_root" > wp-cli.yml
+	fi
 
 	wp_debug_text=''
 	if [[ $wp_debug = 'y' ]]; then
@@ -660,30 +669,32 @@ PHP"
 		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
 	fi
 
-	# Create SQL commands for database creation
-	# =============================================================================
-	if [ ! -e "$path"/database/init-custom.sql ]; then
-		touch "$path"/database/init-custom.sql
-	fi
-	printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
+	if [ "$no_wp" = "false" ]; then
+		# Create SQL commands for database creation
+		# =============================================================================
+		if [ ! -e "$path"/database/init-custom.sql ]; then
+			touch "$path"/database/init-custom.sql
+		fi
+		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
-	{
-		echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
-		echo "	echo 'Installing WordPress $version in $site/$web_root...'"
-		echo "	if [ ! -d \"./$web_root\" ]; then"
-		echo "		mkdir ./$web_root"
-		echo "	fi"
-		echo "	cd ./$web_root"
-		echo "	wp core download --allow-root $installversion"
-		echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
-		echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
-		echo "	$add_placeholder_content"
-		echo "	"
-		echo "	cd -"
-		echo "$blueprint_text"
-		echo "fi"
-	} >> vvv-init.sh
+		{
+			echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
+			echo "	echo 'Installing WordPress $version in $site/$web_root...'"
+			echo "	if [ ! -d \"./$web_root\" ]; then"
+			echo "		mkdir ./$web_root"
+			echo "	fi"
+			echo "	cd ./$web_root"
+			echo "	wp core download --allow-root $installversion"
+			echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
+			echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
+			echo "	$add_placeholder_content"
+			echo "	"
+			echo "	cd -"
+			echo "$blueprint_text"
+			echo "fi"
+		} >> vvv-init.sh
+	fi
 
 	echo "Done"
 
@@ -1198,6 +1209,10 @@ check_args() {
 				blueprint_init="true"
 				shift
 				;;
+			--blank)
+				no_wp="true"
+				shift
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -1226,6 +1241,7 @@ main() {
 	check_for_config_file
 
 	use_defaults="false"
+	no_wp="false"
 	check_args "$@"
 }
 
