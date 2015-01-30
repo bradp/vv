@@ -564,12 +564,12 @@ site_creation_questions() {
 			fi
 		fi
 
-		while [ -z "$db_import" ]; do
+		if [ -z "$db_import" ]; then
 			if [ "$use_defaults" = "false" ]; then
 				prompt "Local SQL file to import for database (leave blank to skip)"
 				read -r db_import
 			fi
-		done
+		fi
 
 		add_placeholder_content="";
 		if [ -z "$placeholder_content" ]; then
