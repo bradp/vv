@@ -254,6 +254,7 @@ ${bold} SITE OPTIONS: ${normal}
     --email  			Admin email
     --git-repo  		Git repo to clone as wp-content
     --blueprint, -b 		Name of blueprint to use
+    --blank			Creates blank VVV site, with no WordPress
 
 
 ${bold} EXAMPLE:${normal}

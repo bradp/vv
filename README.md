@@ -181,6 +181,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--git-repo`|Git repo to clone as wp-content|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
+|`--blank`|Creates blank VVV site, with no WordPress|
 
 ### Options for Site Removal
 |Option|Description|
