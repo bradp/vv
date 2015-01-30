@@ -256,6 +256,7 @@ ${bold} SITE OPTIONS: ${normal}
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
+    -db|--database 	Import a local database file
 
 
 ${bold} EXAMPLE:${normal}
@@ -563,6 +564,13 @@ site_creation_questions() {
 			fi
 		fi
 
+		while [ -z "$db_import" ]; do
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Local SQL file to import for database (leave blank to skip)"
+				read -r db_import
+			fi
+		done
+
 		add_placeholder_content="";
 		if [ -z "$placeholder_content" ]; then
 			if [ "$use_defaults" = "false" ]; then
@@ -573,7 +581,6 @@ site_creation_questions() {
 				add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp plugin install wordpress-importer --allow-root  && wp plugin activate wordpress-importer --allow-root  && wp import import.xml --authors=skip --allow-root && rm import.xml"
 			fi
 		fi
-
 
 		# Ask if WP_DEBUG should be turned on
 		while [ -z "$wp_debug" ]; do
@@ -671,11 +678,20 @@ PHP"
 		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
 	fi
 
+	if [[ ! -z "$db_import" ]]; then
+		cp "$db_import" "$path"/www/"$site"/"$site".sql
+	fi
+
 	if [ "$no_wp" = "false" ]; then
 		# Create SQL commands for database creation
 		# =============================================================================
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
+		fi
+
+		db_init=""
+		if [[ ! -z "$db_import" ]]; then
+			db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
 		fi
 
 		install_method="wp core download --allow-root $installversion"
@@ -700,6 +716,7 @@ PHP"
 			echo "	$config"
 			echo "	$core"
 			echo "	$add_placeholder_content"
+			echo "	$db_init"
 			echo "	"
 			echo "	cd -"
 			echo "$blueprint_text"
@@ -1138,6 +1155,11 @@ check_args() {
 				cd "$path"
 				echo "$(vagrant "$2");"
 				exit
+				shift 2
+				;;
+			-db|--database)
+				argument_expected "$1" "$2"
+				db_import=$2
 				shift 2
 				;;
 			-r|-rm|--rm|rm|--remove|remove|--delete|delete|--teardown|teardown)
