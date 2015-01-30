@@ -182,6 +182,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--blank`|Creates blank VVV site, with no WordPress|
+|`--wpskeleton`, `--skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)`
 
 ### Options for Site Removal
 |Option|Description|

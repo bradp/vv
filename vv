@@ -255,6 +255,7 @@ ${bold} SITE OPTIONS: ${normal}
     --git-repo  		Git repo to clone as wp-content
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
+    --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
 
 
 ${bold} EXAMPLE:${normal}
@@ -676,6 +677,15 @@ PHP"
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
 		fi
+
+		install_method="wp core download --allow-root $installversion"
+		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
+		core="wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
+		if [ "$wpskeleton" = "true" ]; then
+			install_method="git clone --recursive https://github.com/markjaquith/WordPress-Skeleton.git . "
+			config="echo \"<?php define( 'DB_NAME', '$db_name' ); define( 'DB_USER', 'wp' ); define( 'DB_PASSWORD', 'wp' ); define( 'DB_HOST', 'localhost' );\" >> local-config.php"
+			core=""
+		fi
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
@@ -686,9 +696,9 @@ PHP"
 			echo "		mkdir ./$web_root"
 			echo "	fi"
 			echo "	cd ./$web_root"
-			echo "	wp core download --allow-root $installversion"
-			echo "	wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
-			echo "	wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
+			echo "	$install_method"
+			echo "	$config"
+			echo "	$core"
 			echo "	$add_placeholder_content"
 			echo "	"
 			echo "	cd -"
@@ -1212,6 +1222,10 @@ check_args() {
 				;;
 			--blank)
 				no_wp="true"
+				shift
+				;;
+			--wpskeleton|--skel)
+				wpskeleton="true"
 				shift
 				;;
 			*)
