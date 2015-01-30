@@ -1,5 +1,14 @@
 ## Change Log
 
+#### 1.5.1 *2015-1-* ####
+ Add --blank paramater to create blank VVV site, with no WordPress
+ Add --defaults command to accept all default options in site creation
+ Fix placeholder import process
+ Replace old method of image proxying
+ Fix color output to look a bit better
+ Fix deployment creation
+ Add check for curl
+ Add check for tput
 
 #### 1.5.0 - *2015-1-5* ####
  Tons of cleanup, bug fixes, and standardization. Tons of props to @creativecoder.
