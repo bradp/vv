@@ -255,7 +255,6 @@ ${bold} SITE OPTIONS: ${normal}
     --git-repo  		Git repo to clone as wp-content
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
-    --file-path		Pass in a directory name to be used instead of htdocs
 
 
 ${bold} EXAMPLE:${normal}
