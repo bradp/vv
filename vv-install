@@ -58,7 +58,7 @@ function add_option( $option ) {
 	exec( "wp --allow-root option add $a $b" );
 }
 
-function add_define( $object ) {
+function add_define( $object, $path ) {
 	$object = explode( "::", $object );
 	exec( '		echo "$(sed "34a\\
 define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
