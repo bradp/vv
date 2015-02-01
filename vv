@@ -603,13 +603,13 @@ site_creation_questions() {
 		fi
 	fi
 
-	if [ -z "$username" ]; then
+	if [[ -z "$username" ]]; then
 		username="admin"
 	fi
-	if [ -z "$password" ]; then
+	if [[ -z "$password" ]]; then
 		password="password"
 	fi
-	if [ -z "$email" ]; then
+	if [[ -z "$email" ]]; then
 		email="admin@localhost.dev"
 	fi
 }
