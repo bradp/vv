@@ -1,6 +1,6 @@
 ## Change Log
 
-#### 1.6.0 *2015-1-* ####
+#### 1.6.0 *2015-2-2* ####
  * Fix issue with passing in custom admin user/pass
  * Adds ability to import a local database export.
  * Add ability to set up a WordPress Skeleton style installation
