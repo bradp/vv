@@ -26,6 +26,8 @@ You can run `vv --update` to update to the latest version. This will update via 
 
 vv will automatically check for updates and update itself once a week. You can disble this by adding `"auto_update_disable": false` to the JSON config in `~/.vv-config`.
 
+Sometimes there may be issues updating where it will not always pull the actual latest version from Github but still mention that you are out-of-date after running `vv --update` - in such scenarios, try `vv --force-update`if that still does not work you may want to use homebrew to uninstall Variable VV and reinstall it by fetching the latest version. Note: It will keep all your changes and it is quite safe to do so. You can do this by running `brew remove vv` then `brew untap bradp/vv` and finally, run the install command `brew install bradp/vv/vv`as mentioned above.
+
 ## Usage
 
 Once installed, you can run `vv` anywhere you'd like. If vv can't automatically find your VVV installation, you will be prompted for the path. It will also save this into a configuration file in `~/.vv-config`, so you won't be prompted again.
