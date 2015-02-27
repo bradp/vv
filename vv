@@ -358,6 +358,8 @@ get_vvv_path(){
 			path=$(pwd)
 		elif [ -e ~/Sites/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/Sites
+		elif [ -e ~/Sites/Vagrant/Vagrantfile ] && [ -z $force_path ]; then
+			path=~/Sites/Vagrant
 		elif [ -e ~/vagrant/Vagrantfile ] && [ -z $force_path ]; then
 			path=~/vagrant
 		elif [ -e ~/vagrant-local/Vagrantfile ] && [ -z $force_path ]; then
