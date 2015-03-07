@@ -38,7 +38,7 @@ function main( $blueprint, $path = 'htdocs' ) {
 }
 
 function install ( $type, $object, $path ) {
-    echo "Installing $object...\n";
+    echo "  Installing $object...\n";
 	if ( strpos( $object, '.git' ) !== false ) {
 		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object && cd -" );
 	} elseif ( strpos( $object, '.zip' ) !== false ) {
@@ -57,12 +57,12 @@ function add_option( $option ) {
 	$b = $object[1];
 	exec( "wp --allow-root option delete $a" );
 	exec( "wp --allow-root option add $a $b" );
-	echo "Insert settings $a...\n";
+	echo "  Insert settings $a...\n";
 }
 
 function add_define( $object, $path ) {
 	$object = explode( "::", $object );
-	echo "Insert constants $object[0]...\n";
+	echo "  Insert constants $object[0]...\n";
 	if(strtolower($object[1]) === 'true' || strtolower($object[1]) === 'false') {
     exec( '     echo "$(sed "34a\\
 define(\"'. $object[0] . '\",' . $object[1]  . ');
