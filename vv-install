@@ -63,7 +63,7 @@ function add_option( $option ) {
 function add_define( $object, $path ) {
 	$object = explode( "::", $object );
 	echo "  Insert constants $object[0]...\n";
-	if(strtolower($object[1]) === 'true' || strtolower($object[1]) === 'false') {
+	if(is_bool($object[1])) {
     exec( '     echo "$(sed "34a\\
 define(\"'. $object[0] . '\",' . $object[1]  . ');
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
