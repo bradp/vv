@@ -252,12 +252,12 @@ ${bold} SITE OPTIONS: ${normal}
     --username  		Admin username
     --password  		Admin password
     --email  			Admin email
-    --git-repo  		Git repo to clone as wp-content
+    --git-repo, -gr  		Git repo to clone as wp-content
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
-    -db|--database 	Import a local database file
-
+    --database, -db 		Import a local database file
+    --remove-defaults, -rd 	Remove defaul themes and plugins
 
 ${bold} EXAMPLE:${normal}
     vv create --domain mysite.dev --name mysite --debug
@@ -573,6 +573,13 @@ site_creation_questions() {
 			fi
 		fi
 
+		if [ -z "$remove_defaults" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Remove default themes and plugins? (y/N)"
+				read -r remove_defaults
+			fi
+		fi
+
 		add_placeholder_content="";
 		if [ -z "$placeholder_content" ]; then
 			if [ "$use_defaults" = "false" ]; then
@@ -696,6 +703,11 @@ PHP"
 			db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
 		fi
 
+		maybe_remove_defaults=""
+		if [[ ! -z "$remove_defaults" ]]; then
+			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete aksimet --allow-root; git checkout HEAD ."
+		fi
+
 		install_method="wp core download --allow-root $installversion"
 		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
 		core="wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
@@ -719,6 +731,7 @@ PHP"
 			echo "	$core"
 			echo "	$add_placeholder_content"
 			echo "	$db_init"
+			echo "  $maybe_remove_defaults"
 			echo "	"
 			echo "	cd -"
 			echo "$blueprint_text"
@@ -1107,7 +1120,7 @@ check_args() {
 				email=$2
 				shift 2
 				;;
-			--git-repo|--git_repo|--gitrepo)
+			--git-repo|--git_repo|--gitrepo|-gr)
 				argument_expected "$1" "$2"
 				git_repo=$2
 				shift 2
@@ -1215,6 +1228,10 @@ check_args() {
 				placeholder_content="y"
 				shift
 				;;
+			--rd|--remove-defaults)
+				remove_defaults="y"
+				shift
+				;;
 			--about|about)
 				check_for_update
 				about
@@ -1254,7 +1271,7 @@ check_args() {
 				no_wp="true"
 				shift
 				;;
-			--wpskeleton|--skel)
+			--wpskeleton|--skel,-skel)
 				wpskeleton="true"
 				shift
 				;;

@@ -184,12 +184,13 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--username`|Admin username|
 |`--password`|Admin password|
 |`--email`|Admin email|
-|`--git-repo`|Git repo to clone as wp-content|
+|`--git-repo`,`-gr`|Git repo to clone as wp-content|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--blank`|Creates blank VVV site, with no WordPress|
-|`--wpskeleton`, `--skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)`
-|`-db`,`--database`|Imports a local database export|
+|`--wpskeleton`, `-skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)`
+|`--database`,`-db`|Imports a local database export|
+|`--remove-defaults`,`-rd`|Removes default themes and plugins|
 
 ### Options for Site Removal
 |Option|Description|
