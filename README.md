@@ -227,4 +227,4 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 ## Thanks
 
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
-Also thanks to @creativecoder, @jtsternberg, @tnorthcutt, @joehills, @gregrickaby, @leogopal for awesome contributions.
+Also thanks to [@creativecoder](http://github.com/creativecoder), [@jtsternberg](http://github.com/jtsternberg), [@tnorthcutt](http://github.com/tnorthcutt), [@joehills](http;//github.com/joehills), [@gregrickaby](http://github.com/gregrickaby), [@leogopal](http://github.com/leogopal) for awesome contributions.
