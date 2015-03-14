@@ -255,6 +255,7 @@ ${bold} SITE OPTIONS: ${normal}
     --git-repo, -gr  		Git repo to clone as wp-content
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
+    --blank-with-db		Adds a blank VVV site, with a database
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
     --database, -db 		Import a local database file
     --remove-defaults, -rd 	Remove defaul themes and plugins
@@ -691,16 +692,40 @@ PHP"
 		cp "$db_import" "$path"/www/"$site"/"$site".sql
 	fi
 
+	db_init=""
+	if [[ ! -z "$db_import" ]]; then
+		db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
+	fi
+
+	if [ "$no_wp_with_db" = "true" ]; then
+		if [ ! -e "$path"/database/init-custom.sql ]; then
+			touch "$path"/database/init-custom.sql
+		fi
+		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
+"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
+
+		if [[ ! -z "$db_import" ]]; then
+			{
+				echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
+				echo "	echo 'Making the correct directories and adding DB in $site/$web_root...'"
+				echo "	if [ ! -d \"./$web_root\" ]; then"
+				echo "		mkdir ./$web_root"
+				echo "	fi"
+				echo "	cd ./$web_root"
+				echo "	$db_init"
+				echo "	"
+				echo "	cd -"
+				echo "$blueprint_text"
+				echo "fi"
+			} >> vvv-init.sh
+		fi
+	fi
+
 	if [ "$no_wp" = "false" ]; then
 		# Create SQL commands for database creation
 		# =============================================================================
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
-		fi
-
-		db_init=""
-		if [[ ! -z "$db_import" ]]; then
-			db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
 		fi
 
 		maybe_remove_defaults=""
@@ -764,7 +789,7 @@ PHP"
 	fi
 	xip_domain=" ~^"$site"\.\d+\.\d+\.\d+\.\d+.xip\.io$"
 	nginx_domain_text="$nginx_domain_text""$xip_domain"
-	
+
 	sed -e "s/testserver\.com/$nginx_domain_text/" \
 		-e "s|wordpress-local|$site/$web_root|" local-nginx-example.conf-sample > "$site".conf
 
@@ -1271,6 +1296,11 @@ check_args() {
 				no_wp="true"
 				shift
 				;;
+			--blank-with-db)
+				no_wp="true"
+				no_wp_with_db="true"
+				shift
+				;;
 			--wpskeleton|--skel,-skel)
 				wpskeleton="true"
 				shift
@@ -1304,6 +1334,7 @@ main() {
 
 	use_defaults="false"
 	no_wp="false"
+	no_wp_with_db="false"
 	check_args "$@"
 }
 
