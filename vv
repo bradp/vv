@@ -14,9 +14,9 @@
 #	 ██    ██ ██    ██
 #	░██   ░██░██   ░██ 	  ▓▓▓▓▓▓▓▓▓▓
 #	░░██ ░██ ░░██ ░██ 	 ░▓ author ▓ Brad Parbs <brad@bradparbs.com>
-#	 ░░████   ░░████     ░▓ github ▓ http://github.com/bradp/vv
-#	  ░░██     ░░██      ░▓▓▓▓▓▓▓▓▓▓
-#	   ░░       ░░   	 ░░░░░░░░░░
+#	 ░░████   ░░████         ░▓ github ▓ http://github.com/bradp/vv
+#	  ░░██     ░░██          ░▓▓▓▓▓▓▓▓▓▓
+#	   ░░       ░░   	  ░░░░░░░░░░
 #
 #
 # =============================================================================
@@ -83,7 +83,7 @@ fail () {
 check_for_update () {
 	if [[ ! -z $(which curl) ]]; then
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-		if [[ ! $version_number = $github_version ]]; then
+		if [[ ! "$version_number" = "$github_version" ]]; then
 			info "Your version of vv does not match the current Github version. Please update with vv --update"
 		fi
 	fi
@@ -118,7 +118,7 @@ update_vv () {
 
 vv_bootstrap_update () {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-	download_link="https://github.com/bradp/vv/archive/"$github_version".tar.gz"
+	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
 	curl -L -o ~/"$github_version".tar.gz "$download_link" 2>/dev/null
 	tar -C ~/ -zxvf ~/"$github_version".tar.gz 2>/dev/null
@@ -141,7 +141,7 @@ auto_update_main () {
 			if [[ $epoch_diff -gt $epoch_target ]]; then
 				info "vv is out of date. Checking for update."
 				github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-				if [[ ! $version_number = $github_version ]]; then
+				if [[ ! "$version_number" = "$github_version" ]]; then
 					update_vv
 				fi
 
@@ -154,7 +154,7 @@ auto_update_main () {
 
 _current_epoch() {
   seconds=$(date +%s)
-  echo $(($seconds/60/60/24))
+  echo $((seconds/60/60/24))
 }
 
 _update_vv_update() {
@@ -335,7 +335,7 @@ get_vvv_path(){
 			error "Path specified is not a VVV root directory. Where is VVV installed?"
 			unset path
 
-			while [ -z $path ]; do
+			while [ -z "$path" ]; do
 				read -r -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
@@ -356,22 +356,22 @@ get_vvv_path(){
 		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
 			path=$(pwd)
-		elif [ -e ~/Sites/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/Sites
-		elif [ -e ~/Sites/Vagrant/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/Sites/Vagrant
-		elif [ -e ~/vagrant/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/vagrant
-		elif [ -e ~/vagrant-local/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/vagrant-local
-		elif [ -e ~/projects/vvv/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/projects/vvv
-		elif [ -e ~/working/vvv/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/working/vvv
-		elif [ -e ~/vvv/Vagrantfile ] && [ -z $force_path ]; then
+		elif [ -e ~/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
 			path=~/vvv
 		else
-			while [ -z $path ]; do
+			while [ -z "$path" ]; do
 				read -r -e -p "VVV install directory: " path
 
 				# Make sure directory is actually a VVV root
@@ -389,7 +389,7 @@ get_vvv_path(){
 get_list_sites() {
 	clean_saved=$clean
 	clean="true"
-	sites=$(list_sites)
+	list_sites
 	clean=$clean_saved
 }
 
@@ -408,7 +408,7 @@ list_sites() {
 				fi
 
 				if [[ ! $clean = "true" ]]; then
-					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}" "${cyan}[VVV default]${normal}"
+					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
 				fi
 			else
 				# @TODO fix having Multiple URLs in vvv-hosts
@@ -419,9 +419,9 @@ list_sites() {
 					url="$(echo "$url" | paste -d ' ' - -)"
 				fi
 				if [[ ! $clean = "true" ]]; then
-					printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}($url)${normal}"
+					printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
 				else
-					printf "$filename\n"
+					printf "%s\n" "$filename"
 				fi
 			fi
 		fi
@@ -658,12 +658,12 @@ create_site_files(){
 	cd "$path"/www
 	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
 	if [ ! -d "$site" ]; then
-		mkdir $site
+		mkdir "$site"
 	fi
 	cd "$site"
 
 	if [ "$no_wp" = "false" ]; then
-		printf "path: $web_root" > wp-cli.yml
+		printf "path: %s" "$web_root" > wp-cli.yml
 	fi
 
 	wp_debug_text=''
