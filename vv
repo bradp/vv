@@ -737,7 +737,7 @@ PHP"
 	echo "Done"
 
 	if [ ! -z "$git_repo" ]; then
-		git clone --recursive $git_repo $web_root/wp-content
+		git clone --recursive "$git_repo" $web_root/wp-content
 	fi
 
 	# Add site conf file to nginx-config
