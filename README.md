@@ -135,6 +135,7 @@ For options and constants, please note the `::` as a seperator between the key a
 
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
+When creating a site, the name you've specified (in this example, "sample") is what you'll need to specify to use this blueprint.
 
 ## Vagrant Proxy
 
