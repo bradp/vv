@@ -151,6 +151,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--update`|Updates vv to the latest stable version|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
+|`--force-sites-folder`,`-fsf`|Override sites folder directory locating|
 |`--defaults`|Accept all default options and skip the wizard|
 
 ### Commands
