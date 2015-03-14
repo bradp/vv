@@ -259,7 +259,7 @@ ${bold} SITE OPTIONS: ${normal}
     --blank-with-db		Adds a blank VVV site, with a database
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
     --database, -db 		Import a local database file
-    --remove-defaults, -rd 	Remove defaul themes and plugins
+    --remove-defaults, -rd 	Remove default themes and plugins
 
 ${bold} EXAMPLE:${normal}
     vv create --domain mysite.dev --name mysite --debug
