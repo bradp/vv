@@ -429,7 +429,6 @@ list_sites() {
 					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
 				fi
 			else
-				# @TODO fix having Multiple URLs in vvv-hosts
 				url=$(<"$path"/"$sites_folder"/"$filename"/vvv-hosts)
 				url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 				urls=$(echo "$url" | wc -l)
