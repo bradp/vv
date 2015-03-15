@@ -5,25 +5,25 @@ function main( $blueprint, $path = 'htdocs' ) {
 	$blueprints = json_decode( file_get_contents( "vv-blueprints.json") );
 
 	if ( ! empty( $blueprints->$blueprint->themes ) ) {
-		echo "Installing themes...";
+		echo "Installing themes...\n";
 		foreach( $blueprints->$blueprint->themes as $theme ) {
 			install( 'theme', $theme, $path );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
-		echo "Installing plugins...";
+		echo "Installing plugins...\n";
 		foreach( $blueprints->$blueprint->plugins as $plugin ) {
 			install( 'plugin', $plugin, $path );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
-		echo "Installing mu-plugins...";
+		echo "Installing mu-plugins...\n";
 		foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
 			install( 'mu-plugin', $mu_plugin, $path );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->options ) ) {
-		echo "setting up options...";
+		echo "Setting up options...\n";
 		foreach( $blueprints->$blueprint->options as $option ) {
 			add_option( $option );
 		}
@@ -34,10 +34,11 @@ function main( $blueprint, $path = 'htdocs' ) {
 	 		add_define( $define, $path );
 	 	}
 	}
-	echo "Blueprint set up.";
+	echo "Blueprint set up.\n";
 }
 
 function install ( $type, $object, $path ) {
+    echo "  Installing $object...\n";
 	if ( strpos( $object, '.git' ) !== false ) {
 		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object && cd -" );
 	} elseif ( strpos( $object, '.zip' ) !== false ) {
@@ -56,13 +57,21 @@ function add_option( $option ) {
 	$b = $object[1];
 	exec( "wp --allow-root option delete $a" );
 	exec( "wp --allow-root option add $a $b" );
+	echo "  Insert settings $a...\n";
 }
 
 function add_define( $object, $path ) {
 	$object = explode( "::", $object );
+	echo "  Insert constants $object[0]...\n";
+	if(is_bool($object[1])) {
+    exec( '     echo "$(sed "34a\\
+define(\"'. $object[0] . '\",' . $object[1]  . ');
+" ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
+	} else {
 	exec( '		echo "$(sed "34a\\
 define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
+    }
 }
 
 main( $argv[1], $argv[2] );
