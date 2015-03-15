@@ -5,7 +5,7 @@
 # By Brad Parbs <brad@bradparbs.com>
 # Originally by Alison Barrett <alison@barre.tt>
 #
-# Version 1.6.0
+# Version 1.7.0
 #
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
@@ -35,7 +35,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
-version_number=1.6.0
+version_number=1.7.0
 
 if [[ ! -z $(which tput) ]]; then
 	normal=$(tput sgr0)

@@ -1,5 +1,16 @@
 ## Change Log
 
+#### 1.7.0 - *2015-3-15* ####
+ * Allow vv list to work with sites in subfolders
+ * Cleaned up and fix licensing terms and information
+ * Added experimental support for non vvv-providers, with the combination of -fp and -fsf
+ * Added the option to create a blank VVV site with a DB. 
+ * Added ability to remove default themes and plugins when creating a new site.
+ * Added xip.io support to all created sites
+ * Clarified bluepring usage when setting up a site.
+ * Clarified deployment removal for site
+ * Sanitization & shellcheck fixes 
+
 #### 1.6.0 - *2015-2-2* ####
  * Fix issue with passing in custom admin user/pass
  * Adds ability to import a local database export.
