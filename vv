@@ -1,25 +1,40 @@
 #!/usr/bin/env bash
 
-# =============================================================================
+#
 # Variable VVV - A VVV Site Setup Script
 # By Brad Parbs <brad@bradparbs.com>
 # Originally by Alison Barrett <alison@barre.tt>
-# https://github.com/bradp/vvv-site-wizard
 #
 # Version 1.6.0
 #
-# This script automates the creation & deletion of new WordPress sites using
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
 #	 ██    ██ ██    ██
 #	░██   ░██░██   ░██ 	  ▓▓▓▓▓▓▓▓▓▓
 #	░░██ ░██ ░░██ ░██ 	 ░▓ author ▓ Brad Parbs <brad@bradparbs.com>
-#	 ░░████   ░░████     ░▓ github ▓ http://github.com/bradp/vv
-#	  ░░██     ░░██      ░▓▓▓▓▓▓▓▓▓▓
+#	 ░░████   ░░████         ░▓ github ▓ http://github.com/bradp/vv
+#	  ░░██     ░░██          ░▓▓▓▓▓▓▓▓▓▓
 #	   ░░       ░░   	  ░░░░░░░░░░
 #
+# This script automates the creation & deletion of new WordPress sites using
+# Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
-# =============================================================================
+# Copyright (C) 2015 Brad Parbs
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
+#
 
 version_number=1.6.0
 
