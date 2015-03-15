@@ -55,8 +55,8 @@ function add_option( $option ) {
 	$object = explode("::", $option );
 	$a = $object[0];
 	$b = $object[1];
-	exec( "wp --allow-root option delete $a" );
-	exec( "wp --allow-root option add $a $b" );
+	exec( "wp --allow-root option delete '$a'" );
+	exec( "wp --allow-root option add '$a' '$b'" );
 	echo "  Insert settings $a...\n";
 }
 
