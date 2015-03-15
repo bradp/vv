@@ -221,7 +221,6 @@ The first time you run `vv`, it will attempt to locate your VVV installation loc
 
 You can also add `"auto_update_disable": false` to this file to disable auto-update functionality.
 
-In the future, any additional settings and defaults will be stored here, along with VVV installation path.
 
 ## Questions?
 
