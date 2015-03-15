@@ -48,8 +48,81 @@ if [[ ! -z $(which tput) ]]; then
 	cyan=$(tput setaf 6)
 fi
 
+
+about() {
+	cat <<ABOUT
+	${magenta}
+	 ██    ██ ██    ██
+	░██   ░██░██   ░██ 	 ▓▓▓▓▓▓▓▓▓▓
+	░░██ ░██ ░░██ ░██  	░▓ author ▓  Brad Parbs <brad@bradparbs.com>
+	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
+	  ░░██     ░░██  	░▓▓▓▓▓▓▓▓▓▓
+	   ░░       ░░  	░░░░░░░░░░
+${normal}
+ABOUT
+}
+
+
+# Usage: show_help [exit_code]
+# Example: show_help 254
+show_help () {
+    cat <<HELP
+
+${bold} USAGE: ${normal}
+    vv [--help|-h] [--version] [--about] [--path|-p <path>] [--force-path|-fp] <command> [<site-options>] ...
+
+${bold} OPTIONS: ${normal}
+    --help, -h 			Show this help and usage
+    --version 			Show current vv version
+    --about 			Show project info
+    --path, -p 			Path to VVV installation
+    --force-path, -fp 		Override vv auto-VVV locating
+    --force-sites-folder, -fsf 	Override sites folder directory locating
+    --use_defaults		Accept all default options and skip the wizard
+
+${bold} COMMANDS: ${normal}
+
+    list 			List all VVV sites
+    create 			Create a new site
+    remove 			Remove a site
+    vagrant, v 			Pass vagrant command through to VVV
+    deployment-create		Create a deployment
+    deployment-remove 		Remove a deployment
+    deployment-config 		Manually configure deployment
+    blueprint-init 		Initialize blueprint file
+
+${bold} SITE OPTIONS: ${normal}
+    --domain, -d 		Domain of new site
+    --live-url, -u 		Live URL of site
+    --files, -f 		Do not provision Vagrant, just create the site directory and files
+    --images, -i 		Load images by proxy from the live site
+    --name, -n 			Desired name for the site directory (e.g. mysite)
+    --web-root, -wr 		Subdirectory used for web server root
+    --wp-version, -wv 		Version of WordPress to install
+    --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
+    --multisite, -m 		Install as a multisite
+    --sample-content, -sc 	Add sample content to site
+    --username  		Admin username
+    --password  		Admin password
+    --email  			Admin email
+    --git-repo, -gr  		Git repo to clone as wp-content
+    --blueprint, -b 		Name of blueprint to use
+    --blank			Creates blank VVV site, with no WordPress
+    --blank-with-db		Adds a blank VVV site, with a database
+    --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
+    --database, -db 		Import a local database file
+    --remove-defaults, -rd 	Remove default themes and plugins
+
+${bold} EXAMPLE:${normal}
+    vv create --domain mysite.dev --name mysite --debug
+    vv create -d mysite.dev -n mysite -x
+
+HELP
+}
+
+
 version () {
-echo "vv version $version_number"
+	echo "vv version $version_number"
 }
 
 # Usage: info "message"
@@ -209,77 +282,6 @@ ask () {
         esac
 
     done
-}
-
-about() {
-	cat <<ABOUT
-	${magenta}
-	 ██    ██ ██    ██
-	░██   ░██░██   ░██ 	 ▓▓▓▓▓▓▓▓▓▓
-	░░██ ░██ ░░██ ░██  	░▓ author ▓  Brad Parbs <brad@bradparbs.com>
-	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
-	  ░░██     ░░██  	░▓▓▓▓▓▓▓▓▓▓
-	   ░░       ░░  	░░░░░░░░░░
-${normal}
-ABOUT
-}
-
-
-# Usage: show_help [exit_code]
-# Example: show_help 254
-show_help () {
-    cat <<HELP
-
-${bold} USAGE: ${normal}
-    vv [--help|-h] [--version] [--about] [--path|-p <path>] [--force-path|-fp] <command> [<site-options>] ...
-
-${bold} OPTIONS: ${normal}
-    --help, -h 			Show this help and usage
-    --version 			Show current vv version
-    --about 			Show project info
-    --path, -p 			Path to VVV installation
-    --force-path, -fp 		Override vv auto-VVV locating
-    --force-sites-folder, -fsf 	Override sites folder directory locating
-    --use_defaults		Accept all default options and skip the wizard
-
-${bold} COMMANDS: ${normal}
-
-    list 			List all VVV sites
-    create 			Create a new site
-    remove 			Remove a site
-    vagrant, v 			Pass vagrant command through to VVV
-    deployment-create		Create a deployment
-    deployment-remove 		Remove a deployment
-    deployment-config 		Manually configure deployment
-    blueprint-init 		Initialize blueprint file
-
-${bold} SITE OPTIONS: ${normal}
-    --domain, -d 		Domain of new site
-    --live-url, -u 		Live URL of site
-    --files, -f 		Do not provision Vagrant, just create the site directory and files
-    --images, -i 		Load images by proxy from the live site
-    --name, -n 			Desired name for the site directory (e.g. mysite)
-    --web-root, -wr 		Subdirectory used for web server root
-    --wp-version, -wv 		Version of WordPress to install
-    --debug, -x 		Turn on WP_DEBUG and WP_DEBUG_LOG
-    --multisite, -m 		Install as a multisite
-    --sample-content, -sc 	Add sample content to site
-    --username  		Admin username
-    --password  		Admin password
-    --email  			Admin email
-    --git-repo, -gr  		Git repo to clone as wp-content
-    --blueprint, -b 		Name of blueprint to use
-    --blank			Creates blank VVV site, with no WordPress
-    --blank-with-db		Adds a blank VVV site, with a database
-    --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
-    --database, -db 		Import a local database file
-    --remove-defaults, -rd 	Remove default themes and plugins
-
-${bold} EXAMPLE:${normal}
-    vv create --domain mysite.dev --name mysite --debug
-    vv create -d mysite.dev -n mysite -x
-
-HELP
 }
 
 argument_expected() {
