@@ -83,7 +83,20 @@ function install ( $type, $object, $path ) {
     // Download a git repository based on username and repository name
     elseif ( strpos( $object->location, '/' ) !== false ) {
         $exploded = explode( "/", $object->location ); $folder = $exploded[1];
-        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object->location/archive/master.zip " . $wpcli_options . " && pwd && mv $folder-master $folder";
+        $command .=     "mkdir -p $path/wp-content/{$type}s".
+                        " && cd $path/wp-content/{$type}s".
+                        " && curl \"https://codeload.github.com/$object->location/tar.gz/master\" -o \"$folder-master.tar.gz\"". // Download the tarball from the repository
+                        " && tar xpvf $folder-master.tar.gz". // Unzip the file
+                        " && pwd".
+                        " && mv $folder-master $folder"; // Move the files so te folder has the same name as the repository
+
+        // Activate the plugin using WP-CLI
+        if ( isset( $object->activate ) && $object->activate == true ) {
+            $command .= " && wp --allow-root $type activate $folder";
+        }
+        if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
+            $command .= " && wp --allow-root $type activate $folder --network";
+        }
     }
     // Download the plugin from the WP Plugin repository based on the URL slug
     else {
