@@ -35,7 +35,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
-version_number=1.7.0
+version_number=1.7.1
 
 if [[ ! -z $(which tput) ]]; then
 	normal=$(tput sgr0)
@@ -429,7 +429,7 @@ list_sites() {
 					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
 				fi
 			else
-				if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then 
+				if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
 					url=$(<"$path"/"$sites_folder"/"$filename"/vvv-hosts)
 					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 					urls=$(echo "$url" | wc -l)
@@ -438,7 +438,7 @@ list_sites() {
 					fi
 					if [[ ! $clean = "true" ]]; then
 						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
-				
+
 					fi
 				fi
 			fi
