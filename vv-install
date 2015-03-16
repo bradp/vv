@@ -1,74 +1,129 @@
 <?php
 #/usr/bin/php
+/**
+ * @param $blueprint
+ * @param string $path
+ */
 function main( $blueprint, $path = 'htdocs' ) {
-	echo "Setting up blueprint $blueprint...\n";
-	$blueprints = json_decode( file_get_contents( "vv-blueprints.json") );
+    echo "Setting up blueprint $blueprint...\n";
+    $blueprints = json_decode( file_get_contents( "vv-blueprints.json") );
 
-	if ( ! empty( $blueprints->$blueprint->themes ) ) {
-		echo "Installing themes...\n";
-		foreach( $blueprints->$blueprint->themes as $theme ) {
-			install( 'theme', $theme, $path );
-		}
-	}
-	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
-		echo "Installing plugins...\n";
-		foreach( $blueprints->$blueprint->plugins as $plugin ) {
-			install( 'plugin', $plugin, $path );
-		}
-	}
-	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
-		echo "Installing mu-plugins...\n";
-		foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-			install( 'mu-plugin', $mu_plugin, $path );
-		}
-	}
-	if ( ! empty( $blueprints->$blueprint->options ) ) {
-		echo "Setting up options...\n";
-		foreach( $blueprints->$blueprint->options as $option ) {
-			add_option( $option );
-		}
-	}
-	if ( ! empty( $blueprints->$blueprint->defines ) ) {
-		echo "Adding constants to wp-config.php...";
-		foreach( $blueprints->$blueprint->defines as $define ) {
-	 		add_define( $define, $path );
-	 	}
-	}
-	echo "Blueprint set up.\n";
+    if ( ! empty( $blueprints->$blueprint->themes ) ) {
+        echo "Installing themes...\n";
+        foreach( $blueprints->$blueprint->themes as $theme ) {
+            install( 'theme', $theme, $path );
+        }
+    }
+    if ( ! empty( $blueprints->$blueprint->plugins ) ) {
+        echo "Installing plugins...\n";
+        foreach( $blueprints->$blueprint->plugins as $plugin ) {
+            install( 'plugin', $plugin, $path );
+        }
+    }
+    if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
+        echo "Installing mu-plugins...\n";
+        foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
+            install( 'mu-plugin', $mu_plugin, $path );
+        }
+    }
+    if ( ! empty( $blueprints->$blueprint->options ) ) {
+        echo "Setting up options...\n";
+        foreach( $blueprints->$blueprint->options as $option ) {
+            add_option( $option );
+        }
+    }
+    if ( ! empty( $blueprints->$blueprint->defines ) ) {
+        echo "Adding constants to wp-config.php...";
+        foreach( $blueprints->$blueprint->defines as $define ) {
+            add_define( $define, $path );
+        }
+    }
+
+    echo "Blueprint set up.\n";
 }
 
+/**
+ * @param $type
+ * @param $object
+ * @param $path
+ */
 function install ( $type, $object, $path ) {
-    echo "  Installing $object...\n";
-	if ( strpos( $object, '.git' ) !== false ) {
-		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object && cd -" );
-	} elseif ( strpos( $object, '.zip' ) !== false ) {
-		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
-	} elseif ( strpos( $object, '/' ) !== false ) {
-		$exploded = explode( "/", $object ); $folder = $exploded[1];
-		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object/archive/master.zip && pwd && mv $folder-master $folder && cd -" );
-	} else {
-		exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
-	}
+    echo "  Installing $object->location...\n";
+    $command = "";
+
+    /**
+     * Set up the base commands for all possible scenario's
+     */
+    // Clone a git repository
+    if ( strpos( $object->location, '.git' ) !== false ) {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object->location";
+    }
+    // Download a zip file from a specified location
+    elseif ( strpos( $object->location, '.zip' ) !== false ) {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location";
+    }
+    // Download a git repository based on username and repository name
+    elseif ( strpos( $object->location, '/' ) !== false ) {
+        $exploded = explode( "/", $object->location ); $folder = $exploded[1];
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object->location/archive/master.zip && pwd && mv $folder-master $folder";
+    }
+    // Download the plugin from the WP Plugin repository based on the URL slug
+    else {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location";
+    }
+
+    /**
+     * Include extra options defined in the blueprint
+     * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
+     */
+    if ( isset( $object->version ) ) {
+        $command .= " --version=$object->version";
+    }
+    if ( isset( $object->force ) && $object->force == true ) {
+        $command .= " --force";
+    }
+    if ( isset( $object->activate ) && $object->activate == true ) {
+        $command .= " --activate";
+    }
+    if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
+        $command .= " --activate-network";
+    }
+
+    $command .= " && cd -";
+
+    exec( $command );
 }
 
+/**
+ * @param $option
+ */
 function add_option( $option ) {
-	$object = explode("::", $option );
-	$a = $object[0];
-	$b = $object[1];
-	exec( "wp --allow-root option delete '$a'" );
-	exec( "wp --allow-root option add '$a' '$b'" );
-	echo "  Insert settings $a...\n";
+    $object = explode("::", $option );
+    $a = $object[0];
+    $b = $object[1];
+    exec( "wp --allow-root option delete '$a'" );
+    exec( "wp --allow-root option add '$a' '$b'" );
+    echo "  Insert settings $a...\n";
 }
 
+/**
+ * @param $object
+ * @param $path
+ */
 function add_define( $object, $path ) {
-	$object = explode( "::", $object );
-	echo "  Insert constants $object[0]...\n";
-	if(is_bool($object[1])) {
-    exec( '     echo "$(sed "34a\\
+    $object = explode( "::", $object );
+    echo "  Insert constants $object[0]...\n";
+
+    /**
+     * Changed is_bool to a string comparison because is_bool only works for real booleans, not strings
+     * Reference: http://stackoverflow.com/questions/7336861/how-to-convert-string-to-boolean-php
+     */
+    if( strtolower( $object[1] ) == 'true' || strtolower( $object[1] ) == 'false' ) {
+        exec( '     echo "$(sed "34a\\
 define(\"'. $object[0] . '\",' . $object[1]  . ');
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
-	} else {
-	exec( '		echo "$(sed "34a\\
+    } else {
+        exec( '		echo "$(sed "34a\\
 define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
     }

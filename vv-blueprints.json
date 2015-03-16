@@ -1,14 +1,31 @@
 {
   "sample": {
     "themes": [
-      "automattic/_s"
+      {
+        "location": "automattic/_s",
+        "activate": true
+      }
     ],
     "mu_plugins": [
-      "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+      {
+        "location": "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+      }
     ],
     "plugins": [
-      "https://github.com/clef/wordpress/archive/master.zip",
-      "CMB2"
+      {
+        "location": "https://github.com/clef/wordpress/archive/master.zip",
+        "version": null,
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      },
+      {
+        "location": "advanced-custom-fields",
+        "version": "4.3.0",
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      }
     ],
     "options": [
       "current_theme::_s"
