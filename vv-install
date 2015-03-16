@@ -50,43 +50,44 @@ function main( $blueprint, $path = 'htdocs' ) {
 function install ( $type, $object, $path ) {
     echo "  Installing $object->location...\n";
     $command = "";
-
-    /**
-     * Set up the base commands for all possible scenario's
-     */
-    // Clone a git repository
-    if ( strpos( $object->location, '.git' ) !== false ) {
-        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object->location";
-    }
-    // Download a zip file from a specified location
-    elseif ( strpos( $object->location, '.zip' ) !== false ) {
-        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location";
-    }
-    // Download a git repository based on username and repository name
-    elseif ( strpos( $object->location, '/' ) !== false ) {
-        $exploded = explode( "/", $object->location ); $folder = $exploded[1];
-        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object->location/archive/master.zip && pwd && mv $folder-master $folder";
-    }
-    // Download the plugin from the WP Plugin repository based on the URL slug
-    else {
-        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location";
-    }
+    $wpcli_options = "";
 
     /**
      * Include extra options defined in the blueprint
      * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
      */
     if ( isset( $object->version ) ) {
-        $command .= " --version=$object->version";
+        $wpcli_options .= " --version=$object->version";
     }
     if ( isset( $object->force ) && $object->force == true ) {
-        $command .= " --force";
+        $wpcli_options .= " --force";
     }
     if ( isset( $object->activate ) && $object->activate == true ) {
-        $command .= " --activate";
+        $wpcli_options .= " --activate";
     }
     if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
-        $command .= " --activate-network";
+        $wpcli_options .= " --activate-network";
+    }
+
+    /**
+     * Set up the base commands for all possible scenario's
+     */
+    // Clone a git repository
+    if ( strpos( $object->location, '.git' ) !== false ) {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object->location" . $wpcli_options;
+    }
+    // Download a zip file from a specified location
+    elseif ( strpos( $object->location, '.zip' ) !== false ) {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location". $wpcli_options;
+    }
+    // Download a git repository based on username and repository name
+    elseif ( strpos( $object->location, '/' ) !== false ) {
+        $exploded = explode( "/", $object->location ); $folder = $exploded[1];
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object->location/archive/master.zip " . $wpcli_options . " && pwd && mv $folder-master $folder";
+    }
+    // Download the plugin from the WP Plugin repository based on the URL slug
+    else {
+        $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location" . $wpcli_options;
     }
 
     $command .= " && cd -";
