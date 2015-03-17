@@ -25,7 +25,8 @@
         "force": false,
         "activate": true,
         "activate_network": false
-      }
+      },
+      "advanced-page-manager"
     ],
     "options": [
       "current_theme::_s"
