@@ -48,15 +48,38 @@ function main( $blueprint, $path = 'htdocs' ) {
  * @param $path
  */
 function install ( $type, $object, $path ) {
-    if( is_object( $object ) ) {
-        echo "  Installing $object->location...\n";
-        $command = "";
-        $wpcli_options = "";
+    /**
+     * Set up the base command, make the wp-content folders and move into them
+     * (-p: no error if existing, make parent directories as needed)
+     */
+    $command = "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s";
 
-        /**
-         * Include extra options defined in the blueprint
-         * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
-         */
+    /**
+     * Set up the string variable that will hold the WP-CLI options
+     */
+    $wpcli_options = "";
+
+    /**
+     * Get the target object we need to install
+     */
+    $target = $object;
+
+    /**
+     * This boolean tells if this blueprint is WP-CLI compatible.
+     */
+    $wpcli_compat = false;
+
+    /**
+     * If our target is an object, get the location of that object
+     * and set up the WP-CLI options for this installation
+     * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
+     *
+     * If the target is not an object, this is a target object from an old blueprint. This way we keep backwards compatibility
+     */
+    if( is_object( $target ) ) {
+        $target = $object->location;
+        $wpcli_compat = true;
+
         if ( isset( $object->version ) ) {
             $wpcli_options .= " --version=$object->version";
         }
@@ -69,27 +92,45 @@ function install ( $type, $object, $path ) {
         if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
             $wpcli_options .= " --activate-network";
         }
+    }
 
-        /**
-         * Set up the base commands for all possible scenario's
-         */
-        // Clone a git repository
-        if ( strpos( $object->location, '.git' ) !== false ) {
-            $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object->location" . $wpcli_options;
+    /**
+     * Give feedback to the console
+     */
+    echo "  Installing ".$target.$wpcli_options."...\n";
+
+    /**
+     * Set up the rest of the command for this installation depending
+     * on the type of installation we are going to do
+     */
+    // Clone a git repository
+    if ( strpos( $target, '.git' ) !== false ) {
+        $command .= " && git clone $target";
+        if( $wpcli_compat ) {
+            $command .= $wpcli_options;
         }
-        // Download a zip file from a specified location
-        elseif ( strpos( $object->location, '.zip' ) !== false ) {
-            $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location". $wpcli_options;
+    }
+    // Download a zip file from a specified location
+    elseif ( strpos( $target, '.zip' ) !== false ) {
+        $command .= " && wp --allow-root $type install $target";
+        if( $wpcli_compat ) {
+            $command .= $wpcli_options;
         }
-        // Download a git repository based on username and repository name
-        elseif ( strpos( $object->location, '/' ) !== false ) {
-            $exploded = explode( "/", $object->location ); $folder = $exploded[1];
-            $command .=     "mkdir -p $path/wp-content/{$type}s".
-                            " && cd $path/wp-content/{$type}s".
-                            " && curl \"https://codeload.github.com/$object->location/tar.gz/master\" -o \"$folder-master.tar.gz\"". // Download the tarball from the repository
-                            " && tar xpvf $folder-master.tar.gz". // Unzip the file
-                            " && pwd".
-                            " && mv $folder-master $folder"; // Move the files so te folder has the same name as the repository
+    }
+    // Download a git repository based on username and repository name
+    elseif ( strpos( $target, '/' ) !== false ) {
+        // Get the folder name
+        $exploded = explode( "/", $target );
+        $folder = $exploded[1];
+
+        // Check if the blueprint is WP-CLI compatible
+        if( !$wpcli_compat ) {
+            $command .= " && wp --allow-root $type install https://github.com/$target/archive/master.zip && pwd && mv $folder-master $folder";
+        } else {
+            $command .= " && curl -s -S \"https://codeload.github.com/$target/tar.gz/master\" -o \"$folder-master.tar.gz\"".    // Download the tarball from the repository, do it silent but show errors
+                        " && tar xpvf $folder-master.tar.gz".                                                                   // Unzip the file
+                        " && pwd".                                                                                              // Print working directory
+                        " && mv $folder-master $folder";                                                                        // Move the files so te folder has the same name as the repository
 
             // Activate the plugin using WP-CLI
             if ( isset( $object->activate ) && $object->activate == true ) {
@@ -99,26 +140,24 @@ function install ( $type, $object, $path ) {
                 $command .= " && wp --allow-root $type activate $folder --network";
             }
         }
-        // Download the plugin from the WP Plugin repository based on the URL slug
-        else {
-            $command .= "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object->location" . $wpcli_options;
-        }
-        $command .= " && cd -";
-
-        exec( $command );
-    } else {
-        echo "  Installing $object...\n";
-        if ( strpos( $object, '.git' ) !== false ) {
-            exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && git clone $object && cd -" );
-        } elseif ( strpos( $object, '.zip' ) !== false ) {
-            exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
-        } elseif ( strpos( $object, '/' ) !== false ) {
-            $exploded = explode( "/", $object ); $folder = $exploded[1];
-            exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install https://github.com/$object/archive/master.zip && pwd && mv $folder-master $folder && cd -" );
-        } else {
-            exec( "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s && wp --allow-root $type install $object && cd -" );
+    }
+    // Download the plugin from the WP Plugin repository based on the URL slug
+    else {
+        $command .= " && wp --allow-root $type install $target";
+        if( $wpcli_compat ) {
+            $command .= $wpcli_options;
         }
     }
+
+    /**
+     * Finish up the command
+     */
+    $command .= " && cd -";
+
+    /**
+     * Execute the command
+     */
+    exec( $command );
 }
 
 /**
