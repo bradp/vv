@@ -5,24 +5,24 @@
  * @param string $path
  */
 function main( $blueprint, $path = 'htdocs' ) {
-    echo "Setting up blueprint $blueprint...\n";
-    $blueprints = json_decode( file_get_contents( "vv-blueprints.json") );
+	echo "Setting up blueprint $blueprint...\n";
+	$blueprints = json_decode( file_get_contents( "vv-blueprints.json" ) );
 
-    if ( ! empty( $blueprints->$blueprint->themes ) ) {
-        echo "Installing themes...\n";
-        foreach( $blueprints->$blueprint->themes as $theme ) {
-            install( 'theme', $theme, $path );
-        }
-    }
-    if ( ! empty( $blueprints->$blueprint->plugins ) ) {
-        echo "Installing plugins...\n";
-        foreach( $blueprints->$blueprint->plugins as $plugin ) {
-            install( 'plugin', $plugin, $path );
-        }
-    }
-    if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
-        echo "Installing mu-plugins...\n";
-        foreach( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
+	if ( ! empty( $blueprints->$blueprint->themes ) ) {
+		echo "Installing themes...\n";
+		foreach ( $blueprints->$blueprint->themes as $theme ) {
+			install( 'theme', $theme, $path );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
+		echo "Installing plugins...\n";
+		foreach ( $blueprints->$blueprint->plugins as $plugin ) {
+			install( 'plugin', $plugin, $path );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
+		echo "Installing mu-plugins...\n";
+		foreach ( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
             install( 'mu-plugin', $mu_plugin, $path );
         }
     }
@@ -128,9 +128,10 @@ function install ( $type, $object, $path ) {
             $command .= " && wp --allow-root $type install https://github.com/$target/archive/master.zip && pwd && mv $folder-master $folder";
         } else {
             $command .= " && curl -s -S \"https://codeload.github.com/$target/tar.gz/master\" -o \"$folder-master.tar.gz\"".    // Download the tarball from the repository, do it silent but show errors
-                        " && tar xpvf $folder-master.tar.gz".                                                                   // Unzip the file
-                        " && pwd".                                                                                              // Print working directory
-                        " && mv $folder-master $folder";                                                                        // Move the files so te folder has the same name as the repository
+		" && tar xpvf $folder-master.tar.gz". // Unzip the file
+		" && pwd". // Print working directory
+		" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
+		" && rm $folder-master.tar.gz" // Remove our file
 
             // Activate the plugin using WP-CLI
             if ( isset( $object->activate ) && $object->activate == true ) {
