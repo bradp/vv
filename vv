@@ -1087,7 +1087,7 @@ parse_the_args() {
     	if [ ! -z "$remove" ]; then
         	remove_site
     	fi
-   	 if [ ! -z "$deployment_setup" ]; then
+   	if [ ! -z "$deployment_setup" ]; then
     		deployment_setup
     	fi
     	if [ ! -z "$deployment_remove" ]; then
@@ -1101,13 +1101,10 @@ parse_the_args() {
 	fi
 	if [ ! -z "$lets_update" ]; then
    		install_update
+	fi
    	if [ ! -z "$force_update" ]; then
    		vv_bootstrap_update
 	fi
-   	else
-   		check_for_update
-   	fi
-
 }
 
 check_args() {
@@ -1259,7 +1256,6 @@ check_args() {
 				shift
 				;;
 			--version)
-				check_for_update
 				version
 				shift
 				;;
@@ -1280,7 +1276,6 @@ check_args() {
 				shift
 				;;
 			--about|about)
-				check_for_update
 				about
 				exit
 				shift
@@ -1340,7 +1335,6 @@ check_args() {
 
 	get_vvv_path
 	parse_the_args
-
 	exit 0
 }
 
@@ -1353,12 +1347,13 @@ main() {
 	fi
 
 	check_for_config_file
-
+	check_for_update
 	use_defaults="false"
 	no_wp="false"
 	no_wp_with_db="false"
 	sites_folder="www"
 	check_args "$@"
+
 }
 
 main "$@"
