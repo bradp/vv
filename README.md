@@ -105,23 +105,41 @@ The blueprint should look like this:
 {
   "sample": {
     "themes": [
-      "automattic/_s"
+      {
+        "location": "automattic/_s",
+        "activate": true
+      }
     ],
     "mu_plugins": [
-      "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+      {
+        "location": "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+      }
     ],
     "plugins": [
-      "https://github.com/clef/wordpress/archive/master.zip",
-      "cmb2"
+      {
+        "location": "https://github.com/clef/wordpress/archive/master.zip",
+        "version": null,
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      },
+      {
+        "location": "cmb2",
+        "version": "2.0.5",
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      },
     ],
     "options": [
-      "active_theme::_s"
+      "current_theme::_s"
     ],
     "defines": [
       "WP_CACHE::false"
     ]
   }
 }
+
 ```
 
 For themes, plugins, and mu-plugins, you can use:
@@ -130,6 +148,8 @@ For themes, plugins, and mu-plugins, you can use:
 * Full git url
 * Url to zip file
 * WordPress.org slug
+
+The options for plugins and themes correspond to the equivelant [WP CLI](http://wp-cli.org) option.
 
 For options and constants, please note the `::` as a seperator between the key and value.
 
