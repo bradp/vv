@@ -20,13 +20,12 @@
         "activate_network": false
       },
       {
-        "location": "advanced-custom-fields",
-        "version": "4.3.0",
+        "location": "cmb2",
+        "version": "2.0.5",
         "force": false,
         "activate": true,
         "activate_network": false
       },
-      "advanced-page-manager"
     ],
     "options": [
       "current_theme::_s"
