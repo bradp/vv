@@ -1,6 +1,11 @@
 ## Change Log
 
 #### 1.7.1 - *2015-3-17* ####
+ * Fixed deployment creation bug where push.dir was not defined
+ * Created new blueprint structure
+ * Added new blueprint installation methods
+
+#### 1.7.1 - *2015-3-17* ####
  * Fixed bug where default themes and plugins were sometimes removed when they shouldn't be.
 
 #### 1.7.0 - *2015-3-15* ####
