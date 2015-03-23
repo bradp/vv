@@ -131,7 +131,7 @@ function install ( $type, $object, $path ) {
 		" && tar xpvf $folder-master.tar.gz". // Unzip the file
 		" && pwd". // Print working directory
 		" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
-		" && rm $folder-master.tar.gz" // Remove our file
+		" && rm $folder-master.tar.gz"; // Remove our file
 
             // Activate the plugin using WP-CLI
             if ( isset( $object->activate ) && $object->activate == true ) {
