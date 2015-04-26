@@ -327,6 +327,9 @@ load_config_values() {
 	#Load path from config file
 	path="$( getJsonVal "['path']" < ~/.vv-config )"
 	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
+
+	#vv_scripts_folder="$( getJsonVal "['scripts']" < ~/.vv-config )"
+	#vv_scripts_folder="$(echo "$vv_scripts_folder" | sed -e 's/^"//' -e 's/"$//')"
 }
 
 load_config_autopdate_config_values() {
@@ -404,6 +407,18 @@ get_vvv_path(){
 	path=${path%/}
 }
 
+setup_scripts_folder() {
+	vv_scripts_folder="$path"/vv
+
+}
+run_hook() {
+	hook $1
+}
+hook() {
+	vv_scripts_folder="$path"/vv
+	test -f "$vv_scripts_folder"/"$1".sh && source "$vv_scripts_folder"/"$1".sh && run_"$1"
+}
+
 get_list_sites() {
 	clean_saved=$clean
 	clean="true"
@@ -413,6 +428,7 @@ get_list_sites() {
 
 list_sites() {
 	cd "$path"/"$sites_folder"
+	hook "pre_list_sites"
 	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
@@ -444,6 +460,7 @@ list_sites() {
 			fi
 		fi
 	done
+	hook "post_list_sites"
 	exit
 }
 
@@ -1334,6 +1351,7 @@ check_args() {
 	fi
 
 	get_vvv_path
+	setup_scripts_folder
 	parse_the_args
 	exit 0
 }
