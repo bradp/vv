@@ -170,8 +170,10 @@ fail () {
 check_for_update () {
 	if [[ ! -z $(which curl) ]]; then
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-		if [[ ! "$version_number" = "$github_version" ]]; then
-			info "Your version of vv does not match the current Github version. Please update with vv --update"
+		if [[ ! -z "$github_version" ]]; then
+			if [[ ! "$version_number" = "$github_version" ]]; then
+				info "Your version of vv ( $version_number )  does not match the current Github version ( $github_version ). Please update with vv --update"
+			fi
 		fi
 	fi
 }
