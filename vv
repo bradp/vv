@@ -416,11 +416,9 @@ run_hook() {
 }
 hook() {
 	vv_scripts_folder="$path"/vv
-	test -f "$vv_scripts_folder"/"$1".sh && source "$vv_scripts_folder"/"$1".sh && run_"$1"
-	test -f "$vv_scripts_folder/"hooks && source "$vv_scripts_folder"/hooks && "$1"
+	test -f "$vv_scripts_folder"/"$1".sh && source "$vv_scripts_folder"/"$1".sh && which run_"$1" &&  run_"$1"
+	test -f "$vv_scripts_folder/"hooks && source "$vv_scripts_folder"/hooks && which "$1" && "$1"
 }
-pre_list_sites(){ $(); }
-run_post_list_sites(){ $(); }
 
 
 get_list_sites() {
