@@ -107,6 +107,13 @@ function install ( $type, $object, $path ) {
     if ( strpos( $target, '.git' ) !== false ) {
         $command .= " && git clone $target";
         if( $wpcli_compat ) {
+            // Now determine the name of the plugin for activation
+            $url_parts = explode( '/', $target );
+            $git_file = end( $url_parts );
+            $plugin_name = str_replace( '.git', '', $git_file );
+            // Add WP CLI command for activation with our newly determined plugin name
+            $command .= " && wp --allow-root $type install $plugin_name";
+            // Add WP CLI options to the command
             $command .= $wpcli_options;
         }
     }
