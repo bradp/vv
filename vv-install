@@ -107,7 +107,18 @@ function install ( $type, $object, $path ) {
     if ( strpos( $target, '.git' ) !== false ) {
         $command .= " && git clone $target";
         if( $wpcli_compat ) {
-            $command .= $wpcli_options;
+            // Now determine the name of the plugin for activation
+            $target_parts = explode( '/', $target );
+            $git_file = end( $target_parts );
+            $plugin_name = str_replace( '.git', '', $git_file );
+
+            // Give feedback to the console to let people know what we determined to be the plugin name in case of a conflicting name.
+            echo "  VV determined your .git plugin name to be: ".$plugin_name."\n";
+
+            // Add WP CLI command for activation with our newly determined plugin name
+            if ( isset( $object->activate ) && $object->activate == true ) {
+                $command .= " && wp --allow-root $type activate $plugin_name";
+            }
         }
     }
     // Download a zip file from a specified location
