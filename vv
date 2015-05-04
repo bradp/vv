@@ -129,51 +129,66 @@ version () {
 # Example: info "doing thing"
 # Output (to STDOUT): doing thing
 info () {
-    printf "%b" "${bold}${yellow}$1${normal} \n"
+	hook "pre_info_output"
+	printf "%b" "${bold}${yellow}$1${normal} \n"
+	hook "post_info_output"
 }
 
 # Usage: success "message"
 # Example: success "It's Working"
 # Output (to STDOUT): [...] It's Working
 success () {
-    printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
+	hook "pre_success_output"
+	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
+	hook "post_success_output"
 }
 
 # Usage: warning "message"
 # Example: warning "some warning"
 # Output (to STDOUT): [...] some warning
 warning () {
-    printf "%b" "${red} $1 ${normal}\n"
+	hook "pre_warning_output"
+	printf "%b" "${red} $1 ${normal}\n"
+	hook "post_warning_output"
 }
 
 # Usage: prompt "question"
 # Example: prompt "Site name"
 # Output (to STDOUT): Site Name:
 prompt () {
-    printf "%b" "${magenta} $1: ${normal}"
+	hook "pre_prompt_output"
+	printf "%b" "${magenta} $1: ${normal}"
+	hook "post_prompt_output"
 }
 
 # Usage: error ["message"]
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
 error () {
-    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
+	hook "pre_error_output"
+	printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
+	hook "post_error_output"
 }
 
 # Usage: fail "message"
 # Example: fail "Unknown Option" 254
 fail () {
-    error "$1"
-    exit 1
+	error "$1"
+	hook "fail_and_exit"
+	exit 1
 }
 
 check_for_update () {
+	hook "pre_update_check"
 	if [[ ! -z $(which curl) ]]; then
+		hook "pre_update_check_github_fetch"
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+		hook "post_update_check_github_fetch"
 		if [[ ! "$version_number" = "$github_version" ]]; then
 			info "Your version of vv does not match the current Github version. Please update with vv --update"
 		fi
 	fi
+	hook "post_update_check"
 }
 
 check_how_installed () {
