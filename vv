@@ -749,7 +749,7 @@ PHP"
 
 		maybe_remove_defaults=""
 		if [[ "$remove_defaults" = "y" ]]; then
-			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete aksimet --allow-root; git checkout HEAD ."
+			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete akismet --allow-root; git checkout HEAD ."
 		fi
 
 		install_method="wp core download --allow-root $installversion"
