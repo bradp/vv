@@ -1273,7 +1273,7 @@ check_args() {
 				placeholder_content="y"
 				shift
 				;;
-			--rd|--remove-defaults)
+			-rd|--rd|--remove-defaults)
 				remove_defaults="y"
 				shift
 				;;
