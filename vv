@@ -179,19 +179,16 @@ fail () {
 }
 
 check_for_update () {
-	hook "pre_update_check"
 	if [[ ! -z $(which curl) ]]; then
-		hook "pre_update_check_github_fetch"
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-		hook "post_update_check_github_fetch"
 		if [[ ! "$version_number" = "$github_version" ]]; then
 			info "Your version of vv does not match the current Github version. Please update with vv --update"
 		fi
 	fi
-	hook "post_update_check"
 }
 
 check_how_installed () {
+	hook "pre_check_how_installed"
 	if [[ ! -z $(which brew) ]]; then
 		brew_install_location=$(brew --prefix)
 		if [[ -f $brew_install_location"/bin/vv" ]]; then
@@ -200,11 +197,14 @@ check_how_installed () {
 			installed_with_brew="false"
 		fi
 	fi
+	hook "post_check_how_installed"
 }
 
 install_update () {
+	hook "pre_install_update"
 	check_how_installed
 	update_vv
+	hook "post_install_update"
 }
 
 update_vv () {
@@ -301,6 +301,7 @@ ask () {
 
 argument_expected() {
     if [ -z "$2" ] || [[ "$2" == -* ]]; then
+    	hook "error_no_arg_$1"
         fail "$1 expected an argument"
     fi
 }
@@ -421,20 +422,23 @@ get_vvv_path(){
 	fi
 	path=${path%/}
 }
-
 setup_scripts_folder() {
-	vv_scripts_folder="$path"/vv
+	vv_scripts_folder="$path"/vv/
 
 }
 run_hook() {
-	hook $1
+	hook "$1" "$2" "$3" "$4"
 }
 hook() {
-	vv_scripts_folder="$path"/vv
-	test -f "$vv_scripts_folder"/"$1".sh && source "$vv_scripts_folder"/"$1".sh && which run_"$1" &&  run_"$1"
-	test -f "$vv_scripts_folder/"hooks && source "$vv_scripts_folder"/hooks && which "$1" && "$1"
-}
+	# Display all hooks to screen if the show_hooks flag is set
+	if [[ $show_hooks = 'true' ]]; then
+		echo "$1" "$2" "$3" "$4"
+	fi
 
+	test -f "$vv_scripts_folder""$1" && source "$vv_scripts_folder""$1" && which run_"$1" &&  run_"$1" "$2" "$3" "$4"
+	# test -f "$vv_scripts_folder"hooks && source "$vv_scripts_folder"hooks && which "$1" && $("$1" "$2")
+	# this is currently not working
+}
 
 get_list_sites() {
 	clean_saved=$clean
@@ -450,6 +454,8 @@ list_sites() {
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
 			if [[ $filename = 'wordpress-default' || $filename = 'wordpress-develop' || $filename = 'wordpress-trunk' ]]; then
+				hook "pre_list_site_$filename"
+				hook "list_site" "$filename"
 				if [[ $filename = 'wordpress-default' ]]; then
 					url=local.wordpress.dev
 				elif [[ $filename = 'wordpress-develop' ]]; then
@@ -460,9 +466,13 @@ list_sites() {
 
 				if [[ ! $clean = "true" ]]; then
 					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
+					hook "post_list_site_$filename"
 				fi
 			else
 				if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
+					hook "pre_list_site_$filename"
+					hook "list_site" "$filename"
+					hook "list_custom_site" "$filename"
 					url=$(<"$path"/"$sites_folder"/"$filename"/vvv-hosts)
 					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 					urls=$(echo "$url" | wc -l)
@@ -471,7 +481,7 @@ list_sites() {
 					fi
 					if [[ ! $clean = "true" ]]; then
 						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
-
+						hook "post_list_site_$filename"
 					fi
 				fi
 			fi
@@ -482,6 +492,7 @@ list_sites() {
 }
 
 site_creation_questions() {
+	hook "pre_site_creation_wizard"
 	files_only_text=''
 	if [[ "$files_only" = "true" ]]; then
 		files_only_text=" (file creation only)"
@@ -673,6 +684,8 @@ site_creation_questions() {
 	if [[ -z "$email" ]]; then
 		email="admin@localhost.dev"
 	fi
+
+	hook "post_site_creation_wizard"
 }
 
 confirm_site_creation() {
@@ -708,10 +721,12 @@ confirm_site_creation() {
 
 	success "New VVV setup starting for site '$site'"
 	cd "$path"
+	hook "pre_creation_pre_vagrant_halt"
 	vagrant halt
 }
 
 create_site_files(){
+	hook "pre_create_site_files" "$site" "$domain" "$path"
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
 	cd "$path"/"$sites_folder"
@@ -859,6 +874,7 @@ run_vagrant_up() {
 	cd "$path"
 	if [[ -z "$files_only" ]]; then
 		info "Running vagrant up --provision... "
+		hook "pre_vagrant_provision"
 		vagrant up --provision
 	fi
 }
@@ -875,6 +891,7 @@ creation_success_message() {
 	echo "URL:       $domain"
 	echo "Username:  $username"
 	echo "Password:  $password"
+	hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
 create_site() {
@@ -1112,31 +1129,23 @@ create_blueprints() {
 
 parse_the_args() {
 
-    	if [ ! -z "$list" ]; then
+    if [ ! -z "$list" ]; then
         	list_sites
-   	fi
-    	if [ ! -z "$create" ]; then
+   	elif [ ! -z "$create" ]; then
         	create_site
-    	fi
-    	if [ ! -z "$remove" ]; then
-        	remove_site
-    	fi
-   	if [ ! -z "$deployment_setup" ]; then
-    		deployment_setup
-    	fi
-    	if [ ! -z "$deployment_remove" ]; then
-    		deployment_removal_prompt
-    	fi
-   	if [ ! -z "$deployment_config" ]; then
+    elif [ ! -z "$remove" ]; then
+    	remove_site
+    elif [ ! -z "$deployment_setup" ]; then
+    	deployment_setup
+    elif [ ! -z "$deployment_remove" ]; then
+    	deployment_removal_prompt
+    elif [ ! -z "$deployment_config" ]; then
    		deployment_config
-   	fi
-   	 if [ ! -z "$blueprint_init" ]; then
-		create_blueprints
-	fi
-	if [ ! -z "$lets_update" ]; then
+   	elif [ ! -z "$blueprint_init" ]; then
+		create_blueprint
+	elif [ ! -z "$lets_update" ]; then
    		install_update
-	fi
-   	if [ ! -z "$force_update" ]; then
+	elif [ ! -z "$force_update" ]; then
    		vv_bootstrap_update
 	fi
 }
@@ -1356,6 +1365,10 @@ check_args() {
 				wpskeleton="true"
 				shift
 				;;
+			--show-hooks)
+				show_hooks="true"
+				shift
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -1388,7 +1401,6 @@ main() {
 	no_wp_with_db="false"
 	sites_folder="www"
 	check_args "$@"
-
 }
 
 main "$@"
