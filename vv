@@ -181,8 +181,10 @@ fail () {
 check_for_update () {
 	if [[ ! -z $(which curl) ]]; then
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-		if [[ ! "$version_number" = "$github_version" ]]; then
-			info "Your version of vv does not match the current Github version. Please update with vv --update"
+		if [[ ! -z "$github_version" ]]; then
+			if [[ ! "$version_number" = "$github_version" ]]; then
+				info "Your version of vv ( $version_number )  does not match the current Github version ( $github_version ). Please update with vv --update"
+			fi
 		fi
 	fi
 }
@@ -796,7 +798,7 @@ PHP"
 
 		maybe_remove_defaults=""
 		if [[ "$remove_defaults" = "y" ]]; then
-			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete aksimet --allow-root; git checkout HEAD ."
+			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete akismet --allow-root; git checkout HEAD ."
 		fi
 
 		install_method="wp core download --allow-root $installversion"
@@ -1314,7 +1316,7 @@ check_args() {
 				placeholder_content="y"
 				shift
 				;;
-			--rd|--remove-defaults)
+			-rd|--rd|--remove-defaults)
 				remove_defaults="y"
 				shift
 				;;
