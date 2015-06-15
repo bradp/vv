@@ -32,6 +32,14 @@ function main( $blueprint, $path = 'htdocs' ) {
             add_option( $option );
         }
     }
+    if ( ! empty( $blueprints->$blueprint->demo_content ) ) {
+        echo "Activating WordPress Importer...\n";
+        activate_wordpress_importer();
+        echo "Importing demo content...\n";
+        foreach( $blueprints->$blueprint->demo_content as $demo ) {
+            import_demo_content( $demo );
+        }
+    }
     if ( ! empty( $blueprints->$blueprint->defines ) ) {
         echo "Adding constants to wp-config.php...";
         foreach( $blueprints->$blueprint->defines as $define ) {
@@ -182,6 +190,20 @@ function add_option( $option ) {
     exec( "wp --allow-root option delete '$a'" );
     exec( "wp --allow-root option add '$a' '$b'" );
     echo "  Insert settings $a...\n";
+}
+
+function activate_wordpress_importer() {
+    exec( 'wp plugin install wordpress-importer --allow-root && wp plugin activate wordpress-importer --allow-root');
+}
+
+/**
+ * @param $demo
+ */
+function import_demo_content( $demo ) {
+    $object = explode("::", $demo );
+    $link = $object[1];
+    exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=skip --allow-root && rm import.xml' );
+    echo "  Import Complete!\n";
 }
 
 /**
