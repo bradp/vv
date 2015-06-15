@@ -30,6 +30,9 @@
     "options": [
       "current_theme::_s"
     ],
+    "demo_content": [
+      "link::https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml"
+    ],
     "defines": [
       "WP_CACHE::false"
     ]
