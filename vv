@@ -804,7 +804,7 @@ PHP"
 
 	nginx_domain_text="$domain"
 	if [[ $multisite = 'y' ]] && [[ $ms_type = 'subdomain' ]]; then
-		nginx_domain_text="$domain $multisite_domains"
+		nginx_domain_text="$domain *.$domain $multisite_domains"
 	fi
 	xip_domain=" ~^"$site"\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
 	nginx_domain_text="$nginx_domain_text""$xip_domain"
