@@ -12,11 +12,33 @@
 
 ## Installation
 
+### OS X Installation
+
 If you have [Homebrew](http://brew.sh/) installed, you run the following in your terminal application:
 
 	$ brew install bradp/vv/vv
 
 Otherwise you'll want to clone and edit your `$PATH` to include the vv core file.
+
+### Windows Installation
+
+* Clone `vv` to a folder somewhere. 
+
+    `$ git clone https://github.com/bradp/vv.git`
+
+* Add that folder to your system path. See [here](http://windowsitpro.com/systems-management/how-can-i-add-new-folder-my-system-path) if you need help.
+
+* Open an explorer window and go to My Computer (or This PC).
+* Right click and choose properties
+* Choose Advanced System Settings
+* Choose Environmental Variables form the Advanced Tab
+* Choose the "Path" variable and edit it.
+* Add a semicolon to end the previous path item and then add the vv folder path (Example: ;C:\Users\Name\Documents\vv)
+* Open Git Bash and run `vv`
+
+Alternately, you can use cmd.exe with `bash vv`.
+
+Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If you're having issues, please see [this issue](https://github.com/bradp/vv/issues/33).
 
 ## Updating
 
