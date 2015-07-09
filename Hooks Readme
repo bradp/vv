@@ -1,0 +1,17 @@
+Hooks Readme
+
+- Pass in the '--show-hooks' flag to see all hooks that are running for a command
+
+- to add code for a hook, simply make a file named that hook inside of a new 'vv' folder inside of the root of 'vvv'
+this file can be any command line runnable language, and will be executed inline
+	for example:
+
+		#! /usr/bin/php
+		echo 'Hello'
+
+Running npm install inside of wp-content for all new sites:
+	Make a file named post_site_creation_finished - this file gets 3 variables passed in, the site name, the site domain, and the path to the site
+
+		#!/bin/bash
+		cd "$3"
+		npm install
