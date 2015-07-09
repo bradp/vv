@@ -134,6 +134,9 @@ The blueprint should look like this:
     "options": [
       "current_theme::_s"
     ],
+    "demo_content": [
+      "link::https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml"
+    ],
     "defines": [
       "WP_CACHE::false"
     ]
@@ -151,7 +154,9 @@ For themes, plugins, and mu-plugins, you can use:
 
 The options for plugins and themes correspond to the equivelant [WP CLI](http://wp-cli.org) option.
 
-For options and constants, please note the `::` as a seperator between the key and value.
+For options, demo content, and constants, please note the `::` as a seperator between the key and value.
+
+Custom demo content can be imported through the blueprint. Be sure to use a link that points to just the xml code, like [this](https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml). You can add as many demo content files as you'd like, just seperate each line with a comma as usual.
 
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
@@ -249,4 +254,4 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 ## Thanks
 
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
-Also thanks to [creativecoder](http://github.com/creativecoder), [jtsternberg](http://github.com/jtsternberg), [tnorthcutt](http://github.com/tnorthcutt), [joehills](http;//github.com/joehills), [gregrickaby](http://github.com/gregrickaby), [leogopal](http://github.com/leogopal), [Mte90](http://github.com/Mte90), [Octopixell](http://github.com/Octopixell), [wpsmith](https://github.com/wpsmith) for awesome contributions.
+Also thanks to [creativecoder](http://github.com/creativecoder), [jtsternberg](http://github.com/jtsternberg), [tnorthcutt](http://github.com/tnorthcutt), [joehills](http;//github.com/joehills), [gregrickaby](http://github.com/gregrickaby), [leogopal](http://github.com/leogopal), [Mte90](http://github.com/Mte90), [Octopixell](http://github.com/Octopixell), [wpsmith](https://github.com/wpsmith), [WPProdigy](https://github.com/WPprodigy) for awesome contributions.
