@@ -106,7 +106,7 @@ ${bold} SITE OPTIONS: ${normal}
     --password  		Admin password
     --email  			Admin email
     --git-repo, -gr  		Git repo to clone as wp-content
-    --bedrock, -b   		Creates Roots.io Bedrock install
+    --bedrock, -bed 		Creates Roots.io Bedrock install
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
     --blank-with-db		Adds a blank VVV site, with a database
@@ -708,11 +708,6 @@ PHP"
 		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
 	fi
 
-	bedrock_text=''
-	if [[ $bedrock_init ]]; then
-		bedrock_text="echo \"Installing Bedrock stack using Composer\"\ncomposer create-project roots/bedrock htdocs"
-	fi
-
 	if [[ ! -z "$db_import" ]]; then
 		cp "$db_import" "$path"/"$sites_folder"/"$site"/"$site".sql
 	fi
@@ -741,7 +736,6 @@ PHP"
 				echo "	"
 				echo "	cd -"
 				echo "$blueprint_text"
-				echo "$bedrock_text"
 				echo "fi"
 			} >> vvv-init.sh
 		fi
@@ -766,6 +760,11 @@ PHP"
 			install_method="git clone --recursive https://github.com/markjaquith/WordPress-Skeleton.git . "
 			config="echo \"<?php define( 'DB_NAME', '$db_name' ); define( 'DB_USER', 'wp' ); define( 'DB_PASSWORD', 'wp' ); define( 'DB_HOST', 'localhost' );\" >> local-config.php"
 			core=""
+		fi
+		if [ "$bedrock_init" = "true" ]; then
+			install_method="composer create-project roots/bedrock htdocs"
+			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
+			core="$core --path=\"htdocs/web/wp\""
 		fi
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
@@ -1333,7 +1332,7 @@ check_args() {
 				;;
 			-bed|--bedrock)
 				bedrock_init="true"
-				no_wp="true"
+				web_root="htdocs/web"
 				no_wp_with_db="true"
 				shift
 				;;
