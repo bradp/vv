@@ -106,6 +106,7 @@ ${bold} SITE OPTIONS: ${normal}
     --password  		Admin password
     --email  			Admin email
     --git-repo, -gr  		Git repo to clone as wp-content
+    --bedrock, -b   		Creates Roots.io Bedrock install
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
     --blank-with-db		Adds a blank VVV site, with a database
@@ -1322,6 +1323,10 @@ check_args() {
 				;;
 			--wpskeleton|--skel,-skel)
 				wpskeleton="true"
+				shift
+				;;
+			-bed|--bedrock)
+				echo "bedrock"
 				shift
 				;;
 			*)
