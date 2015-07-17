@@ -84,6 +84,15 @@ Creating a site does the following:
 
 Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it downloads WordPress into your site's htdocs directory and runs the installation. If you want to skip provisioning and install WordPress manually, you can run the new site's `vvv-init.sh` file directly in the Vagrant shell.
 
+### Subdomain Multisite Installation
+
+If you are using a site a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
+    mysite.dev
+    siteA.mysite.dev
+    siteB.mysite.dev
+
+After this, run `vagrant halt; vagrant up --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
+
 ## Site Deletion
 
 `vv delete`
