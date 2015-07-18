@@ -230,6 +230,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--domain, -d`|Domain of new site|
 |`--webroot`, `-wr`|Subdirectory used for web server root|
+|`--bedrock`, `-bed`|Creates Roots.io Bedrock install|
 |`--blueprint`, `-b`|Name of blueprint to use|
 |`--live-url`, `-u`|Live URL of site|
 |`--files`, `-f`|Do not provision Vagrant, just create the site directory and files|
