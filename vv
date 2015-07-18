@@ -1078,6 +1078,16 @@ create_blueprints() {
 	fi
 }
 
+autocomplete_list() {
+	echo "list create remove deployment_setup deployment_remove deployment_config blueprint_init lets_update force_update"
+}
+
+test_for_autocomplete_functionality() {
+	if [[ -z $(which _vv_complete) ]]; then
+		_vv_complete
+	fi
+}
+
 parse_the_args() {
 
     	if [ ! -z "$list" ]; then
@@ -1324,6 +1334,9 @@ check_args() {
 				wpskeleton="true"
 				shift
 				;;
+			autocomplete_list)
+				autocomplete_list
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -1358,4 +1371,8 @@ main() {
 
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+	main "$@"
+else
+	test_for_autocomplete_functionality
+fi
