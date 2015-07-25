@@ -127,6 +127,8 @@ Or, the more readable version with all expanded flags.
 
 `vv create --domain mysite.dev --name mysite --multisite subdomains --debug`
 
+To use a custom database prefix, simply use the `vv create --prefix myprefix` when creating a new site.
+
 ## Blueprints
 
 Blueprints allow you to set up different plugins, themes, mu-plugins, options, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
@@ -242,6 +244,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--username`|Admin username|
 |`--password`|Admin password|
 |`--email`|Admin email|
+|`--prefix`|Database prefix to use|
 |`--git-repo`,`-gr`|Git repo to clone as wp-content|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|

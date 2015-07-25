@@ -105,6 +105,7 @@ ${bold} SITE OPTIONS: ${normal}
     --username  		Admin username
     --password  		Admin password
     --email  			Admin email
+    --prefix  			Database prefix to use
     --git-repo, -gr  		Git repo to clone as wp-content
     --bedrock, -bed 		Creates Roots.io Bedrock install
     --blueprint, -b 		Name of blueprint to use
