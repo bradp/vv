@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.7.2
+	░██   ░██░██   ░██     Variable VVV 1.8.0
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -22,7 +22,7 @@ Otherwise you'll want to clone and edit your `$PATH` to include the vv core file
 
 ### Windows Installation
 
-* Clone `vv` to a folder somewhere. 
+* Clone `vv` to a folder somewhere.
 
     `$ git clone https://github.com/bradp/vv.git`
 
