@@ -753,8 +753,15 @@ PHP"
 			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete akismet --allow-root; git checkout HEAD ."
 		fi
 
+		wp_db_prefix="wp_"
+		if [[ ! -z "$db_prefix" ]]; then
+			wp_db_prefix=$db_prefix
+		fi
+
+
+
 		install_method="wp core download --allow-root $installversion"
-		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
+		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --dbprefix=$wp_db_prefix --allow-root$wp_debug_text"
 		core="wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
 		if [ "$wpskeleton" = "true" ]; then
 			install_method="git clone --recursive https://github.com/markjaquith/WordPress-Skeleton.git . "
@@ -1291,6 +1298,12 @@ check_args() {
 				;;
 			-rd|--rd|--remove-defaults)
 				remove_defaults="y"
+				shift
+				;;
+			--prefix|--db-prefix|-dbp)
+				argument_expected "$1" "$2"
+				db_prefix=$2
+				shift
 				shift
 				;;
 			--about|about)
