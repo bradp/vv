@@ -754,6 +754,11 @@ PHP"
 			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete akismet --allow-root; git checkout HEAD ."
 		fi
 
+		maybe_download_search_and_replace=""
+		if [[ "$download_search_and_replace" = "true" ]]; then
+			maybe_download_search_and_replace="wget https://github.com/interconnectit/Search-Replace-DB/archive/master.zip && unzip master.zip && rm master.zip"
+		fi
+
 		wp_db_prefix="wp_"
 		if [[ ! -z "$db_prefix" ]]; then
 			wp_db_prefix=$db_prefix
@@ -790,6 +795,7 @@ PHP"
 			echo "	$add_placeholder_content"
 			echo "	$db_init"
 			echo "  $maybe_remove_defaults"
+			echo "  $maybe_download_search_and_replace"
 			echo "	"
 			echo "	cd -"
 			echo "$blueprint_text"
@@ -1291,6 +1297,10 @@ check_args() {
 				;;
 			--defaults)
 				use_defaults="true"
+				shift
+				;;
+			--download-search-and-replace)
+				download_search_and_replace="true"
 				shift
 				;;
 			-sc|--sc|--sample-content|--sample_content|--samplecontent)
