@@ -158,7 +158,7 @@ prompt () {
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
 error () {
-    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
 }
 
 # Usage: fail "message"
