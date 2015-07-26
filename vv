@@ -755,11 +755,15 @@ PHP"
 	blueprint_text=''
 	if [[ ! -z "$blueprint" ]]; then
 		cp "$path"/vv-blueprints.json "$path"/"$sites_folder"/"$site"/vv-blueprints.json
+		hook "pre_blueprint_text_output"
 		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
+		hook "post_blueprint_text_output"
 	fi
 
 	if [[ ! -z "$db_import" ]]; then
+		hook "pre_site_creation_db_import"
 		cp "$db_import" "$path"/"$sites_folder"/"$site"/"$site".sql
+		hook "post_site_creation_db_import"
 	fi
 
 	db_init=""
@@ -831,6 +835,7 @@ PHP"
 			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
 			core="$core --path=\"htdocs/web/wp\""
 		fi
+		hook "pre_write_vvv_init"
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
@@ -853,6 +858,7 @@ PHP"
 			echo "$blueprint_text"
 			echo "fi"
 		} >> vvv-init.sh
+		hook "post_write_vvv_init"
 	fi
 
 	echo "Done"
@@ -860,9 +866,11 @@ PHP"
 	# Add vvv-hosts file for domain in the site's "$sites_folder" root
 	# =============================================================================
 	cd "$path"/"$sites_folder"/"$site"
+	hook "pre_write_vvv_hosts"
 	info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
 	printf "%s\n" "$domain" >> vvv-hosts
+	hook "post_write_vvv_hosts"
 	echo "Done"
 
 	if [ ! -z "$git_repo" ]; then
