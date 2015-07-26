@@ -883,7 +883,14 @@ create_site() {
 not_valid_site() {
 	if [[ -z $site || ! -d "$path/"$sites_folder"/$site" ]]; then
 		error "You must enter a valid directory from $path/"$sites_folder"/."
-		unset site
+		info "Would you like to continue the process to remove left-over objects?"
+		prompt "Continue (y/N) "
+		read -r continue_delete_first
+		if [ "$continue_delete" = 'y' ]; then
+			break
+		else
+			unset site
+		fi
 	elif [[ $site = 'wordpress-default' || $site = 'wordpress-develop' || $site = 'wordpress-trunk' || $site = 'default' || $site = 'phpcs' || $site = 'vvv-hosts' || $site = 'wp-cli' || $site = '.gitshow' ]]; then
 		error "This script can't delete the default VVV folders."
 		unset site
