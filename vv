@@ -678,7 +678,10 @@ confirm_site_creation() {
 
 	success "New VVV setup starting for site '$site'"
 	cd "$path"
-	vagrant halt
+	if [[ -z "$files_only" ]]; then
+		info "Running vagrant halt"
+		vagrant halt
+	fi
 }
 
 create_site_files(){
