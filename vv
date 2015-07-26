@@ -1327,14 +1327,12 @@ check_args() {
 			--prefix|--db-prefix|-dbp)
 				argument_expected "$1" "$2"
 				db_prefix=$2
-				shift
-				shift
+				shift 2
 				;;
 			--language|--locale|--lang|-lang)
 				argument_expected "$1" "$2"
 				db_lang=$2
-				shift
-				shift
+				shift 2
 				;;
 			--about|about)
 				about
