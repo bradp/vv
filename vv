@@ -114,6 +114,7 @@ ${bold} SITE OPTIONS: ${normal}
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
     --database, -db 		Import a local database file
     --remove-defaults, -rd 	Remove default themes and plugins
+    --language,--locale,	Install WP in another locale.
 
 ${bold} EXAMPLE:${normal}
     vv create --domain mysite.dev --name mysite --debug

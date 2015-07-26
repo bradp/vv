@@ -253,6 +253,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--wpskeleton`, `-skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)
 |`--database`,`-db`|Imports a local database export|
 |`--remove-defaults`,`-rd`|Removes default themes and plugins|
+|`--language`,`--locale`|Install WP in another locale. Need to pass the local afterwards, like so: `vv create --locale fr_FR`|
 
 ### Options for Site Removal
 |Option|Description|
