@@ -909,6 +909,7 @@ run_vagrant_up() {
 		info "Running vagrant up --provision... "
 		hook "pre_vagrant_provision"
 		vagrant up --provision
+		hook "post_vagrant_provision"
 	fi
 }
 
@@ -928,11 +929,21 @@ creation_success_message() {
 }
 
 create_site() {
+	hook "pre_site_creation_questions"
 	site_creation_questions
+	hook "post_site_creation_questions"
+	hook "pre_site_creation_confirm"
 	confirm_site_creation
+	hook "post_site_creation_confirm"
+	hook "pre_site_creation_create_files"
 	create_site_files
+	hook "post_site_creation_create_files"
+	hook "pre_site_creation_vagrant_up"
 	run_vagrant_up
+	hook "post_site_creation_vagrant_up"
+	hook "pre_site_creation_finished_message"
 	creation_success_message
+	hook "post_site_creation_finished_message"
 	exit
 }
 
@@ -954,6 +965,7 @@ not_valid_site() {
 }
 
 remove_site() { # @TODO refactor this if we need to
+	hook "pre_site_removal"
 	info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
@@ -974,38 +986,51 @@ remove_site() { # @TODO refactor this if we need to
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path"
-
+			hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant halt
+			hook "post_site_removal_vagrant_halt" "$site" "$path"
 
 			# Delete the site folder
 			info "Removing directory $site... "
+			hook "pre_site_removal_delete_files" "$path" "$sites_folder" "$site"
 			rm -rf "$path"/"$sites_folder"/"$site"
+			hook "post_site_removal_delete_files" "$path" "$sites_folder" "$site"
 			echo "Done"
 
 			# Remove the nginx conf file
 			info "Removing nginx config file $site.conf... "
+			hook "pre_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
 			rm "$path"/config/nginx-config/sites/"$site".conf
+			hook "post_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
+
 			echo "Done"
 
 			# Remove the database creation from init-custom.sql
 			info "Removing the database creation commands from init-custom.sql... "
 			cd "$path"/database
+			hook "pre_site_removal_remove_db_creation" "$site" "$path"
 			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
 			rm init-custom.sql
 			mv init-custom.sql.tmp init-custom.sql
+			hook "post_site_removal_remove_db_creation" "$site" "$path"
 			cd "$path"
 			echo "Done"
 
 			info "Removing database"
+			hook "pre_site_removal_remove_db" "$site" "$path"
 			rm -rf "$path"/database/data/"$site"
+			hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
 			info "Removing any set up deployments. "
+			hook "pre_site_removal_remove_deployments" "$site" "$path"
 			remove_site_remove_all_deployment
+			hook "post_site_removal_remove_deployments" "$site" "$path"
 			echo "Done"
 
 			# Deleted.
 			success "\nVVV Site Teardown: Done!"
+			hook "post_site_removal"
 			exit
 
 		elif [ "$continue_delete" = 'n' ]; then
