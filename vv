@@ -478,7 +478,7 @@ list_sites() {
 					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 					urls=$(echo "$url" | wc -l)
 					if (( "$urls" > 1 )); then
-						url="$(echo "$url" | paste -d ' ' - -)"
+						url="$(echo "$url" | paste -d ' ' $( echo $( for i in $(seq 1 $urls); do echo '-'; done ) ) )"
 					fi
 					if [[ ! $clean = "true" ]]; then
 						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
