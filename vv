@@ -323,19 +323,18 @@ info "	"
 
 }
 
-getJsonVal () {
-    python -c "import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)$1))";
+get_config_value() {
+	value=$(grep "$1" ~/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	echo $value
 }
 
 load_config_values() {
-	#Load path from config file
-	path="$( getJsonVal "['path']" < ~/.vv-config )"
-	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
+	path=$(get_config_value path)
 }
 
 load_config_autopdate_config_values() {
 	#Load path from config file
-	auto_update_disable_config="$( getJsonVal "['auto_update_disable']" < ~/.vv-config )"
+	auto_update_disble_config=$(get_config_value auto_update_disable)
 	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
 	if [[ $auto_update_disable_config = "true" ]]; then
 		auto_update_disable="true"
@@ -343,7 +342,7 @@ load_config_autopdate_config_values() {
 }
 
 load_default_values() {
-	defaults="$( getJsonVal "['defaults']" < ~/.vv-config )"
+	defaults=$(get_config_value defaults)
 	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
