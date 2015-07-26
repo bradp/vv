@@ -1,6 +1,30 @@
 ## Change Log
 
-#### 1.7.1 - *2015-3-17* ####
+
+#### 1.8.0 - *2015-7-25* ####
+ * Adds flag to download a search/replace db tool
+ * Add documentation around db prefix
+ * Add db prefix option / flag
+ * fix typo in unknown errorDate:
+ * Pull from upstream / fix merge conflict
+ * Formatting fixes
+ * Add beginnings for tab-complete functionality
+ * Add subdomain multisite installation instructions
+ * Creates Roots.io Bedrock install
+ * Adds bedrock to readme create commands
+ * Adds installation of bedrock
+ * Adds composer bedrock text to create_site_files
+ * Adds help and arg case
+ * Add windows install instuctions to readme
+ * Adding *.domain support to subdomain networks
+ * Making VV handle wildcard subdomains as VVV does per #94.
+ * README Update - Custom Demo Content
+ * Akismet typo
+ * Output better version update debugging, and only run when github returns a real string
+ * Update README to have correct version number
+
+
+#### 1.7.2 - *2015-3-17* ####
  * Fixed deployment creation bug where push.dir was not defined
  * Created new blueprint structure
  * Added new blueprint installation methods

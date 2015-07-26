@@ -5,7 +5,7 @@
 # By Brad Parbs <brad@bradparbs.com>
 # Originally by Alison Barrett <alison@barre.tt>
 #
-# Version 1.7.2
+# Version 1.8.0
 #
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
@@ -35,7 +35,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
-version_number=1.7.2
+version_number=1.8.0
 
 if [[ ! -z $(which tput) ]]; then
 	normal=$(tput sgr0)
@@ -105,13 +105,16 @@ ${bold} SITE OPTIONS: ${normal}
     --username  		Admin username
     --password  		Admin password
     --email  			Admin email
+    --prefix  			Database prefix to use
     --git-repo, -gr  		Git repo to clone as wp-content
+    --bedrock, -bed 		Creates Roots.io Bedrock install
     --blueprint, -b 		Name of blueprint to use
     --blank			Creates blank VVV site, with no WordPress
     --blank-with-db		Adds a blank VVV site, with a database
     --wpskeleton, --skel 	Creates a new site with the structure of WP Skeleton
     --database, -db 		Import a local database file
     --remove-defaults, -rd 	Remove default themes and plugins
+    --language,--locale,	Install WP in another locale.
 
 ${bold} EXAMPLE:${normal}
     vv create --domain mysite.dev --name mysite --debug
@@ -166,8 +169,8 @@ prompt () {
 # Output (to STDERR): [ERROR] this is an error
 error () {
 	hook "pre_error_output"
-	printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unkown Error'}${normal}\n" >&2
-	hook "post_error_output"
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
+    hook "post_error_output"
 }
 
 # Usage: fail "message"
@@ -337,22 +340,18 @@ info "	"
 
 }
 
-getJsonVal () {
-    python -c "import json,sys;sys.stdout.write(json.dumps(json.load(sys.stdin)$1))";
+get_config_value() {
+	value=$(grep "$1" ~/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	echo $value
 }
 
 load_config_values() {
-	#Load path from config file
-	path="$( getJsonVal "['path']" < ~/.vv-config )"
-	path="$(echo "$path" | sed -e 's/^"//'  -e 's/"$//')"
-
-	#vv_scripts_folder="$( getJsonVal "['scripts']" < ~/.vv-config )"
-	#vv_scripts_folder="$(echo "$vv_scripts_folder" | sed -e 's/^"//' -e 's/"$//')"
+	path=$(get_config_value path)
 }
 
 load_config_autopdate_config_values() {
 	#Load path from config file
-	auto_update_disable_config="$( getJsonVal "['auto_update_disable']" < ~/.vv-config )"
+	auto_update_disble_config=$(get_config_value auto_update_disable)
 	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
 	if [[ $auto_update_disable_config = "true" ]]; then
 		auto_update_disable="true"
@@ -360,7 +359,7 @@ load_config_autopdate_config_values() {
 }
 
 load_default_values() {
-	defaults="$( getJsonVal "['defaults']" < ~/.vv-config )"
+	defaults=$(get_config_value defaults)
 	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
@@ -723,8 +722,11 @@ confirm_site_creation() {
 
 	success "New VVV setup starting for site '$site'"
 	cd "$path"
-	hook "pre_creation_pre_vagrant_halt"
-	vagrant halt
+	if [[ -z "$files_only" ]]; then
+		info "Running vagrant halt"
+		hook "pre_creation_pre_vagrant_halt"
+		vagrant halt
+	fi
 }
 
 create_site_files(){
@@ -801,13 +803,33 @@ PHP"
 			maybe_remove_defaults="wp theme delete twentythirteen --allow-root; wp theme delete twentyfourteen --allow-root; wp theme delete twentyfifteen --allow-root; wp plugin delete hello --allow-root; wp plugin delete akismet --allow-root; git checkout HEAD ."
 		fi
 
-		install_method="wp core download --allow-root $installversion"
-		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --allow-root$wp_debug_text"
+		maybe_download_search_and_replace=""
+		if [[ "$download_search_and_replace" = "true" ]]; then
+			maybe_download_search_and_replace="wget https://github.com/interconnectit/Search-Replace-DB/archive/master.zip && unzip master.zip && rm master.zip"
+		fi
+
+		wp_db_prefix="wp_"
+		if [[ ! -z "$db_prefix" ]]; then
+			wp_db_prefix=$db_prefix
+		fi
+
+		wp_db_lang="en_US"
+		if [[ ! -z "$db_lang" ]]; then
+			wp_db_lang=$db_lang
+		fi
+
+		install_method="wp core download --locale=$wp_db_lang --allow-root $installversion"
+		config="wp core config --dbname=\"$db_name\" --dbuser=wp --dbpass=wp --dbhost=\"localhost\" --dbprefix=$wp_db_prefix --locale=$wp_db_lang --allow-root$wp_debug_text"
 		core="wp core $install_text --url=$domain --title=\"$site\" --admin_user=$username --admin_password=$password --admin_email=$email --allow-root"
 		if [ "$wpskeleton" = "true" ]; then
 			install_method="git clone --recursive https://github.com/markjaquith/WordPress-Skeleton.git . "
 			config="echo \"<?php define( 'DB_NAME', '$db_name' ); define( 'DB_USER', 'wp' ); define( 'DB_PASSWORD', 'wp' ); define( 'DB_HOST', 'localhost' );\" >> local-config.php"
 			core=""
+		fi
+		if [ "$bedrock_init" = "true" ]; then
+			install_method="composer create-project roots/bedrock htdocs"
+			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
+			core="$core --path=\"htdocs/web/wp\""
 		fi
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
 "GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
@@ -825,6 +847,7 @@ PHP"
 			echo "	$add_placeholder_content"
 			echo "	$db_init"
 			echo "  $maybe_remove_defaults"
+			echo "  $maybe_download_search_and_replace"
 			echo "	"
 			echo "	cd -"
 			echo "$blueprint_text"
@@ -862,7 +885,7 @@ PHP"
 		-e "s|wordpress-local|$site/$web_root|" local-nginx-example.conf-sample > "$site".conf
 
 	if [[ $image_proxy = "true" ]]; then
-		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
+		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ if (!-f $request_filename) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \} \}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
 		rm "$site".conf
 		mv tmp.conf "$site".conf
 	fi
@@ -908,7 +931,14 @@ create_site() {
 not_valid_site() {
 	if [[ -z $site || ! -d "$path/"$sites_folder"/$site" ]]; then
 		error "You must enter a valid directory from $path/"$sites_folder"/."
-		unset site
+		info "Would you like to continue the process to remove left-over objects?"
+		prompt "Continue (y/N) "
+		read -r continue_delete_first
+		if [ "$continue_delete" = 'y' ]; then
+			break
+		else
+			unset site
+		fi
 	elif [[ $site = 'wordpress-default' || $site = 'wordpress-develop' || $site = 'wordpress-trunk' || $site = 'default' || $site = 'phpcs' || $site = 'vvv-hosts' || $site = 'wp-cli' || $site = '.gitshow' ]]; then
 		error "This script can't delete the default VVV folders."
 		unset site
@@ -1129,26 +1159,44 @@ create_blueprints() {
 	fi
 }
 
+autocomplete_list() {
+	echo "list create remove deployment_setup deployment_remove deployment_config blueprint_init lets_update force_update"
+}
+
+test_for_autocomplete_functionality() {
+	if [[ -z $(which _vv_complete) ]]; then
+		_vv_complete
+	fi
+}
+
 parse_the_args() {
 
     if [ ! -z "$list" ]; then
-        	list_sites
-   	elif [ ! -z "$create" ]; then
-        	create_site
-    elif [ ! -z "$remove" ]; then
+    	list_sites
+   	fi
+    if [ ! -z "$create" ]; then
+    	create_site
+    fi
+    if [ ! -z "$remove" ]; then
     	remove_site
-    elif [ ! -z "$deployment_setup" ]; then
+    fi
+   	if [ ! -z "$deployment_setup" ]; then
     	deployment_setup
-    elif [ ! -z "$deployment_remove" ]; then
+    fi
+    if [ ! -z "$deployment_remove" ]; then
     	deployment_removal_prompt
-    elif [ ! -z "$deployment_config" ]; then
+    fi
+   	if [ ! -z "$deployment_config" ]; then
    		deployment_config
-   	elif [ ! -z "$blueprint_init" ]; then
-		create_blueprint
-	elif [ ! -z "$lets_update" ]; then
-   		install_update
-	elif [ ! -z "$force_update" ]; then
-   		vv_bootstrap_update
+   	fi
+   	if [ ! -z "$blueprint_init" ]; then
+		create_blueprints
+	fi
+	if [ ! -z "$lets_update" ]; then
+		install_update
+	fi
+	if [ ! -z "$force_update" ]; then
+		vv_bootstrap_update
 	fi
 }
 
@@ -1312,12 +1360,28 @@ check_args() {
 				use_defaults="true"
 				shift
 				;;
+			--download-search-and-replace)
+				download_search_and_replace="true"
+				shift
+				;;
 			-sc|--sc|--sample-content|--sample_content|--samplecontent)
 				placeholder_content="y"
 				shift
 				;;
 			-rd|--rd|--remove-defaults)
 				remove_defaults="y"
+				shift
+				;;
+			--prefix|--db-prefix|-dbp)
+				argument_expected "$1" "$2"
+				db_prefix=$2
+				shift
+				shift
+				;;
+			--language|--locale|--lang|-lang)
+				argument_expected "$1" "$2"
+				db_lang=$2
+				shift
 				shift
 				;;
 			--about|about)
@@ -1371,6 +1435,16 @@ check_args() {
 				show_hooks="true"
 				shift
 				;;
+			autocomplete_list)
+				autocomplete_list
+				shift
+				;;
+			-bed|--bedrock)
+				bedrock_init="true"
+				web_root="htdocs/web"
+				no_wp_with_db="true"
+				shift
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -1405,4 +1479,8 @@ main() {
 	check_args "$@"
 }
 
-main "$@"
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+	main "$@"
+else
+	test_for_autocomplete_functionality
+fi

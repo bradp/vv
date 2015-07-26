@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.7.2
+	░██   ░██░██   ░██     Variable VVV 1.8.0
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -12,11 +12,33 @@
 
 ## Installation
 
+### OS X Installation
+
 If you have [Homebrew](http://brew.sh/) installed, you run the following in your terminal application:
 
 	$ brew install bradp/vv/vv
 
 Otherwise you'll want to clone and edit your `$PATH` to include the vv core file.
+
+### Windows Installation
+
+* Clone `vv` to a folder somewhere.
+
+    `$ git clone https://github.com/bradp/vv.git`
+
+* Add that folder to your system path. See [here](http://windowsitpro.com/systems-management/how-can-i-add-new-folder-my-system-path) if you need help.
+
+* Open an explorer window and go to My Computer (or This PC).
+* Right click and choose properties
+* Choose Advanced System Settings
+* Choose Environmental Variables form the Advanced Tab
+* Choose the "Path" variable and edit it.
+* Add a semicolon to end the previous path item and then add the vv folder path (Example: ;C:\Users\Name\Documents\vv)
+* Open Git Bash and run `vv`
+
+Alternately, you can use cmd.exe with `bash vv`.
+
+Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If you're having issues, please see [this issue](https://github.com/bradp/vv/issues/33).
 
 ## Updating
 
@@ -62,6 +84,15 @@ Creating a site does the following:
 
 Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it downloads WordPress into your site's htdocs directory and runs the installation. If you want to skip provisioning and install WordPress manually, you can run the new site's `vvv-init.sh` file directly in the Vagrant shell.
 
+### Subdomain Multisite Installation
+
+If you are using a site a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
+    mysite.dev
+    siteA.mysite.dev
+    siteB.mysite.dev
+
+After this, run `vagrant halt; vagrant up --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
+
 ## Site Deletion
 
 `vv delete`
@@ -95,6 +126,8 @@ To create a new site named 'mysite' that has the domain 'mysite.dev' and is a mu
 Or, the more readable version with all expanded flags.
 
 `vv create --domain mysite.dev --name mysite --multisite subdomains --debug`
+
+To use a custom database prefix, simply use the `vv create --prefix myprefix` when creating a new site.
 
 ## Blueprints
 
@@ -199,6 +232,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--name`, `-n`|Desired name for the site directory (e.g. mysite)|
 |`--domain, -d`|Domain of new site|
 |`--webroot`, `-wr`|Subdirectory used for web server root|
+|`--bedrock`, `-bed`|Creates Roots.io Bedrock install|
 |`--blueprint`, `-b`|Name of blueprint to use|
 |`--live-url`, `-u`|Live URL of site|
 |`--files`, `-f`|Do not provision Vagrant, just create the site directory and files|
@@ -210,14 +244,16 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--username`|Admin username|
 |`--password`|Admin password|
 |`--email`|Admin email|
+|`--prefix`|Database prefix to use|
 |`--git-repo`,`-gr`|Git repo to clone as wp-content|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--blank`|Creates blank VVV site, with no WordPress|
 |`--blank-with-db`|Creates a blank VVV site, with a database|
-|`--wpskeleton`, `-skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)`
+|`--wpskeleton`, `-skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)
 |`--database`,`-db`|Imports a local database export|
 |`--remove-defaults`,`-rd`|Removes default themes and plugins|
+|`--language`,`--locale`|Install WP in another locale. Need to pass the local afterwards, like so: `vv create --locale fr_FR`|
 
 ### Options for Site Removal
 |Option|Description|
@@ -254,4 +290,4 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 ## Thanks
 
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
-Also thanks to [creativecoder](http://github.com/creativecoder), [jtsternberg](http://github.com/jtsternberg), [tnorthcutt](http://github.com/tnorthcutt), [joehills](http;//github.com/joehills), [gregrickaby](http://github.com/gregrickaby), [leogopal](http://github.com/leogopal), [Mte90](http://github.com/Mte90), [Octopixell](http://github.com/Octopixell), [wpsmith](https://github.com/wpsmith), [WPProdigy](https://github.com/WPprodigy) for awesome contributions.
+Also thanks to [creativecoder](http://github.com/creativecoder), [jtsternberg](http://github.com/jtsternberg), [tnorthcutt](http://github.com/tnorthcutt), [joehills](http;//github.com/joehills), [gregrickaby](http://github.com/gregrickaby), [leogopal](http://github.com/leogopal), [Mte90](http://github.com/Mte90), [Octopixell](http://github.com/Octopixell), [wpsmith](https://github.com/wpsmith), [WPProdigy](https://github.com/WPprodigy), [caseypatrickdriscoll](http://github.com/caseypatrickdriscoll) for awesome contributions.
