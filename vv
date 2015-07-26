@@ -839,7 +839,7 @@ PHP"
 		-e "s|wordpress-local|$site/$web_root|" local-nginx-example.conf-sample > "$site".conf
 
 	if [[ $image_proxy = "true" ]]; then
-		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
+		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ if (!-f $request_filename) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \} \}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
 		rm "$site".conf
 		mv tmp.conf "$site".conf
 	fi
