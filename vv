@@ -953,8 +953,8 @@ not_valid_site() {
 		info "Would you like to continue the process to remove left-over objects?"
 		prompt "Continue (y/N) "
 		read -r continue_delete_first
-		if [ "$continue_delete" = 'y' ]; then
-			break
+		if [ "$continue_delete_first" = 'y' ]; then
+			continue
 		else
 			unset site
 		fi
