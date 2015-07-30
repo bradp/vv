@@ -42,7 +42,7 @@ Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If yo
 
 ## Updating
 
-vv is currently under development, and you'll probably want the latest and greatest version at all time.
+vv is currently under development, and you'll probably want the latest and greatest version at all times.
 
 You can run `vv --update` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will boostrap an update on where ever you've installed it.
 
@@ -86,7 +86,7 @@ Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it
 
 ### Subdomain Multisite Installation
 
-If you are using a site a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
+If you are using a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
     mysite.dev
     siteA.mysite.dev
     siteB.mysite.dev
