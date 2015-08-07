@@ -702,7 +702,10 @@ create_site_files(){
 	if [[ $wp_debug = 'y' ]]; then
 		wp_debug_text=" --extra-php <<PHP
 define('WP_DEBUG', true);
+define('WP_DEBUG_DISPLAY', false);
 define('WP_DEBUG_LOG', true);
+define('SCRIPT_DEBUG', true);
+define('JETPACK_DEV_DEBUG', true);
 PHP"
 	fi
 
