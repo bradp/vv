@@ -1146,6 +1146,7 @@ output_debug_vv() {
 	echo "find: $(which find)"
 	echo "git: $(which git)"
 	echo "sed: $(which sed)"
+	echo "paste: $(which paste)"
 	echo "vagrant: $(which vagrant)"
 
 	echo "----------"
