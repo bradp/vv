@@ -43,7 +43,6 @@ if [[ ! -z $(which tput) ]]; then
 	red=$(tput setaf 1)
 	green=$(tput setaf 2)
 	yellow=$(tput setaf 3)
-	blue=$(tput setaf 6)
 	magenta=$(tput setaf 5)
 	cyan=$(tput setaf 6)
 fi
@@ -213,11 +212,11 @@ vv_bootstrap_update() {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
-	curl -L -o ~/"$github_version".tar.gz "$download_link" 2>/dev/null
-	tar -C ~/ -zxvf ~/"$github_version".tar.gz 2>/dev/null
-	rm ~/"$github_version".tar.gz
-	echo "$(cat ~/vv-"$github_version"/vv)" > "$vv_install_location"
-	rm -rf ~/vv-"$github_version"
+	curl -L -o "$HOME/$github_version.tar.gz" "$download_link" 2>/dev/null
+	tar -C "$HOME" -zxvf "$HOME/$github_version.tar.gz" 2>/dev/null
+	rm "$HOME/$github_version.tar.gz"
+	cat "$HOME/vv-$github_version/vv" > "$vv_install_location"
+	rm "$HOME/vv-$github_version"
 	success "vv has been updated to the latest version. Thanks!"
 }
 
@@ -229,7 +228,7 @@ auto_update_main() {
 		else
 			source ~/.vv-update
 
-			epoch_diff=$(($(_current_epoch) - $DAYS_SINCE_UPDATE_CHECK))
+			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
 			epoch_target=7
 			if [[ $epoch_diff -gt $epoch_target ]]; then
 				info "vv is out of date. Checking for update."
@@ -327,7 +326,7 @@ info "	"
 
 get_config_value() {
 	value=$(grep "$1" ~/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
-	echo $value
+	echo "$value"
 }
 
 load_config_values() {
@@ -336,8 +335,8 @@ load_config_values() {
 
 load_config_autopdate_config_values() {
 	#Load path from config file
-	auto_update_disble_config=$(get_config_value auto_update_disable)
-	auto_update_disable_config="$(echo "$auto_update_disable_config" | sed -e 's/^"//'  -e 's/"$//')"
+	auto_update_disble_config_var=$(get_config_value auto_update_disable)
+	auto_update_disable_config="$(echo "$auto_update_disble_config_var" | sed -e 's/^"//'  -e 's/"$//')"
 	if [[ $auto_update_disable_config = "true" ]]; then
 		auto_update_disable="true"
 	fi
@@ -439,7 +438,7 @@ list_sites() {
 					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 					urls=$(echo "$url" | wc -l)
 					if (( "$urls" > 1 )); then
-						url="$(echo "$url" | paste -d ' ' $( echo $( for i in $(seq 1 $urls); do echo '-'; done ) ) )"
+						url="$(echo "$url" | paste -d ' ' $( echo $( for i in $(seq 1 "$urls"); do echo '-'; done ) ) )"
 					fi
 					if [[ ! $clean = "true" ]]; then
 						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
@@ -467,8 +466,8 @@ site_creation_questions() {
 		if [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
 			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
 			unset site
-		elif [ -d "$path/"$sites_folder"/$site" ]; then
-			warning "Directory $path/"$sites_folder"/$site already exists. Existing VVV configuration files will be overwritten."
+		elif [ -d "$path/$sites_folder/$site" ]; then
+			warning "Directory $path/$sites_folder/$site already exists. Existing VVV configuration files will be overwritten."
 		fi
 	fi
 	while [ -z "$site" ]; do
@@ -480,8 +479,8 @@ site_creation_questions() {
 		elif [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
 			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
 			unset site
-		elif [ -d "$path/"$sites_folder"/$site" ]; then
-			warning "Directory $path/"$sites_folder"/$site already exists. Existing VVV configuration files will be overwritten."
+		elif [ -d "$path/$sites_folder/$site" ]; then
+			warning "Directory $path/$sites_folder/$site already exists. Existing VVV configuration files will be overwritten."
 		fi
 	done
 
@@ -579,10 +578,10 @@ site_creation_questions() {
 			install_text='multisite-install --subdomains'
 		fi
 
-		if [[ ! -z $git_repo && -d "$path/"$sites_folder"/$site" ]]; then
-			error "$path/"$sites_folder"/$site already exists. Skipping git clone."
+		if [[ ! -z $git_repo && -d "$path/$sites_folder/$site" ]]; then
+			error "$path/$sites_folder/$site already exists. Skipping git clone."
 			unset git_repo
-		elif [[ -z "$git_repo" && ! -d "$path/"$sites_folder"/$site" ]]; then
+		elif [[ -z "$git_repo" && ! -d "$path/$sites_folder/$site" ]]; then
 			if [ "$use_defaults" = "false" ]; then
 				prompt "Git repo to clone as wp-content (leave blank to skip)"
 				read -r git_repo
@@ -651,7 +650,7 @@ confirm_site_creation() {
 	# =============================================================================
 	info "\nAbout to perform the following:"
 	# @ TODO
-	echo -e "* Halt Vagrant (if running)\n* Create directory $site in $path/"$sites_folder"\n* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site\n* Create file $site.conf in $path/config/nginx-config/sites"
+	echo -e "* Halt Vagrant (if running)\n* Create directory $site in $path/$sites_folder\n* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site\n* Create file $site.conf in $path/config/nginx-config/sites"
 	if [[ -z "$files_only" ]]; then
 		echo -e "* Run \`vagrant up --provision\` to initialize site"
 	else
@@ -729,8 +728,7 @@ PHP"
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
 		fi
-		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
-"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
+		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
 		if [[ ! -z "$db_import" ]]; then
 			{
@@ -789,8 +787,7 @@ PHP"
 			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
 			core="$core --path=\"htdocs/web/wp\""
 		fi
-		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n"\
-"GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
+		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
 		{
 			echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
@@ -834,16 +831,16 @@ PHP"
 
 	nginx_domain_text="$domain"
 	if [[ $multisite = 'y' ]] && [[ $ms_type = 'subdomain' ]]; then
-		nginx_domain_text="$domain *.$domain $multisite_domains"
+		nginx_domain_text="$domain *.$domain"
 	fi
-	xip_domain=" ~^"$site"\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
+	xip_domain=" ~^$site\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
 	nginx_domain_text="$nginx_domain_text""$xip_domain"
 
 	sed -e "s/testserver\.com/$nginx_domain_text/" \
 		-e "s|wordpress-local|$site/$web_root|" local-nginx-example.conf-sample > "$site".conf
 
 	if [[ $image_proxy = "true" ]]; then
-		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ if (!-f $request_filename) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \} \}|' -e "s|LIVE_URL|"$live_site_url"|" "$site".conf > tmp.conf
+		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ if (!-f $request_filename) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \} \}|' -e "s|LIVE_URL|$live_site_url|" "$site".conf > tmp.conf
 		rm "$site".conf
 		mv tmp.conf "$site".conf
 	fi
@@ -869,7 +866,7 @@ creation_success_message() {
 	fi
 
 	success "New VVV Site Setup: Done!"
-	echo "Directory: $path/"$sites_folder"/$site"
+	echo "Directory: $path/$sites_folder/$site"
 	echo "URL:       $domain"
 	echo "Username:  $username"
 	echo "Password:  $password"
@@ -885,13 +882,13 @@ create_site() {
 }
 
 not_valid_site() {
-	if [[ -z $site || ! -d "$path/"$sites_folder"/$site" ]]; then
-		error "You must enter a valid directory from $path/"$sites_folder"/."
+	if [[ -z $site || ! -d "$path/$sites_folder/$site" ]]; then
+		error "You must enter a valid directory from $path/$sites_folder/."
 		info "Would you like to continue the process to remove left-over objects?"
 		prompt "Continue (y/N) "
 		read -r continue_delete_first
 		if [ "$continue_delete_first" = 'y' ]; then
-			break
+			return
 		else
 			unset site
 		fi
@@ -915,7 +912,7 @@ remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/"$sites_folder"\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
@@ -927,7 +924,7 @@ remove_site() { # @TODO refactor this if we need to
 
 			# Delete the site folder
 			info "Removing directory $site... "
-			rm -rf "$path"/"$sites_folder"/"$site"
+			rm -rf "${path:?}"/"${sites_folder:?}"/"${site:?}"
 			echo "Done"
 
 			# Remove the nginx conf file
@@ -1065,7 +1062,8 @@ deployment_setup() {
 	echo "	destination: $destination"
 	cp "$path/Vagrantfile" "$path/Vagrantfile-backup"
 
-echo "$(sed  '$ d' < "$path/Vagrantfile")" > "$path/Vagrantfile"
+	vagrant_file=$(sed  '$ d' < "$path/Vagrantfile")
+	echo "$vagrant_file" > "$path/Vagrantfile"
 {
 	echo "# begin-vv-$site-$deployment_name"
 	echo "	config.push.define \"$site-$deployment_name\", strategy: \"ftp\" do |push|"
@@ -1075,7 +1073,7 @@ echo "$(sed  '$ d' < "$path/Vagrantfile")" > "$path/Vagrantfile"
 	echo "		push.passive =\"$passive\""
 	echo "		push.secure =\"$secure\""
 	echo "		push.destination =\"$destination\""
-	echo "		push.dir = \"$path/"$sites_folder"/$site/htdocs\""
+	echo "		push.dir = \"$path/$sites_folder/$site/htdocs\""
 	echo "		push.exclude = \"wp-config.php\""
 	echo "	end"
 	echo "# end-vv-$site-$deployment_name"
@@ -1085,7 +1083,7 @@ echo "$(sed  '$ d' < "$path/Vagrantfile")" > "$path/Vagrantfile"
 }
 
 remove_site_remove_all_deployment() {
-	sed "/\# begin-vv-"$site"/,/\# end-vv-"$site"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	sed "/\# begin-vv-$site/,/\# end-vv-$site/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
 }
@@ -1095,7 +1093,7 @@ remove_deployment() {
 		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
 		read -r remove_deployment_confirm
 	done
-	sed "/\# begin-vv-"$site"-"$deployment_name"/,/\# end-vv-"$site"-"$deployment_name"/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	sed "/\# begin-vv-$site-$deployment_name/,/\# end-vv-$site-$deployment_name/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
 
