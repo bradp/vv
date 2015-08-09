@@ -75,6 +75,7 @@ ${bold} OPTIONS: ${normal}
     --help, -h 			Show this help and usage
     --version 			Show current vv version
     --about 			Show project info
+    --debug-vv 			Outputs all debugging info needed for bug reporting
     --path, -p 			Path to VVV installation
     --force-path, -fp 		Override vv auto-VVV locating
     --force-sites-folder, -fsf 	Override sites folder directory locating
@@ -1124,6 +1125,28 @@ test_for_autocomplete_functionality() {
 	fi
 }
 
+output_debug_vv() {
+	echo "----------"
+	version
+	echo ""
+	echo "vv: $(which vv)"
+	echo ""
+	echo "vvv path: $path"
+	echo "home: $HOME"
+	echo ""
+	echo "tput: $(which tput)"
+	echo "cat: $(which cat)"
+	echo "curl: $(which curl)"
+	echo "brew: $(which brew)"
+	echo "tar: $(which tar)"
+	echo "find: $(which find)"
+	echo "git: $(which git)"
+	echo "sed: $(which sed)"
+	echo "vagrant: $(which vagrant)"
+
+	echo "----------"
+}
+
 parse_the_args() {
 
     if [ ! -z "$list" ]; then
@@ -1305,6 +1328,10 @@ check_args() {
 				;;
 			--version)
 				version
+				shift
+				;;
+			--debug-vv)
+				output_debug_vv
 				shift
 				;;
 			--porcelain)

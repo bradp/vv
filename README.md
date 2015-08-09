@@ -207,6 +207,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--version`|Show current vv version number.|
 |`--about`|Show about screen.|
 |`--update`|Updates vv to the latest stable version|
+|`--debug-vv`|Outputs all debugging info needed for bug reporting.|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--force-sites-folder`,`-fsf`|Override sites folder directory locating|
