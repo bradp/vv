@@ -65,7 +65,7 @@ ABOUT
 
 # Usage: show_help [exit_code]
 # Example: show_help 254
-show_help () {
+show_help() {
     cat <<HELP
 
 ${bold} USAGE: ${normal}
@@ -125,53 +125,53 @@ HELP
 }
 
 
-version () {
+version() {
 	echo "vv version $version_number"
 }
 
 # Usage: info "message"
 # Example: info "doing thing"
 # Output (to STDOUT): doing thing
-info () {
+info() {
     printf "%b" "${bold}${yellow}$1${normal} \n"
 }
 
 # Usage: success "message"
 # Example: success "It's Working"
 # Output (to STDOUT): [...] It's Working
-success () {
+success() {
     printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
 }
 
 # Usage: warning "message"
 # Example: warning "some warning"
 # Output (to STDOUT): [...] some warning
-warning () {
+warning() {
     printf "%b" "${red} $1 ${normal}\n"
 }
 
 # Usage: prompt "question"
 # Example: prompt "Site name"
 # Output (to STDOUT): Site Name:
-prompt () {
+prompt() {
     printf "%b" "${magenta} $1: ${normal}"
 }
 
 # Usage: error ["message"]
 # Example: error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
-error () {
+error() {
     printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
 }
 
 # Usage: fail "message"
 # Example: fail "Unknown Option" 254
-fail () {
+fail() {
     error "$1"
     exit 1
 }
 
-check_for_update () {
+check_for_update() {
 	if [[ ! -z $(which curl) ]]; then
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 		if [[ ! -z "$github_version" ]]; then
@@ -182,7 +182,7 @@ check_for_update () {
 	fi
 }
 
-check_how_installed () {
+check_how_installed() {
 	if [[ ! -z $(which brew) ]]; then
 		brew_install_location=$(brew --prefix)
 		if [[ -f $brew_install_location"/bin/vv" ]]; then
@@ -193,12 +193,12 @@ check_how_installed () {
 	fi
 }
 
-install_update () {
+install_update() {
 	check_how_installed
 	update_vv
 }
 
-update_vv () {
+update_vv() {
 	if [[ $installed_with_brew = "true" ]]; then
 		info "Updating vv via Brew..."
 		brew cleanup
@@ -209,7 +209,7 @@ update_vv () {
 	fi
 }
 
-vv_bootstrap_update () {
+vv_bootstrap_update() {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
@@ -221,7 +221,7 @@ vv_bootstrap_update () {
 	success "vv has been updated to the latest version. Thanks!"
 }
 
-auto_update_main () {
+auto_update_main() {
 
 	if [[ ! $auto_update_disable = "true" ]]; then
 		if [ ! -f ~/.vv-update ]; then
@@ -258,7 +258,7 @@ _update_vv_update() {
 # https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
 # Example: if "Yes or No?" Y; then
-ask () {
+ask() {
     while true; do
 
         if [ "${2:-}" = "Y" ]; then
