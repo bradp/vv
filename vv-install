@@ -202,7 +202,7 @@ function activate_wordpress_importer() {
 function import_demo_content( $demo ) {
     $object = explode("::", $demo );
     $link = $object[1];
-    exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=skip --allow-root && rm import.xml' );
+    exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
     echo "  Import Complete!\n";
 }
 
