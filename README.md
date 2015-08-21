@@ -10,6 +10,8 @@
 
 `vv` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV). `vv` supports site creation with many different options; site blueprints to set up all your plugins, themes, and more; deployments; and lots more features.
 
+[![Travis](https://img.shields.io/travis/bradp/vv.svg)]()
+
 ## Installation
 
 ### OS X Installation
@@ -42,7 +44,7 @@ Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If yo
 
 ## Updating
 
-vv is currently under development, and you'll probably want the latest and greatest version at all time.
+vv is currently under development, and you'll probably want the latest and greatest version at all times.
 
 You can run `vv --update` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will boostrap an update on where ever you've installed it.
 
@@ -86,7 +88,7 @@ Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it
 
 ### Subdomain Multisite Installation
 
-If you are using a site a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
+If you are using a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
     mysite.dev
     siteA.mysite.dev
     siteB.mysite.dev
@@ -207,6 +209,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--version`|Show current vv version number.|
 |`--about`|Show about screen.|
 |`--update`|Updates vv to the latest stable version|
+|`--debug-vv`|Outputs all debugging info needed for bug reporting.|
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--force-sites-folder`,`-fsf`|Override sites folder directory locating|
@@ -253,7 +256,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--wpskeleton`, `-skel`|Creates a new site with the structure of [WP Skeleton](https://github.com/markjaquith/WordPress-Skeleton)
 |`--database`,`-db`|Imports a local database export|
 |`--remove-defaults`,`-rd`|Removes default themes and plugins|
-|`--language`,`--locale`|Install WP in another locale. Need to pass the local afterwards, like so: `vv create --locale fr_FR`|
+|`--language`,`--locale`|Install WP in another locale. Need to pass the locale afterwards, like so: `vv create --locale fr_FR`|
 
 ### Options for Site Removal
 |Option|Description|
