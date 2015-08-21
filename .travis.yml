@@ -1,0 +1,3 @@
+language: bash
+install: wget "http://ftp.debian.org/debian/pool/main/s/shellcheck/shellcheck_0.3.7-3_amd64.deb"; sudo dpkg -i shellcheck_0.3.7-3_amd64.deb
+script: shellcheck ../vv || exit 1;
