@@ -926,12 +926,12 @@ remove_site() { # @TODO refactor this if we need to
 
 			# Delete the site folder
 			info "Removing directory $site... "
-			rm -rf "${path:?}"/"${sites_folder:?}"/"${site:?}"
+			rm -rf "${path:?}/${sites_folder:?}/${site:?}"
 			echo "Done"
 
 			# Remove the nginx conf file
 			info "Removing nginx config file $site.conf... "
-			rm "$path"/config/nginx-config/sites/"$site".conf
+			rm "$path/config/nginx-config/sites/$site.conf"
 			echo "Done"
 
 			# Remove the database creation from init-custom.sql
@@ -944,7 +944,7 @@ remove_site() { # @TODO refactor this if we need to
 			echo "Done"
 
 			info "Removing database"
-			rm -rf "$path"/database/data/"$site"
+			rm -rf "$path/database/data/$site"
 			echo "Done"
 
 			info "Removing any set up deployments. "
