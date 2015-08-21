@@ -10,6 +10,8 @@
 
 `vv` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV). `vv` supports site creation with many different options; site blueprints to set up all your plugins, themes, and more; deployments; and lots more features.
 
+[![Travis](https://img.shields.io/travis/bradp/vv.svg)]()
+
 ## Installation
 
 ### OS X Installation
