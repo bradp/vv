@@ -1,12 +1,19 @@
-_vv()
-{
-  _vv_commands=$(vv show_commands)
+if [ -n "$ZSH_VERSION" ]; then
+	echo "vv doesn't support completions in your shell yet."
+elif [ -n "$BASH_VERSION" ]; then
+   _vv()
+   {
+     _vv_commands=$(/Users/brad/Dropbox/Working/vv/vv show_commands)
 
-  local cur prev
-  COMPREPLY=()
-  cur="${COMP_WORDS[COMP_CWORD]}"
-  COMPREPLY=( $(compgen -W "${_vv_commands}" -- ${cur}) )
+     local cur prev
+     COMPREPLY=()
+     cur="${COMP_WORDS[COMP_CWORD]}"
+     COMPREPLY=( $(compgen -W "${_vv_commands}" -- ${cur}) )
 
-  return 0
-}
-complete -o nospace -F _vv vv
+     return 0
+   }
+   complete -o nospace -F _vv vv
+
+else
+   echo "vv doesn't support completions in your shell yet."
+fi
