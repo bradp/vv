@@ -610,16 +610,20 @@ site_creation_questions() {
 				installversion=" --version=$version"
 			fi
 		fi
-
+		use_trunk="false"
 		while [[ -z "$version" ]]; do
 			# Get WordPress version
 			if [ "$use_defaults" = "false" ]; then
-				prompt "WordPress version to install (leave blank for latest version)"
+				prompt "WordPress version to install (leave blank for latest version or trunk for trunk/nightly version))"
 				read -r version
 			fi
 			if [ -z "$version" ]; then
 				installversion=""
 				version="(release version)"
+			elif [ "$version" = "trunk" ]; then
+				installversion=""
+				version="(release version)"
+				use_trunk="true"
 			else
 				# Attempt to verify the existence of the version (hacky)
 				if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
@@ -890,6 +894,11 @@ PHP"
 			config="echo \"<?php define( 'DB_NAME', '$db_name' ); define( 'DB_USER', 'wp' ); define( 'DB_PASSWORD', 'wp' ); define( 'DB_HOST', 'localhost' );\" >> local-config.php"
 			core=""
 		fi
+		maybe_trunk=""
+		if [ "$use_trunk" = "true" ];then
+			maybe_trunk="wp core update https://wordpress.org/nightly-builds/wordpress-latest.zip --allow-root"
+		fi
+
 		if [ "$bedrock_init" = "true" ]; then
 			install_method="composer create-project roots/bedrock htdocs"
 			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
@@ -922,6 +931,7 @@ PHP"
 			echo "	cd -"
 			echo "$blueprint_text"
 			echo "fi"
+			echo "$maybe_trunk"
 			echo "$hooked_post_vvv_init"
 		} >> vvv-init.sh
 		hook "post_write_vvv_init"
