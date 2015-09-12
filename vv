@@ -256,10 +256,10 @@ vv_bootstrap_update() {
 auto_update_main() {
 	hook "pre_auto_update_vv"
 	if [[ ! $auto_update_disable = "true" ]]; then
-		if [ ! -f ~/.vv-update ]; then
+		if [ ! -f "$HOME"/.vv-update ]; then
 			_update_vv_update
 		else
-			source ~/.vv-update
+			source "$HOME"/.vv-update
 
 			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
 			epoch_target=7
@@ -270,7 +270,7 @@ auto_update_main() {
 					update_vv
 				fi
 
-				rm ~/.vv-update
+				rm "$HOME"/.vv-update
 				_update_vv_update
 			fi
 		fi
@@ -369,7 +369,7 @@ create_config_file() {
 }
 
 get_config_value() {
-	value=$(grep "$1" ~/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	value=$(grep "$1" "$HOME"/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
 	echo "$value"
 }
 
@@ -422,20 +422,20 @@ get_vvv_path(){
 		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
 			path=$(pwd)
-		elif [ -e ~/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/Sites
-		elif [ -e ~/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/Sites/Vagrant
-		elif [ -e ~/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/vagrant
-		elif [ -e ~/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/vagrant-local
-		elif [ -e ~/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/projects/vvv
-		elif [ -e ~/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/working/vvv
-		elif [ -e ~/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path=~/vvv
+		elif [ -e "$HOME"/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/Sites
+		elif [ -e "$HOME"/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/Sites/Vagrant
+		elif [ -e "$HOME"/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vagrant
+		elif [ -e "$HOME"/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vagrant-local
+		elif [ -e "$HOME"/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/projects/vvv
+		elif [ -e "$HOME"/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/working/vvv
+		elif [ -e "$HOME"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vvv
 		else
 			while [ -z "$path" ]; do
 				read -r -e -p "VVV install directory: " path
