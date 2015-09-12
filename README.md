@@ -286,6 +286,31 @@ The first time you run `vv`, it will attempt to locate your VVV installation loc
 You can also add `"auto_update_disable": false` to this file to disable auto-update functionality.
 
 
+## `vv` Hooks
+
+`vv` has support for extensibility within the 'hooks' system present. This allows for quite a lot of extensiblity and injection into the `vv` process. This system allows you to add your own code to run within almost any point with `vv`.
+
+To get started with hooks, run any `vv` command with `--show-hooks` at the end. For example, `vv list --show-hooks` will run `vv list` as normal, but will also show all the hooks available.
+
+To create the folder that your hook code should live in, simply make a 'vv' folder inside of your VVV folder.
+
+To add code to run for a hook, make a file within your vv folder inside of VV named the hook that you want to add to. This file can be any command line runnable language, and will be executed inline.
+
+For example, saving this file as the name of any hook will output 'Hello' when that hook gets called.
+
+`
+    #! /usr/bin/php
+    echo 'Hello'
+`
+
+Another example would be running npm install inside of wp-content for all new sites.
+Make a file named post_site_creation_finished - this file gets 4 variables passed in, the hook name, the site name, the site domain, and the name of the site folder
+`
+    #!/bin/bash
+    cd www/$4/htdocs/wp-content
+    npm install
+`
+
 ## Questions?
 
 Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
