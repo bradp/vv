@@ -10,8 +10,9 @@ this file can be any command line runnable language, and will be executed inline
 		echo 'Hello'
 
 Running npm install inside of wp-content for all new sites:
-	Make a file named post_site_creation_finished - this file gets 3 variables passed in, the site name, the site domain, and the path to the site
+	Make a file named post_site_creation_finished - this file gets 4 variables passed in, the hook name, the site name, the site domain, and the name of the site folder
 
 		#!/bin/bash
-		cd "$3"
+		cd www/$4/htdocs/wp-content
 		npm install
+
