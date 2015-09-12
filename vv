@@ -125,6 +125,69 @@ HELP
 hook "post_help_output"
 }
 
+# Usage: show_help [exit_code]
+# Example: show_help 254
+show_commands() {
+	hook "pre_help_output"
+    cat <<COMMANDS
+
+    --help
+    --version
+    --about
+    --debug-vv
+    --path
+    --force-path
+    -fp
+    --force-sites-folder
+    -fsf
+    --use_defaults
+    list
+    create
+    remove
+    vagrant
+    v
+    deployment-create
+    deployment-remove
+    deployment-config
+    blueprint-init
+    --domain
+    -d
+    --live-url
+    -u
+    --files, -f
+    --images, -i
+    --name, -n
+    --web-root, -wr
+    --wp-version
+    -wv
+    --debug
+    -x
+    --multisite
+    -m
+    --sample-content
+    -sc
+    --username
+    --password
+    --email
+    --prefix
+    --git-repo
+    -gr
+    --bedrock
+    -bed
+    --blueprint
+    -b
+    --blank
+    --blank-with-db
+    --wpskeleton
+    --skel
+    --database
+    -db
+    --remove-defaults
+    -rd
+    --language
+    --locale
+COMMANDS
+}
 
 version() {
 	hook "pre_version_output"
@@ -1586,6 +1649,10 @@ check_args() {
 				bedrock_init="true"
 				web_root="htdocs/web"
 				no_wp_with_db="true"
+				shift
+				;;
+			show_commands)
+				show_commands
 				shift
 				;;
 			*)
