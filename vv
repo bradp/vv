@@ -1076,6 +1076,12 @@ remove_site() { # @TODO refactor this if we need to
 			hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
+			info "Removing database backup"
+			hook "pre_site_removal_remove_db_backup" "$site" "$path"
+			rm -rf "$path/database/data/backups/$site.sql"
+			hook "post_site_removal_remove_db_backup" "$site" "$path"
+			echo "Done"
+
 			info "Removing any set up deployments. "
 			hook "pre_site_removal_remove_deployments" "$site" "$path"
 			remove_site_remove_all_deployment
