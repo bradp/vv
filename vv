@@ -818,6 +818,17 @@ PHP"
 	hooked_extra_wp_vvv_init_no_wp=$(hook "hooked_extra_wp_vvv_init_no_wp")
 	hooked_post_vvv_init_no_wp=$(hook "hooked_post_vvv_init_no_wp")
 
+	if [ "$no_wp" = "true" ]; then
+		{
+			echo "$hooked_pre_vvv_init_no_wp"
+			echo "if [ ! -d \"./$web_root\" ]; then"
+			echo "  mkdir ./$web_root"
+			echo "cd ./$web_root"
+			echo "$hooked_extra_wp_vvv_init_no_wp"
+			echo "$hooked_post_vvv_init_no_wp"
+		} >> vvv-init.sh
+	fi
+
 	if [ "$no_wp_with_db" = "true" ]; then
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
