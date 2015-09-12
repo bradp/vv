@@ -350,7 +350,6 @@ check_for_config_file() {
 			info "This step only needs to be done once."
 			info "	"
 			get_vvv_path
-			create_config_file
 		fi
 	fi
 	hook "post_vv_config_check"
@@ -436,18 +435,26 @@ get_vvv_path(){
 			path="$HOME"/working/vvv
 		elif [ -e "$HOME"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
 			path="$HOME"/vvv
-		else
-			while [ -z "$path" ]; do
-				read -r -e -p "VVV install directory: " path
-
-				# Make sure directory is actually a VVV root
-				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
-					error "Path specified is not a VVV root directory. Where is VVV installed?"
-					unset path
-				fi
-				path=$(eval echo "${path//>}")
-			done
 		fi
+		info "Automagically found $path"
+		prompt "Is this where vv is installed? (Y/n)"
+		read -r path_confirmation
+		if [ "$path_confirmation" = 'Y' ]; then
+			create_config_file
+		else
+			unset path
+		fi
+
+		while [ -z "$path" ]; do
+			read -r -e -p "VVV install directory: " path
+
+			# Make sure directory is actually a VVV root
+			if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+				error "Path specified is not a VVV root directory. Where is VVV installed?"
+				unset path
+			fi
+			path=$(eval echo "${path//>}")
+		done
 	fi
 	path=${path%/}
 }
