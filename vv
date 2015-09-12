@@ -65,6 +65,7 @@ ABOUT
 # Usage: show_help [exit_code]
 # Example: show_help 254
 show_help() {
+	hook "pre_help_output"
     cat <<HELP
 
 ${bold} USAGE: ${normal}
@@ -121,11 +122,14 @@ ${bold} EXAMPLE:${normal}
     vv create -d mysite.dev -n mysite -x
 
 HELP
+hook "post_help_output"
 }
 
 
 version() {
+	hook "pre_version_output"
 	echo "vv version $version_number"
+	hook "post_version_output"
 }
 
 # Usage: info "message"
@@ -182,14 +186,20 @@ fail() {
 }
 
 check_for_update() {
+	hook "pre_update_check"
 	if [[ ! -z $(which curl) ]]; then
+		hook "pre_github_update_check"
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+		hook "post_github_update_check"
 		if [[ ! -z "$github_version" ]]; then
 			if [[ ! "$version_number" = "$github_version" ]]; then
+				hook "pre_out_of_date_vv"
 				info "Your version of vv ( $version_number )  does not match the current Github version ( $github_version ). Please update with vv --update"
+				hook "post_out_of_date_vv"
 			fi
 		fi
 	fi
+	hook "post_update_check"
 }
 
 check_how_installed() {
@@ -213,17 +223,24 @@ install_update() {
 }
 
 update_vv() {
+	hook "pre_update_vv"
 	if [[ $installed_with_brew = "true" ]]; then
 		info "Updating vv via Brew..."
+		hook "pre_brew_update_vv"
 		brew cleanup
 		brew reinstall vv
+		hook "post_brew_update_vv"
 	else
+		hook "pre_bootstrap_update_vv"
 		info "Updating vv..."
 		vv_bootstrap_update
+		hook "post_bootstrap_update_vv"
 	fi
+	hook "post_update_vv"
 }
 
 vv_bootstrap_update() {
+	hook "pre_vv_bootstrap_update"
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
@@ -233,10 +250,11 @@ vv_bootstrap_update() {
 	cat "$HOME/vv-$github_version/vv" > "$vv_install_location"
 	rm "$HOME/vv-$github_version"
 	success "vv has been updated to the latest version. Thanks!"
+	hook "post_vv_bootstrap_update"
 }
 
 auto_update_main() {
-
+	hook "pre_auto_update_vv"
 	if [[ ! $auto_update_disable = "true" ]]; then
 		if [ ! -f ~/.vv-update ]; then
 			_update_vv_update
@@ -257,6 +275,7 @@ auto_update_main() {
 			fi
 		fi
 	fi
+	hook "post_auto_update_vv"
 }
 
 _current_epoch() {
@@ -265,14 +284,17 @@ _current_epoch() {
 }
 
 _update_vv_update() {
-	touch ~/.vv-update
-	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > ~/.vv-update
+	hook "pre_vv_auto_update_update"
+	touch "$HOME"/.vv-update
+	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > "$HOME"/.vv-update
+	hook "post_vv_auto_update_update"
 }
 
 # https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
 # Example: if "Yes or No?" Y; then
 ask() {
+	hook "pre_ask"
     while true; do
 
         if [ "${2:-}" = "Y" ]; then
@@ -302,17 +324,21 @@ ask() {
         esac
 
     done
+    hook "post_ask"
 }
 
 argument_expected() {
+	hook "pre_arg_expected"
     if [ -z "$2" ] || [[ "$2" == -* ]]; then
     	hook "error_no_arg_$1"
         fail "$1 expected an argument"
     fi
+    hook "post_arg_expected"
 }
 
 check_for_config_file() {
-	test -f ~/.vv-config && got_config="true"
+	hook "pre_vv_config_check"
+	test -f "$HOME"/.vv-config && got_config="true"
 
 	if [ ! -z $got_config ]; then
 		load_config_values
@@ -327,17 +353,19 @@ check_for_config_file() {
 			create_config_file
 		fi
 	fi
+	hook "post_vv_config_check"
 }
 
 create_config_file() {
+	hook "pre_create_vv_config"
 {
 	echo "{"
 	echo "	\"path\": \"$path\""
 	echo "}"
-} >> ~/.vv-config
-info "$HOME/.vv-config was created."
-info "	"
-
+} >> "$HOME"/.vv-config
+	info "$HOME/.vv-config was created."
+	info "	"
+	hook "post_create_vv_config"
 }
 
 get_config_value() {
@@ -425,8 +453,11 @@ get_vvv_path(){
 }
 setup_scripts_folder() {
 	vv_scripts_folder="$path"/vv/
-
 }
+init_vv_hooks() {
+	mkdir "$path"/vv/
+}
+
 run_hook() {
 	hook "$1" "$2" "$3" "$4"
 }
@@ -776,6 +807,10 @@ PHP"
 		db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
 	fi
 
+	hooked_pre_vvv_init_no_wp=$(hook "hooked_pre_vvv_init_no_wp")
+	hooked_extra_wp_vvv_init_no_wp=$(hook "hooked_extra_wp_vvv_init_no_wp")
+	hooked_post_vvv_init_no_wp=$(hook "hooked_post_vvv_init_no_wp")
+
 	if [ "$no_wp_with_db" = "true" ]; then
 		if [ ! -e "$path"/database/init-custom.sql ]; then
 			touch "$path"/database/init-custom.sql
@@ -784,6 +819,7 @@ PHP"
 
 		if [[ ! -z "$db_import" ]]; then
 			{
+				echo "$hooked_pre_vvv_init_no_wp"
 				echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 				echo "	echo 'Making the correct directories and adding DB in $site/$web_root...'"
 				echo "	if [ ! -d \"./$web_root\" ]; then"
@@ -792,9 +828,11 @@ PHP"
 				echo "	cd ./$web_root"
 				echo "	$db_init"
 				echo "	"
+				echo "	$hooked_extra_wp_vvv_init_no_wp"
 				echo "	cd -"
 				echo "$blueprint_text"
 				echo "fi"
+				echo "$hooked_post_vvv_init_no_wp"
 			} >> vvv-init.sh
 		fi
 	fi
@@ -842,7 +880,12 @@ PHP"
 		hook "pre_write_vvv_init"
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
+		hooked_pre_vvv_init=$(hook "hooked_pre_vvv_init")
+		hooked_extra_wp_vvv_init=$(hook "hooked_extra_wp_vvv_init")
+		hooked_post_vvv_init=$(hook "hooked_post_vvv_init")
+
 		{
+			echo "$hooked_pre_vvv_init"
 			echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 			echo "	echo 'Installing WordPress $version in $site/$web_root...'"
 			echo "	if [ ! -d \"./$web_root\" ]; then"
@@ -856,10 +899,12 @@ PHP"
 			echo "	$db_init"
 			echo "  $maybe_remove_defaults"
 			echo "  $maybe_download_search_and_replace"
+			echo "	$hooked_extra_wp_vvv_init"
 			echo "	"
 			echo "	cd -"
 			echo "$blueprint_text"
 			echo "fi"
+			echo "$hooked_post_vvv_init"
 		} >> vvv-init.sh
 		hook "post_write_vvv_init"
 	fi
@@ -1116,7 +1161,6 @@ deployment_setup() {
 	else
 		passive="true"
 	fi
-
 
 	while [ -z "$secure" ]; do
 		prompt "Use SFTP? (y/N)"
