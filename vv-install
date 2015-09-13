@@ -39,7 +39,7 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 		}
 	}
 
-	echo "Blueprint set up.\n";
+	echo "Blueprint set up.\n"
 }
 
 /**
@@ -176,6 +176,20 @@ function add_option( $option ) {
 	exec( "wp --allow-root option delete '$a'" );
 	exec( "wp --allow-root option add '$a' '$b'" );
 	echo "  Insert settings $a...\n";
+}
+
+function activate_wordpress_importer() {
+	exec( 'wp plugin install wordpress-importer --allow-root && wp plugin activate wordpress-importer --allow-root' );
+}
+
+/**
+ * @param $demo
+ */
+function import_demo_content( $demo ) {
+	$object = explode( '::', $demo );
+	$link = $object[1];
+	exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
+	echo "  Import Complete!\n";
 }
 
 /**
