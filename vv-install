@@ -4,26 +4,26 @@
  * @param $blueprint
  * @param string $path
  */
-function main( $blueprint, $path = 'htdocs' ) {
+function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
 	$blueprints = json_decode( file_get_contents( "vv-blueprints.json" ) );
 
 	if ( ! empty( $blueprints->$blueprint->themes ) ) {
 		echo "Installing themes...\n";
 		foreach ( $blueprints->$blueprint->themes as $theme ) {
-			install( 'theme', $theme, $path );
+			install( 'theme', $theme, $path, $site_name, $domain );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
 		echo "Installing plugins...\n";
 		foreach ( $blueprints->$blueprint->plugins as $plugin ) {
-			install( 'plugin', $plugin, $path );
+			install( 'plugin', $plugin, $path, $site_name, $domain );
 		}
 	}
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
 		echo "Installing mu-plugins...\n";
 		foreach ( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-            install( 'mu-plugin', $mu_plugin, $path );
+            install( 'mu-plugin', $mu_plugin, $path, $site_name, $domain );
         }
     }
     if ( ! empty( $blueprints->$blueprint->options ) ) {
@@ -47,7 +47,7 @@ function main( $blueprint, $path = 'htdocs' ) {
  * @param $object
  * @param $path
  */
-function install ( $type, $object, $path ) {
+function install ( $type, $object, $path , $site_name, $domain) {
     /**
      * Set up the base command, make the wp-content folders and move into them
      * (-p: no error if existing, make parent directories as needed)
@@ -78,6 +78,11 @@ function install ( $type, $object, $path ) {
      */
     if( is_object( $target ) ) {
         $target = $object->location;
+
+        // Allow for sitename and sitedomain placeholders inside of a blueprints file
+        $target = str_replace('SITENAME', $site_name,  $target );
+        $target = str_replace('SITEDOMAIN', $domain,  $target );
+
         $wpcli_compat = true;
 
         if ( isset( $object->version ) ) {
@@ -196,4 +201,4 @@ define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
     }
 }
 
-main( $argv[1], $argv[2] );
+main( $argv[1], $argv[2], $arg[3], $arg[4] );
