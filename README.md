@@ -201,6 +201,8 @@ You can create as many named blueprints in this file as you would like, all with
 
 When creating a site, the name you've specified (in this example, "sample") is what you'll need to specify to use this blueprint.
 
+You can use 'SITENAME' or 'SITEDOMAIN' anywhere in the blueprint, and that will be replaced with the actual site name or local domain when installing.
+
 ## Vagrant Proxy
 
 Because vv knows where you VVV installation is, you can run it from anywhere. vv will proxy any commands passed into `vv vagrant <command>` to your VVV location. So `vv vagrant halt` will halt your VVV vagrant, no matter where you run it.
