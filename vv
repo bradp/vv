@@ -866,7 +866,7 @@ PHP"
 	if [[ ! -z "$blueprint" ]]; then
 		cp "$path"/vv-blueprints.json "$path"/"$sites_folder"/"$site"/vv-blueprints.json
 		hook "pre_blueprint_text_output"
-		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root && rm vv-blueprints.json"
+		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root $site && rm vv-blueprints.json"
 		hook "post_blueprint_text_output"
 	fi
 
