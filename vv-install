@@ -6,7 +6,7 @@
  */
 function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
-	$blueprints = json_decode( file_get_contents( "vv-blueprints.json" ) );
+	$blueprints = json_decode( file_get_contents( 'vv-blueprints.json' ) );
 
 	if ( ! empty( $blueprints->$blueprint->themes ) ) {
 		echo "Installing themes...\n";
@@ -23,23 +23,23 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
 		echo "Installing mu-plugins...\n";
 		foreach ( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-            install( 'mu-plugin', $mu_plugin, $path, $site_name, $domain );
-        }
-    }
-    if ( ! empty( $blueprints->$blueprint->options ) ) {
-        echo "Setting up options...\n";
-        foreach( $blueprints->$blueprint->options as $option ) {
-            add_option( $option );
-        }
-    }
-    if ( ! empty( $blueprints->$blueprint->defines ) ) {
-        echo "Adding constants to wp-config.php...";
-        foreach( $blueprints->$blueprint->defines as $define ) {
-            add_define( $define, $path );
-        }
-    }
+			install( 'mu-plugin', $mu_plugin, $path, $site_name, $domain );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->options ) ) {
+		echo "Setting up options...\n";
+		foreach ( $blueprints->$blueprint->options as $option ) {
+			add_option( $option );
+		}
+	}
+	if ( ! empty( $blueprints->$blueprint->defines ) ) {
+		echo 'Adding constants to wp-config.php...';
+		foreach ( $blueprints->$blueprint->defines as $define ) {
+			add_define( $define, $path );
+		}
+	}
 
-    echo "Blueprint set up.\n";
+	echo "Blueprint set up.\n";
 }
 
 /**
@@ -47,135 +47,135 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
  * @param $object
  * @param $path
  */
-function install ( $type, $object, $path , $site_name, $domain) {
-    /**
-     * Set up the base command, make the wp-content folders and move into them
-     * (-p: no error if existing, make parent directories as needed)
-     */
-    $command = "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s";
+function install( $type, $object, $path, $site_name, $domain ) {
+	/**
+	 * Set up the base command, make the wp-content folders and move into them
+	 * (-p: no error if existing, make parent directories as needed)
+	 */
+	$command = "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s";
 
-    /**
-     * Set up the string variable that will hold the WP-CLI options
-     */
-    $wpcli_options = "";
+	/**
+	 * Set up the string variable that will hold the WP-CLI options
+	 */
+	$wpcli_options = '';
 
-    /**
-     * Get the target object we need to install
-     */
-    $target = $object;
+	/**
+	 * Get the target object we need to install
+	 */
+	$target = $object;
 
-    /**
-     * This boolean tells if this blueprint is WP-CLI compatible.
-     */
-    $wpcli_compat = false;
+	/**
+	 * This boolean tells if this blueprint is WP-CLI compatible.
+	 */
+	$wpcli_compat = false;
 
-    /**
-     * If our target is an object, get the location of that object
-     * and set up the WP-CLI options for this installation
-     * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
-     *
-     * If the target is not an object, this is a target object from an old blueprint. This way we keep backwards compatibility
-     */
-    if( is_object( $target ) ) {
-        $target = $object->location;
+	/**
+	 * If our target is an object, get the location of that object
+	 * and set up the WP-CLI options for this installation
+	 * Documentation: http://wp-cli.org/commands/plugin/install/ && http://wp-cli.org/commands/theme/install/
+	 *
+	 * If the target is not an object, this is a target object from an old blueprint. This way we keep backwards compatibility
+	 */
+	if ( is_object( $target ) ) {
+		$target = $object->location;
 
-        // Allow for sitename and sitedomain placeholders inside of a blueprints file
-        $target = str_replace('SITENAME', $site_name,  $target );
-        $target = str_replace('SITEDOMAIN', $domain,  $target );
+		// Allow for sitename and sitedomain placeholders inside of a blueprints file
+		$target = str_replace( 'SITENAME', $site_name,  $target );
+		$target = str_replace( 'SITEDOMAIN', $domain,  $target );
 
-        $wpcli_compat = true;
+		$wpcli_compat = true;
 
-        if ( isset( $object->version ) ) {
-            $wpcli_options .= " --version=$object->version";
-        }
-        if ( isset( $object->force ) && $object->force == true ) {
-            $wpcli_options .= " --force";
-        }
-        if ( isset( $object->activate ) && $object->activate == true ) {
-            $wpcli_options .= " --activate";
-        }
-        if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
-            $wpcli_options .= " --activate-network";
-        }
-    }
+		if ( isset( $object->version ) ) {
+			$wpcli_options .= " --version=$object->version";
+		}
+		if ( isset( $object->force ) && true == $object->force ) {
+			$wpcli_options .= ' --force';
+		}
+		if ( isset( $object->activate ) && true == $object->activate ) {
+			$wpcli_options .= ' --activate';
+		}
+		if ( isset( $object->activate_network ) && true == $object->activate_network && 'plugin' == $type ) {
+			$wpcli_options .= ' --activate-network';
+		}
+	}
 
-    /**
-     * Give feedback to the console
-     */
-    echo "  Installing ".$target.$wpcli_options."...\n";
+	/**
+	 * Give feedback to the console
+	 */
+	echo '  Installing ' . $target . $wpcli_options . "...\n";
 
-    /**
-     * Set up the rest of the command for this installation depending
-     * on the type of installation we are going to do
-     */
-    // Clone a git repository
-    if ( strpos( $target, '.git' ) !== false ) {
-        $command .= " && git clone $target";
-        if( $wpcli_compat ) {
-            $command .= $wpcli_options;
-        }
-    }
-    // Download a zip file from a specified location
-    elseif ( strpos( $target, '.zip' ) !== false ) {
-        $command .= " && wp --allow-root $type install $target";
-        if( $wpcli_compat ) {
-            $command .= $wpcli_options;
-        }
-    }
-    // Download a git repository based on username and repository name
-    elseif ( strpos( $target, '/' ) !== false ) {
-        // Get the folder name
-        $exploded = explode( "/", $target );
-        $folder = $exploded[1];
+	/**
+	 * Set up the rest of the command for this installation depending
+	 * on the type of installation we are going to do
+	 */
+	// Clone a git repository
+	if ( false !== strpos( $target, '.git' ) ) {
+		$command .= " && git clone $target";
+		if ( $wpcli_compat ) {
+			$command .= $wpcli_options;
+		}
+	}
+	// Download a zip file from a specified location
+	elseif ( false !== strpos( $target, '.zip' ) ) {
+		$command .= " && wp --allow-root $type install $target";
+		if ( $wpcli_compat ) {
+			$command .= $wpcli_options;
+		}
+	}
+	// Download a git repository based on username and repository name
+	elseif ( false !== strpos( $target, '/' ) ) {
+		// Get the folder name
+		$exploded = explode( '/', $target );
+		$folder = $exploded[1];
 
-        // Check if the blueprint is WP-CLI compatible
-        if( !$wpcli_compat ) {
-            $command .= " && wp --allow-root $type install https://github.com/$target/archive/master.zip && pwd && mv $folder-master $folder";
-        } else {
-            $command .= " && curl -s -S \"https://codeload.github.com/$target/tar.gz/master\" -o \"$folder-master.tar.gz\"".    // Download the tarball from the repository, do it silent but show errors
-		" && tar xpvf $folder-master.tar.gz". // Unzip the file
-		" && pwd". // Print working directory
-		" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
-		" && rm $folder-master.tar.gz" // Remove our file
+		// Check if the blueprint is WP-CLI compatible
+		if ( ! $wpcli_compat ) {
+			$command .= " && wp --allow-root $type install https://github.com/$target/archive/master.zip && pwd && mv $folder-master $folder";
+		} else {
+			$command .= " && curl -s -S \"https://codeload.github.com/$target/tar.gz/master\" -o \"$folder-master.tar.gz\"".    // Download the tarball from the repository, do it silent but show errors
+			" && tar xpvf $folder-master.tar.gz". // Unzip the file
+			' && pwd'. // Print working directory
+			" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
+			" && rm $folder-master.tar.gz" // Remove our file
 
-            // Activate the plugin using WP-CLI
-            if ( isset( $object->activate ) && $object->activate == true ) {
-                $command .= " && wp --allow-root $type activate $folder";
-            }
-            if ( isset( $object->activate_network ) && $object->activate_network == true && $type == 'plugin' ) {
-                $command .= " && wp --allow-root $type activate $folder --network";
-            }
-        }
-    }
-    // Download the plugin from the WP Plugin repository based on the URL slug
-    else {
-        $command .= " && wp --allow-root $type install $target";
-        if( $wpcli_compat ) {
-            $command .= $wpcli_options;
-        }
-    }
+			// Activate the plugin using WP-CLI
+			if ( isset( $object->activate ) && true == $object->activate ) {
+				$command .= " && wp --allow-root $type activate $folder";
+			}
+			if ( isset( $object->activate_network ) && true == $object->activate_network && 'plugin' == $type ) {
+				$command .= " && wp --allow-root $type activate $folder --network";
+			}
+		}
+	}
+	// Download the plugin from the WP Plugin repository based on the URL slug
+	else {
+		$command .= " && wp --allow-root $type install $target";
+		if ( $wpcli_compat ) {
+			$command .= $wpcli_options;
+		}
+	}
 
-    /**
-     * Finish up the command
-     */
-    $command .= " && cd -";
+	/**
+	 * Finish up the command
+	 */
+	$command .= ' && cd -';
 
-    /**
-     * Execute the command
-     */
-    exec( $command );
+	/**
+	 * Execute the command
+	 */
+	exec( $command );
 }
 
 /**
  * @param $option
  */
 function add_option( $option ) {
-    $object = explode("::", $option );
-    $a = $object[0];
-    $b = $object[1];
-    exec( "wp --allow-root option delete '$a'" );
-    exec( "wp --allow-root option add '$a' '$b'" );
-    echo "  Insert settings $a...\n";
+	$object = explode( '::', $option );
+	$a = $object[0];
+	$b = $object[1];
+	exec( "wp --allow-root option delete '$a'" );
+	exec( "wp --allow-root option add '$a' '$b'" );
+	echo "  Insert settings $a...\n";
 }
 
 /**
@@ -183,22 +183,22 @@ function add_option( $option ) {
  * @param $path
  */
 function add_define( $object, $path ) {
-    $object = explode( "::", $object );
-    echo "  Insert constants $object[0]...\n";
+	$object = explode( '::', $object );
+	echo "  Insert constants $object[0]...\n";
 
-    /**
-     * Changed is_bool to a string comparison because is_bool only works for real booleans, not strings
-     * Reference: http://stackoverflow.com/questions/7336861/how-to-convert-string-to-boolean-php
-     */
-    if( strtolower( $object[1] ) == 'true' || strtolower( $object[1] ) == 'false' ) {
-        exec( '     echo "$(sed "34a\\
+	/**
+	 * Changed is_bool to a string comparison because is_bool only works for real booleans, not strings
+	 * Reference: http://stackoverflow.com/questions/7336861/how-to-convert-string-to-boolean-php
+	 */
+	if ( 'true' == strtolower( $object[1] ) || 'false' == strtolower( $object[1] ) ) {
+		exec( '     echo "$(sed "34a\\
 define(\"'. $object[0] . '\",' . $object[1]  . ');
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
-    } else {
-        exec( '		echo "$(sed "34a\\
+	} else {
+		exec( '		echo "$(sed "34a\\
 define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
-    }
+	}
 }
 
 main( $argv[1], $argv[2], $arg[3], $arg[4] );
