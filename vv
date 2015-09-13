@@ -1527,6 +1527,8 @@ check_args() {
 			-r|-rm|--rm|rm|--remove|remove|--delete|delete|--teardown|teardown)
 				remove="true"
 				shift
+				site="$1"
+				shift
 				;;
 			-l|--list|list|-s|--show|show)
 				list="true"
