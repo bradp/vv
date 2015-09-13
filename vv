@@ -156,7 +156,8 @@ blueprint-init
 --files, -f
 --images, -i
 --name, -n
---web-root, -wr
+--web-root
+-wr
 --wp-version
 -wv
 --debug
