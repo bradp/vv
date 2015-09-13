@@ -39,7 +39,7 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 		}
 	}
 
-	echo "Blueprint set up.\n"
+	echo "Blueprint set up.\n";
 }
 
 /**
@@ -136,7 +136,7 @@ function install( $type, $object, $path, $site_name, $domain ) {
 			" && tar xpvf $folder-master.tar.gz". // Unzip the file
 			' && pwd'. // Print working directory
 			" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
-			" && rm $folder-master.tar.gz" // Remove our file
+			" && rm $folder-master.tar.gz"; // Remove our file
 
 			// Activate the plugin using WP-CLI
 			if ( isset( $object->activate ) && true == $object->activate ) {
