@@ -304,18 +304,18 @@ To add code to run for a hook, make a file within your vv folder inside of VV na
 
 For example, saving this file as the name of any hook will output 'Hello' when that hook gets called.
 
-`
+```bash
     #! /usr/bin/php
     echo 'Hello'
-`
+```
 
 Another example would be running npm install inside of wp-content for all new sites.
 Make a file named post_site_creation_finished - this file gets 4 variables passed in, the hook name, the site name, the site domain, and the name of the site folder
-`
+```bash
     #!/bin/bash
     cd www/$4/htdocs/wp-content
     npm install
-`
+```
 
 ## Questions?
 
