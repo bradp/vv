@@ -1,5 +1,28 @@
 ## Change Log
 
+#### 1.9.0 - *DATE* ####
+
+ * Add Hooks system for extensibility and modifications
+ * Add SITENAME / SITEDOMAIN instructions to Blueprints
+ * Add tab-completions in both Bash and ZSH
+ * Allow installing trunk version of WordPress
+ * Add folder creation to blank site set up
+ * Remove database backups when removing a site with vv
+ * Confirm VVV path when auto-grabbing it
+ * Switch from '~' to $HOME for portablility
+ * Add automatic Travis testing
+ * General shell script clean up / security / sanity checks added.
+ * Added --debug-vv flag for easier bug reporting.
+ * Clean up multiple url handling code for vv-list
+ * Allow for sourcing vv and leveraging code that way
+ * README spelling fixings
+ * Fix vv list breaking for more than 3 domains for a site
+ * Allow overriding the error of site not existing for vv remove
+ * Add ability to define the language to install WP with the --locale / --language flag
+ * Load settings from vv-config just in bash, removing the need for python to be installed
+ * When proxying images from a live site don't proxy uploaded images
+ * If running creation for only files, don't halt vagrant before creating the files
+
 
 #### 1.8.0 - *2015-7-25* ####
  * Adds flag to download a search/replace db tool
