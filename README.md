@@ -101,7 +101,9 @@ After this, run `vagrant halt; vagrant up --provision` and your subdomains shoul
 
 ## Site Deletion
 
-`vv delete`
+`vv delete site_name`
+
+You can also leave off site_name to be prompted for it.
 
 Deleting a site does the following:
 
