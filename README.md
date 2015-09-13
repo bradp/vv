@@ -42,6 +42,10 @@ Alternately, you can use cmd.exe with `bash vv`.
 
 Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If you're having issues, please see [this issue](https://github.com/bradp/vv/issues/33).
 
+## Adding tab-completion to `vv`
+
+Currently, `vv` supports tab-completion of arguments and options in both bash and ZSH. To enable this, you'll first want to make sure you're on the most current version of `vv`. Then simply add `source $( echo $(which vv)-completions)` to the end of your .bash_profile, .bashrc or .zshrc.
+
 ## Updating
 
 vv is currently under development, and you'll probably want the latest and greatest version at all times.
