@@ -101,7 +101,9 @@ After this, run `vagrant halt; vagrant up --provision` and your subdomains shoul
 
 ## Site Deletion
 
-`vv delete`
+`vv delete site_name`
+
+You can also leave off site_name to be prompted for it.
 
 Deleting a site does the following:
 
@@ -219,7 +221,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |`--path`,	`-p`|Path to VVV installation|
 |`--force-path`, `-fp`|Override vv auto-VVV locating|
 |`--force-sites-folder`,`-fsf`|Override sites folder directory locating|
-|`--defaults`|Accept all default options and skip the wizard|
+|`--defaults`|Accept all default options and skip the wizard. You can also run `yes | vv create ... other flags ... -defaults` to skip the final confirmation|
 
 ### Commands
 
