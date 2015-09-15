@@ -677,7 +677,7 @@ site_creation_questions() {
 		while [[ -z "$version" ]]; do
 			# Get WordPress version
 			if [ "$use_defaults" = "false" ]; then
-				prompt "WordPress version to install (leave blank for latest version or trunk for trunk/nightly version))"
+				prompt "WordPress version to install (leave blank for latest version or trunk for trunk/nightly version)"
 				read -r version
 			fi
 			if [ -z "$version" ]; then
