@@ -118,7 +118,7 @@ Deleting a site does the following:
 
 vv supports setting up deployments that work with [Vagrant Push](https://docs.vagrantup.com/v2/push/index.html). You'll need to be on version 1.7.0 or later of Vagrant. Simply run `vv --deployment-create` and walk through the wizard.
 
-To deploy a site, you can do `vv vagrant push <sitename><deployment_name>`.
+To deploy a site, you can do `vv vagrant push <sitename>-<deployment_name>`.
 
 When removing a deployment, your current Vagrantfile will be backed up as Vagrantfile-backup.
 
