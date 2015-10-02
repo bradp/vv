@@ -1690,6 +1690,4 @@ main() {
 
 if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
 	main "$@"
-else
-	test_for_autocomplete_functionality
 fi
