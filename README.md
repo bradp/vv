@@ -35,7 +35,7 @@ Otherwise you'll want to clone and edit your `$PATH` to include the vv core file
 * Choose Advanced System Settings
 * Choose Environmental Variables form the Advanced Tab
 * Choose the "Path" variable and edit it.
-* Add a semicolon to end the previous path item and then add the vv folder path (Example: ;C:\Users\Name\Documents\vv)
+* Add a semicolon to end the previous path item and then add the `vv` folder path (Example: `;C:\Users\Name\Documents\vv`)
 * Open Git Bash and run `vv`
 
 Alternately, you can use cmd.exe with `bash vv`.
