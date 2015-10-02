@@ -64,7 +64,7 @@ about() {
 	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
 	  ░░██     ░░██  	░▓▓▓▓▓▓▓▓▓▓
 	   ░░       ░░  	░░░░░░░░░░
-${normal}
+	${normal}
 ABOUT
 }
 
