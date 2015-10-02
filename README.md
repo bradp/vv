@@ -12,6 +12,8 @@
 
 [![Travis](https://img.shields.io/travis/bradp/vv.svg)]()
 
+*Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility I built to solve that issue.
+
 ## Installation
 
 ### OS X Installation
