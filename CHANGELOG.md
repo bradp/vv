@@ -22,6 +22,9 @@
  * Load settings from vv-config just in bash, removing the need for python to be installed
  * When proxying images from a live site don't proxy uploaded images
  * If running creation for only files, don't halt vagrant before creating the files
+ * Allow passing in site name directly to `vv remove`
+ * Add `vv_internal_debug` to see exactly what code is running when.
+ * Remove 2016 when removing defaults
 
 
 #### 1.8.0 - *2015-7-25* ####
