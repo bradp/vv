@@ -1347,16 +1347,6 @@ autocomplete_list() {
 	echo "list create remove deployment_setup deployment_remove deployment_config blueprint_init lets_update force_update"
 }
 
-vv_complete() {
-	echo ""
-}
-
-test_for_autocomplete_functionality() {
-	if [[ -z $(which vv_complete) ]]; then
-		vv_complete
-	fi
-}
-
 output_debug_vv() {
 	echo "----------"
 	version
