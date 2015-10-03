@@ -1169,7 +1169,7 @@ remove_site() { # @TODO refactor this if we need to
 
 			info "Removing database backup"
 			hook "pre_site_removal_remove_db_backup" "$site" "$path"
-			rm -rf "$path/database/data/backups/$site.sql"
+			rm -rf "$path/database/backups/$site.sql"
 			hook "post_site_removal_remove_db_backup" "$site" "$path"
 			echo "Done"
 
