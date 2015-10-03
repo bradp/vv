@@ -1,10 +1,7 @@
 ## Change Log
 
-#### 1.9.1 - *2015-10-1* ####
 
- * Fix remove site not actually removing backups from vagrant-triggers
-
-#### 1.9.0 - *2015-10-1* ####
+#### 1.9.2 - *2015-10-1* ####
 
  * Add Hooks system for extensibility and modifications
  * Add SITENAME / SITEDOMAIN instructions to Blueprints
@@ -29,6 +26,8 @@
  * Allow passing in site name directly to `vv remove`
  * Add `vv_internal_debug` to see exactly what code is running when.
  * Remove 2016 when removing defaults
+ * Fix blank site webroot folder creation
+ * Fix remove site not actually removing backups from vagrant-triggers
 
 
 #### 1.8.0 - *2015-7-25* ####
