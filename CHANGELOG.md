@@ -1,5 +1,9 @@
 ## Change Log
 
+#### 1.9.1 - *2015-10-1* ####
+
+ * Fix remove site not actually removing backups from vagrant-triggers
+
 #### 1.9.0 - *2015-10-1* ####
 
  * Add Hooks system for extensibility and modifications
