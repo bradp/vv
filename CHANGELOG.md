@@ -1,7 +1,6 @@
 ## Change Log
 
-
-#### 1.9.2 - *2015-10-1* ####
+#### 1.9.3 - *2015-10-4* ####
 
  * Add Hooks system for extensibility and modifications
  * Add SITENAME / SITEDOMAIN instructions to Blueprints
