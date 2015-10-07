@@ -317,7 +317,7 @@ Another example would be running npm install inside of wp-content for all new si
 Make a file named post_site_creation_finished - this file gets 4 variables passed in, the hook name, the site name, the site domain, and the name of the site folder
 ```bash
     #!/bin/bash
-    cd www/$4/htdocs/wp-content
+    cd www/"$4"/htdocs/wp-content || exit
     npm install
 ```
 
