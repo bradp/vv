@@ -259,7 +259,7 @@ check_for_update() {
 	hook "pre_update_check"
 	if [[ ! -z $(which curl) ]]; then
 		hook "pre_github_update_check"
-		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 		hook "post_github_update_check"
 		if [[ ! -z "$github_version" ]]; then
 			if [[ ! "$version_number" = "$github_version" ]]; then
@@ -311,7 +311,7 @@ update_vv() {
 
 vv_bootstrap_update() {
 	hook "pre_vv_bootstrap_update"
-	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
 	curl -L -o "$HOME/$github_version.tar.gz" "$download_link" 2>/dev/null
@@ -438,7 +438,7 @@ create_config_file() {
 }
 
 get_config_value() {
-	value=$(grep "$1" "$HOME"/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	value=$(grep --color=never "$1" "$HOME"/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
 	echo "$value"
 }
 
@@ -461,7 +461,8 @@ load_default_values() {
 }
 
 get_vvv_path(){
-	if [ ! -z "$force_path" ]; then
+	echo "path=\'$path\'"
+    if [ ! -z "$force_path" ]; then
 		unset path
 	fi
 
@@ -673,7 +674,7 @@ site_creation_questions() {
 	if [ "$no_wp" = "false" ]; then
 		if [ ! -z "$version" ]; then
 			# Attempt to verify the existence of the version (hacky)
-			if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
+			if curl -s http://codex.wordpress.org/Version_"$version" | grep --color=never 'currently no text' > /dev/null; then
 				error "Version $version not found, try again"
 				unset version
 			else
@@ -696,7 +697,7 @@ site_creation_questions() {
 				use_trunk="true"
 			else
 				# Attempt to verify the existence of the version (hacky)
-				if curl -s http://codex.wordpress.org/Version_"$version" | grep 'currently no text' > /dev/null; then
+				if curl -s http://codex.wordpress.org/Version_"$version" | grep --color=never 'currently no text' > /dev/null; then
 					error "Version \"$version\" not found, try again"
 					unset version
 				else
