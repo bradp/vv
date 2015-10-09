@@ -461,7 +461,6 @@ load_default_values() {
 }
 
 get_vvv_path(){
-	echo "path=\'$path\'"
     if [ ! -z "$force_path" ]; then
 		unset path
 	fi
