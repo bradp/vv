@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.9.0
+	░██   ░██░██   ░██     Variable VVV 1.9.3
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -52,9 +52,9 @@ Currently, `vv` supports tab-completion of arguments and options in both bash an
 
 vv is currently under development, and you'll probably want the latest and greatest version at all times.
 
-You can run `vv --update` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will boostrap an update on where ever you've installed it.
+You can run `vv --update` to update to the latest version. This will update via Homebrew if you've installed it that way, otherwise vv will bootstrap an update on where ever you've installed it.
 
-vv will automatically check for updates and update itself once a week. You can disble this by adding `"auto_update_disable": false` to the JSON config in `~/.vv-config`.
+vv will automatically check for updates and update itself once a week. You can disable this by adding `"auto_update_disable": false` to the JSON config in `~/.vv-config`.
 
 If you have trouble updating, you may want to try some of the options below:
 
@@ -99,7 +99,7 @@ If you are using a subdomain multisite, you must edit vvv-hosts file inside of t
     siteA.mysite.dev
     siteB.mysite.dev
 
-After this, run `vagrant halt; vagrant up --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
+After this, run `vagrant halt; vagrant up --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
 ## Site Deletion
 
@@ -195,11 +195,11 @@ For themes, plugins, and mu-plugins, you can use:
 * Url to zip file
 * WordPress.org slug
 
-The options for plugins and themes correspond to the equivelant [WP CLI](http://wp-cli.org) option.
+The options for plugins and themes correspond to the equivalent [WP CLI](http://wp-cli.org) option.
 
-For options, demo content, and constants, please note the `::` as a seperator between the key and value.
+For options, demo content, and constants, please note the `::` as a separator between the key and value.
 
-Custom demo content can be imported through the blueprint. Be sure to use a link that points to just the xml code, like [this](https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml). You can add as many demo content files as you'd like, just seperate each line with a comma as usual.
+Custom demo content can be imported through the blueprint. Be sure to use a link that points to just the xml code, like [this](https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml). You can add as many demo content files as you'd like, just separate each line with a comma as usual.
 
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
@@ -298,7 +298,7 @@ You can also add `"auto_update_disable": false` to this file to disable auto-upd
 
 ## `vv` Hooks
 
-`vv` has support for extensibility within the 'hooks' system present. This allows for quite a lot of extensiblity and injection into the `vv` process. This system allows you to add your own code to run within almost any point with `vv`.
+`vv` has support for extensibility within the 'hooks' system present. This allows for quite a lot of extensibility and injection into the `vv` process. This system allows you to add your own code to run within almost any point with `vv`.
 
 To get started with hooks, run any `vv` command with `--show-hooks` at the end. For example, `vv list --show-hooks` will run `vv list` as normal, but will also show all the hooks available.
 
