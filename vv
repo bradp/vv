@@ -550,7 +550,7 @@ hook() {
 	fi
 
 	if [[ -f "$vv_scripts_folder""$1"   ]]; then
-		cd "$vv_scripts_folder" || echo "Could not change directory."
+		cd "$vv_scripts_folder" || error "Could not change directory."
 		script_type="$(head -n 1 "$1")"
 		case "$script_type" in
 			*bash*)
@@ -585,7 +585,7 @@ get_list_sites() {
 }
 
 list_sites() {
-	cd "$path"/"$sites_folder"
+	cd "$path"/"$sites_folder" || error "Could not change directory."
 	hook "pre_list_sites"
 	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
 		filename=${filename:2}
@@ -863,7 +863,7 @@ confirm_site_creation() {
 	done
 
 	success "New VVV setup starting for site '$site'"
-	cd "$path"
+	cd "$path" || error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
 		info "Running vagrant halt"
 		hook "pre_creation_pre_vagrant_halt"
@@ -875,12 +875,12 @@ create_site_files(){
 	hook "pre_create_site_files" "$site" "$domain" "$path"
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
-	cd "$path"/"$sites_folder"
+	cd "$path"/"$sites_folder" || error "Could not change directory."
 	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
 	if [ ! -d "$site" ]; then
 		mkdir "$site"
 	fi
-	cd "$site"
+	cd "$site" || error "Could not change directory."
 
 	if [ "$no_wp" = "false" ]; then
 		printf "path: %s" "$web_root" > wp-cli.yml
@@ -926,7 +926,7 @@ PHP"
 			echo "if [ ! -d \"./$web_root\" ]; then"
 			echo "  mkdir ./$web_root"
 			echo "fi"
-			echo "cd ./$web_root"
+			echo "cd ./$web_root" || error "Could not change directory."
 			echo "$hooked_extra_wp_vvv_init_no_wp"
 			echo "$hooked_post_vvv_init_no_wp"
 		} >> vvv-init.sh
@@ -946,11 +946,11 @@ PHP"
 				echo "	if [ ! -d \"./$web_root\" ]; then"
 				echo "		mkdir ./$web_root"
 				echo "	fi"
-				echo "	cd ./$web_root"
+				echo "	cd ./$web_root" || error "Could not change directory."
 				echo "	$db_init"
 				echo "	"
 				echo "	$hooked_extra_wp_vvv_init_no_wp"
-				echo "	cd -"
+				echo "	cd -" || error "Could not change directory."
 				echo "$blueprint_text"
 				echo "fi"
 				echo "$hooked_post_vvv_init_no_wp"
@@ -1017,7 +1017,7 @@ PHP"
 			echo "	if [ ! -d \"./$web_root\" ]; then"
 			echo "		mkdir ./$web_root"
 			echo "	fi"
-			echo "	cd ./$web_root"
+			echo "	cd ./$web_root" || error "Could not change directory."
 			echo "	$install_method"
 			echo "	$config"
 			echo "	$core"
@@ -1027,7 +1027,7 @@ PHP"
 			echo "  $maybe_download_search_and_replace"
 			echo "	$hooked_extra_wp_vvv_init"
 			echo "	"
-			echo "	cd -"
+			echo "	cd -" || error "Could not change directory."
 			echo "$blueprint_text"
 			echo "fi"
 			echo "$maybe_trunk"
@@ -1040,7 +1040,7 @@ PHP"
 
 	# Add vvv-hosts file for domain in the site's "$sites_folder" root
 	# =============================================================================
-	cd "$path"/"$sites_folder"/"$site"
+	cd "$path"/"$sites_folder"/"$site" || error "Could not change directory."
 	hook "pre_write_vvv_hosts"
 	info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
@@ -1054,7 +1054,7 @@ PHP"
 
 	# Add site conf file to nginx-config
 	# =============================================================================
-	cd "$path"/config/nginx-config/sites
+	cd "$path"/config/nginx-config/sites || error "Could not change directory."
 	info "Creating nginx-config/sites/$site.conf... "
 
 	nginx_domain_text="$domain"
@@ -1079,7 +1079,7 @@ PHP"
 run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
-	cd "$path"
+	cd "$path" || error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
 		info "Running vagrant up --provision... "
 		hook "pre_vagrant_provision"
@@ -1160,7 +1160,7 @@ remove_site() { # @TODO refactor this if we need to
 		read -r continue_delete
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
-			cd "$path"
+			cd "$path" || error "Could not change directory."
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant halt
 			hook "post_site_removal_vagrant_halt" "$site" "$path"
@@ -1181,13 +1181,13 @@ remove_site() { # @TODO refactor this if we need to
 
 			# Remove the database creation from init-custom.sql
 			info "Removing the database creation commands from init-custom.sql... "
-			cd "$path"/database
+			cd "$path"/database || error "Could not change directory."
 			hook "pre_site_removal_remove_db_creation" "$site" "$path"
 			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
 			rm init-custom.sql
 			mv init-custom.sql.tmp init-custom.sql
 			hook "post_site_removal_remove_db_creation" "$site" "$path"
-			cd "$path"
+			cd "$path" || error "Could not change directory."
 			echo "Done"
 
 			info "Removing database"
@@ -1535,7 +1535,7 @@ check_args() {
 			-v|v|--vagrant|vagrant)
 				argument_expected "$1" "$2"
 				get_vvv_path
-				cd "$path"
+				cd "$path" || error "Could not change directory."
 				echo "$(vagrant "$2");"
 				exit
 				shift 2
