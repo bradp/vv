@@ -332,6 +332,8 @@ auto_update_main() {
 		if [ ! -f "$HOME"/.vv-update ]; then
 			_update_vv_update
 		else
+			# TODO fix shellcheck error
+			# shellcheck disable=SC1090
 			source "$HOME"/.vv-update
 
 			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
