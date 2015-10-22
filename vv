@@ -160,9 +160,12 @@ blueprint-init
 -d
 --live-url
 -u
---files, -f
---images, -i
---name, -n
+--files
+-f
+--images
+-i
+--name
+-n
 --web-root
 -wr
 --wp-version
