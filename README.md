@@ -99,7 +99,7 @@ If you are using a subdomain multisite, you must edit vvv-hosts file inside of t
     siteA.mysite.dev
     siteB.mysite.dev
 
-After this, run `vagrant halt; vagrant up --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
+After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
 ## Site Deletion
 
