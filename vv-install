@@ -215,4 +215,4 @@ define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 	}
 }
 
-main( $argv[1], $argv[2], $arg[3], $arg[4] );
+main( $argv[1], $argv[2], $argv[3], $argv[4] );
