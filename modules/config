@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+
+check_for_config_file() {
+	hook "pre_vv_config_check"
+	test -f "$HOME"/.vv-config && vv_config="${HOME}/.vv-config"
+	test -f ./.vv-config && vv_config="./.vv-config"
+
+	if [ ! -z $vv_config ]; then
+		load_config_values
+	else
+		if [[ ! $showing_help = "true" ]]; then
+			info "	"
+			info "Looks like it's your first time running ${magenta}vv${normal}. "
+			info "${magenta}vv${normal} couldn't find a config file, so we will create one now."
+			info "This step only needs to be done once."
+			info "	"
+			get_vvv_path
+		fi
+	fi
+	hook "post_vv_config_check"
+}
+
+create_config_file() {
+	hook "pre_create_vv_config"
+{
+	echo "{"
+	echo "	\"path\": \"$path\""
+	echo "}"
+} >> "$HOME"/.vv-config
+	info "$HOME/.vv-config was created."
+	info "	"
+	hook "post_create_vv_config"
+}
+
+get_config_value() {
+	value=$(grep --color=never "$1" "$vv_config" | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	echo "$value"
+}
+
+load_config_values() {
+	path=$(get_config_value path)
+}
+
+load_config_autopdate_config_values() {
+	#Load path from config file
+	auto_update_disble_config_var=$(get_config_value auto_update_disable)
+	auto_update_disable_config="$(echo "$auto_update_disble_config_var" | sed -e 's/^"//'  -e 's/"$//')"
+	if [[ $auto_update_disable_config = "true" ]]; then
+		auto_update_disable="true"
+	fi
+}
+
+load_default_values() {
+	defaults=$(get_config_value defaults)
+	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
+}
+
+
+show_configs() {
+	echo ""
+	echo "Path $path"
+
+}
+
+
+get_vvv_path(){
+    if [ ! -z "$force_path" ]; then
+		unset path
+	fi
+
+	if [ ! -z "$path" ]; then
+		if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+			error "Path specified is not a VVV root directory. Where is VVV installed?"
+			unset path
+
+			while [ -z "$path" ]; do
+				read -r -e -p "VVV install directory: " path
+
+				# Make sure directory is actually a VVV root
+				if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+					error "Path specified is not a VVV root directory. Where is VVV installed?"
+					unset path
+				fi
+				path=$(eval echo "${path//>}")
+			done
+
+		else
+			path=$path
+			path=$(eval echo "${path//>}")
+		fi
+
+
+	else
+		current_dir=$(pwd)
+		if [ -e "$current_dir/Vagrantfile" ]; then
+			path=$(pwd)
+		elif [ -e "$HOME"/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/Sites
+		elif [ -e "$HOME"/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/Sites/Vagrant
+		elif [ -e "$HOME"/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vagrant
+		elif [ -e "$HOME"/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vagrant-local
+		elif [ -e "$HOME"/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/projects/vvv
+		elif [ -e "$HOME"/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/working/vvv
+		elif [ -e "$HOME"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$HOME"/vvv
+		fi
+		info "Automagically found $path"
+		prompt "Is this where VVV is installed? (Y/n)"
+		read -r path_confirmation
+		if [ "$path_confirmation" = 'Y' ]; then
+			create_config_file
+		else
+			unset path
+		fi
+
+		while [ -z "$path" ]; do
+			read -r -e -p "VVV install directory: " path
+
+			# Make sure directory is actually a VVV root
+			if [ ! -e "$(eval echo "${path//>}")/Vagrantfile" ]; then
+				error "Path specified is not a VVV root directory. Where is VVV installed?"
+				unset path
+			fi
+			path=$(eval echo "${path//>}")
+		done
+	fi
+	path=${path%/}
+}
