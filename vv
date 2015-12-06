@@ -97,6 +97,7 @@ check_args() {
 	no_wp="false"
 	no_wp_with_db="false"
 	sites_folder="www"
+	skip_restart="true"
 
 
 	while [ ! -z "$1" ]; do

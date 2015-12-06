@@ -205,42 +205,66 @@ site_creation_questions() {
 confirm_site_creation() {
 	# Inform the user of what's about to happen and give them a chance to back out
 	# =============================================================================
-	info "\nAbout to perform the following:"
+	info "\nSave Provisioning Scripts will:"
 	# @ TODO
-	echo -e "* Halt Vagrant (if running)\n* Create directory $site in $path/$sites_folder\n* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site\n* Create file $site.conf in $path/config/nginx-config/sites"
-	if [[ -z "$files_only" ]]; then
-		echo -e "* Run \`vagrant up --provision\` to initialize site"
-	else
-		warning "\nNote: You will need to run \`vagrant up --provision\` to initialize the new site before $domain will load in a browser."
-	fi
-
-	info "\nProvisioning Vagrant will do the following:"
-	if [ "$no_wp" = "false" ]; then
-		echo -e "* Create database $site\n* Install WordPress $version in the $web_root directory\n* Make the site visible at $domain"
-	fi
+	echo -e "* Create directory $site in $path/$sites_folder"
+	echo -e "* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site"
+	echo -e "* Create file $site.conf in $path/config/nginx-config/sites"
 
 	info "\n"
-	while [ -z "$continue_create" ]; do
-		prompt "Continue (y/n)? "
-		read -r continue_create
+	while [ -z "$save_provisioning_scripts" ]; do
+		info "Save Provisioning Scripts (Y/n)?: "
+		read -r save_provisioning_scripts
 
-		if [[ $continue_create = 'n' ]]; then
-			error "Site setup aborted."
-			exit
-		elif [[ $continue_create != 'y' ]]; then
+		if [ -z "$save_provisioning_scripts" ]; then
+			save_provisioning_scripts='Y'
+			continue
+		elif [[ $save_provisioning_scripts = 'n' ]]; then
+			graceful_exit "Site setup aborted."
+		elif [[ $save_provisioning_scripts != 'y' ]]; then
 			error "Answer y or n."
-			unset continue_create
+			unset save_provisioning_scripts
 		fi
 	done
-
-	success "New VVV setup starting for site '$site'"
-	cd "$path" || error "Could not change directory."
-	if [[ -z "$files_only" ]]; then
-		info "Running vagrant halt"
-		hook "pre_creation_pre_vagrant_halt"
-		vagrant halt
-	fi
 }
+
+create_site_maybe_restart_vagrant() {
+	# Inform the user of what's about to happen 
+	# =========================================
+	info "\nProvisioning Vagrant will do the following:"
+	# @ TODO
+	echo -e "* Halt Vagrant (if running)"
+	echo -e "* Run `vagrant up --provision` to initialize site"
+	echo -e "Provisioning Vagrant will do the following:"
+	echo -e "* Create database test2"
+	echo -e "* Install WordPress (release version) in the htdocs directory"
+	echo -e "* Make the site visible at test2.dev"
+	info "\n"
+	while [ -z "$restart_and_provision" ]; do
+		info "Restart and provision Vagrant now (y/N)?:"
+		read -r restart_and_provision
+
+		if [ -z "$restart_and_provision" ]; then
+			restart_and_provision='n'
+		fi
+
+		if [[ $restart_and_provision = 'n' ]]; then
+			echo -e "Note: You will need to run \`vagrant up --provision\` to initialize the new site before $domain will load in a browser."
+			continue
+		elif [[ $restart_and_provision != 'y' ]]; then
+			error "Answer y or n."
+			unset restart_and_provision
+		elif [[ $restart_and_provision = 'y' ]]; then
+			skip_restart=false
+			success "Provisioning New VVV setup starting for site '$site'"
+			cd "$path" || error "Could not change directory."
+			info "Running vagrant halt"
+			hook "pre_creation_pre_vagrant_halt"
+			vagrant halt
+		fi
+	done
+}
+
 
 create_site_files(){
 	hook "pre_create_site_files" "$site" "$domain" "$path"

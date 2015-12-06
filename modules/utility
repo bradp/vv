@@ -53,7 +53,7 @@ fail() {
 	exit 1
 }
 
-exit() {
+graceful_exit() {
     hook "graceful_exit" "$@"
     exit 0
 }
