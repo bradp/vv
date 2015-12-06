@@ -35,7 +35,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
+
 version_number=1.9.3
+# Set our version number.
+
 
 if [[ "$1" == "vv_internal_debug" ]]; then
 	# We check this before anything else, so we can debug all of vv
@@ -44,6 +47,7 @@ if [[ "$1" == "vv_internal_debug" ]]; then
 	shift
 fi
 
+# Set our colors for output
 if [[ ! -z $(which tput) ]]; then
 	normal=$(tput sgr0)
 	bold=$(tput bold)
@@ -53,6 +57,120 @@ if [[ ! -z $(which tput) ]]; then
 	magenta=$(tput setaf 5)
 	cyan=$(tput setaf 6)
 fi
+
+
+# Start Helpers ################################################################
+#
+#  ██               ██
+# ░██              ░██ ██████
+# ░██       █████  ░██░██░░░██  █████  ██████  ██████
+# ░██████  ██░░░██ ░██░██  ░██ ██░░░██░░██░░█ ██░░░░
+# ░██░░░██░███████ ░██░██████ ░███████ ░██ ░ ░░█████
+# ░██  ░██░██░░░░  ░██░██░░░  ░██░░░░  ░██    ░░░░░██
+# ░██  ░██░░██████ ███░██     ░░██████░███    ██████
+# ░░   ░░  ░░░░░░ ░░░ ░░       ░░░░░░ ░░░    ░░░░░░
+
+# Usage: info "message"
+# Example: info "doing thing"
+# Output (to STDOUT): doing thing
+info() {
+	hook "pre_info_output"
+	printf "%b" "${bold}${yellow}$1${normal} \n"
+	hook "post_info_output"
+}
+
+# Usage: success "message"
+# Example: success "It's Working"
+# Output (to STDOUT): [...] It's Working
+success() {
+	hook "pre_success_output"
+	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
+	hook "post_success_output"
+}
+
+# Usage: warning "message"
+# Example: warning "some warning"
+# Output (to STDOUT): [...] some warning
+warning() {
+	hook "pre_warning_output"
+	printf "%b" "${red} $1 ${normal}\n"
+	hook "post_warning_output"
+}
+
+# Usage: prompt "question"
+# Example: prompt "Site name"
+# Output (to STDOUT): Site Name:
+prompt() {
+	hook "pre_prompt_output"
+	printf "%b" "${magenta} $1: ${normal}"
+	hook "post_prompt_output"
+}
+
+# Usage: error ["message"]
+# Example: error "this is an error"
+# Output (to STDERR): [ERROR] this is an error
+error() {
+	hook "pre_error_output"
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
+    hook "post_error_output"
+}
+
+# Usage: fail "message"
+# Example: fail "Unknown Option" 254
+fail() {
+	error "$1"
+	hook "fail_and_exit"
+	exit 1
+}
+
+
+# https://gist.github.com/davejamesmiller/1965569
+# Usage: ask "Yes or No?" [default option]
+# Example: if "Yes or No?" Y; then
+ask() {
+	hook "pre_ask"
+    while true; do
+
+        if [ "${2:-}" = "Y" ]; then
+            prompt_tail="Y/n"
+            default=Y
+        elif [ "${2:-}" = "N" ]; then
+            prompt_tail="y/N"
+            default=N
+        else
+            prompt_tail="y/n"
+            default=
+        fi
+
+        # Ask the question
+        prompt "$1 [$prompt_tail]"
+        read -r REPLY
+
+        # Default?
+        if [ -z "$REPLY" ]; then
+            REPLY=$default
+        fi
+
+        # Check if the reply is valid
+        case "$REPLY" in
+            Y*|y*) return 0 ;;
+            N*|n*) return 1 ;;
+        esac
+
+    done
+    hook "post_ask"
+}
+
+argument_expected() {
+	hook "pre_arg_expected"
+    if [ -z "$2" ] || [[ "$2" == -* ]]; then
+    	hook "error_no_arg_$1"
+        fail "$1 expected an argument"
+    fi
+    hook "post_arg_expected"
+}
+
+# End Helpers ##################################################################
 
 
 about() {
@@ -98,6 +216,8 @@ ${bold} COMMANDS: ${normal}
     deployment-remove 		Remove a deployment
     deployment-config 		Manually configure deployment
     blueprint-init 		Initialize blueprint file
+
+    configs 		Lists current config settings
 
 ${bold} SITE OPTIONS: ${normal}
     --domain, -d 		Domain of new site
@@ -156,6 +276,7 @@ deployment-create
 deployment-remove
 deployment-config
 blueprint-init
+configs
 --domain
 -d
 --live-url
@@ -205,58 +326,9 @@ version() {
 	hook "post_version_output"
 }
 
-# Usage: info "message"
-# Example: info "doing thing"
-# Output (to STDOUT): doing thing
-info() {
-	hook "pre_info_output"
-	printf "%b" "${bold}${yellow}$1${normal} \n"
-	hook "post_info_output"
-}
 
-# Usage: success "message"
-# Example: success "It's Working"
-# Output (to STDOUT): [...] It's Working
-success() {
-	hook "pre_success_output"
-	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
-	hook "post_success_output"
-}
 
-# Usage: warning "message"
-# Example: warning "some warning"
-# Output (to STDOUT): [...] some warning
-warning() {
-	hook "pre_warning_output"
-	printf "%b" "${red} $1 ${normal}\n"
-	hook "post_warning_output"
-}
 
-# Usage: prompt "question"
-# Example: prompt "Site name"
-# Output (to STDOUT): Site Name:
-prompt() {
-	hook "pre_prompt_output"
-	printf "%b" "${magenta} $1: ${normal}"
-	hook "post_prompt_output"
-}
-
-# Usage: error ["message"]
-# Example: error "this is an error"
-# Output (to STDERR): [ERROR] this is an error
-error() {
-	hook "pre_error_output"
-    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
-    hook "post_error_output"
-}
-
-# Usage: fail "message"
-# Example: fail "Unknown Option" 254
-fail() {
-	error "$1"
-	hook "fail_and_exit"
-	exit 1
-}
 
 check_for_update() {
 	hook "pre_update_check"
@@ -365,57 +437,12 @@ _update_vv_update() {
 	hook "post_vv_auto_update_update"
 }
 
-# https://gist.github.com/davejamesmiller/1965569
-# Usage: ask "Yes or No?" [default option]
-# Example: if "Yes or No?" Y; then
-ask() {
-	hook "pre_ask"
-    while true; do
-
-        if [ "${2:-}" = "Y" ]; then
-            prompt_tail="Y/n"
-            default=Y
-        elif [ "${2:-}" = "N" ]; then
-            prompt_tail="y/N"
-            default=N
-        else
-            prompt_tail="y/n"
-            default=
-        fi
-
-        # Ask the question
-        prompt "$1 [$prompt_tail]"
-        read -r REPLY
-
-        # Default?
-        if [ -z "$REPLY" ]; then
-            REPLY=$default
-        fi
-
-        # Check if the reply is valid
-        case "$REPLY" in
-            Y*|y*) return 0 ;;
-            N*|n*) return 1 ;;
-        esac
-
-    done
-    hook "post_ask"
-}
-
-argument_expected() {
-	hook "pre_arg_expected"
-    if [ -z "$2" ] || [[ "$2" == -* ]]; then
-    	hook "error_no_arg_$1"
-        fail "$1 expected an argument"
-    fi
-    hook "post_arg_expected"
-}
-
 check_for_config_file() {
 	hook "pre_vv_config_check"
-	test -f "$HOME"/.vv-config && got_config="true"
+	test -f "$HOME"/.vv-config && vv_config="${HOME}/.vv-config"
+	test -f ./.vv-config && vv_config="./.vv-config"
 
-	if [ ! -z $got_config ]; then
+	if [ ! -z $vv_config ]; then
 		load_config_values
 	else
 		if [[ ! $showing_help = "true" ]]; then
@@ -443,7 +470,7 @@ create_config_file() {
 }
 
 get_config_value() {
-	value=$(grep --color=never "$1" "$HOME"/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	value=$(grep --color=never "$1" "$vv_config" | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
 	echo "$value"
 }
 
@@ -630,6 +657,7 @@ list_sites() {
 	exit
 }
 
+# @todo go through this and optimize / replace
 site_creation_questions() {
 	hook "pre_site_creation_wizard"
 	files_only_text=''
@@ -926,7 +954,7 @@ PHP"
 			echo "if [ ! -d \"./$web_root\" ]; then"
 			echo "  mkdir ./$web_root"
 			echo "fi"
-			echo "cd ./$web_root" || error "Could not change directory."
+			echo "cd ./$web_root"
 			echo "$hooked_extra_wp_vvv_init_no_wp"
 			echo "$hooked_post_vvv_init_no_wp"
 		} >> vvv-init.sh
@@ -946,11 +974,11 @@ PHP"
 				echo "	if [ ! -d \"./$web_root\" ]; then"
 				echo "		mkdir ./$web_root"
 				echo "	fi"
-				echo "	cd ./$web_root" || error "Could not change directory."
+				echo "	cd ./$web_root"
 				echo "	$db_init"
 				echo "	"
 				echo "	$hooked_extra_wp_vvv_init_no_wp"
-				echo "	cd -" || error "Could not change directory."
+				echo "	cd -"
 				echo "$blueprint_text"
 				echo "fi"
 				echo "$hooked_post_vvv_init_no_wp"
@@ -1017,7 +1045,7 @@ PHP"
 			echo "	if [ ! -d \"./$web_root\" ]; then"
 			echo "		mkdir ./$web_root"
 			echo "	fi"
-			echo "	cd ./$web_root" || error "Could not change directory."
+			echo "	cd ./$web_root"
 			echo "	$install_method"
 			echo "	$config"
 			echo "	$core"
@@ -1027,7 +1055,7 @@ PHP"
 			echo "  $maybe_download_search_and_replace"
 			echo "	$hooked_extra_wp_vvv_init"
 			echo "	"
-			echo "	cd -" || error "Could not change directory."
+			echo "	cd -"
 			echo "$blueprint_text"
 			echo "fi"
 			echo "$maybe_trunk"
@@ -1372,6 +1400,12 @@ create_blueprints() {
 	fi
 }
 
+show_configs() {
+	echo ""
+	echo "Path $path"
+
+}
+
 autocomplete_list() {
 	echo "list create remove deployment_setup deployment_remove deployment_config blueprint_init lets_update force_update"
 }
@@ -1384,6 +1418,7 @@ output_debug_vv() {
 	echo ""
 	echo "vvv path: $path"
 	echo "home: $HOME"
+	echo "vv_config: $vv_config"
 	echo ""
 	echo "tput: $(which tput)"
 	echo "cat: $(which cat)"
@@ -1431,6 +1466,15 @@ parse_the_args() {
 }
 
 check_args() {
+
+
+	# Set some default variables that will change later.
+	use_defaults="false"
+	no_wp="false"
+	no_wp_with_db="false"
+	sites_folder="www"
+
+
 	while [ ! -z "$1" ]; do
 		case "$1" in
 			-h|--help|help|h|what)
@@ -1683,6 +1727,10 @@ check_args() {
 				show_commands
 				shift
 				;;
+			configs)
+				show_configs
+				exit 0
+				;;
 			*)
 				fail "Unknown option $1"
 				shift
@@ -1701,19 +1749,23 @@ check_args() {
 }
 
 main() {
+	# First thing we do is
 	auto_update_main
 
+	# If no arguments are passed in, we'll show the help menu
 	if [ -z "$1" ]; then
 	    show_help
 		showing_help="true"
 	fi
 
+
+	# Check for our vv config file
 	check_for_config_file
+
+	# @TODO we've already done the auto update check, is this needed?
 	check_for_update
-	use_defaults="false"
-	no_wp="false"
-	no_wp_with_db="false"
-	sites_folder="www"
+
+	# Check what has been passed in, run the associated commands
 	check_args "$@"
 }
 
