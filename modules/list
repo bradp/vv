@@ -1,2 +1,54 @@
 #!/usr/bin/env bash
-echo "loaded list"
+
+get_list_sites() {
+	clean_saved=$clean
+	clean="true"
+	list_sites
+	clean=$clean_saved
+}
+
+list_sites() {
+	cd "$path"/"$sites_folder" || error "Could not change directory."
+	hook "pre_list_sites"
+	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
+		filename=${filename:2}
+		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
+			if [[ $filename = 'wordpress-default' || $filename = 'wordpress-develop' || $filename = 'wordpress-trunk' ]]; then
+				hook "pre_list_site_$filename"
+				hook "list_site" "$filename"
+				if [[ $filename = 'wordpress-default' ]]; then
+					url=local.wordpress.dev
+				elif [[ $filename = 'wordpress-develop' ]]; then
+					url=src.wordpress-develop.dev
+				elif [[ $filename = 'wordpress-trunk' ]]; then
+					url=local.wordpress-trunk.dev
+				fi
+
+				if [[ ! $clean = "true" ]]; then
+					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
+					hook "post_list_site_$filename"
+				fi
+			else
+				if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
+					hook "pre_list_site_$filename"
+					hook "list_site" "$filename"
+					hook "list_custom_site" "$filename"
+					url=$(<"$path"/"$sites_folder"/"$filename"/vvv-hosts)
+					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
+					urls=$(echo "$url" | wc -l)
+					if (( "$urls" > 1 )); then
+						url_seq=$(seq 1 "$urls")
+						dashes=($( for _ in $url_seq; do echo '-'; done ))
+						url="$(echo "$url" | paste -d ' ' "${dashes[@]}" )"
+					fi
+					if [[ ! $clean = "true" ]]; then
+						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
+						hook "post_list_site_$filename"
+					fi
+				fi
+			fi
+		fi
+	done
+	hook "post_list_sites"
+	exit
+}

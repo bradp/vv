@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+run_vagrant_up() {
+	# vagrant waaaaay up
+	# =============================================================================
+	cd "$path" || error "Could not change directory."
+	if [[ -z "$files_only" ]]; then
+		info "Running vagrant up --provision... "
+		hook "pre_vagrant_provision"
+		vagrant up --provision
+		hook "post_vagrant_provision"
+	fi
+}
