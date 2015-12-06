@@ -53,6 +53,11 @@ fail() {
 	exit 1
 }
 
+exit() {
+    hook "graceful_exit" "$@"
+    exit 0
+}
+
 
 # https://gist.github.com/davejamesmiller/1965569
 # Usage: ask "Yes or No?" [default option]
