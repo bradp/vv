@@ -465,21 +465,31 @@ creation_success_message() {
 
 
 create_site() {
+
 	hook "pre_site_creation_questions"
 	site_creation_questions
 	hook "post_site_creation_questions"
+
 	hook "pre_site_creation_confirm"
 	confirm_site_creation
 	hook "post_site_creation_confirm"
+
+	create_site_maybe_restart_vagrant
+
 	hook "pre_site_creation_create_files"
 	create_site_files
 	hook "post_site_creation_create_files"
+
+
+
 	hook "pre_site_creation_vagrant_up"
 	run_vagrant_up
 	hook "post_site_creation_vagrant_up"
+
 	hook "pre_site_creation_finished_message"
 	creation_success_message
 	hook "post_site_creation_finished_message"
+
 	exit
 }
 
