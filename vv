@@ -39,7 +39,6 @@
 version_number=1.9.3
 # Set our version number.
 
-
 if [[ "$1" == "vv_internal_debug" ]]; then
 	# We check this before anything else, so we can debug all of vv
 	# This will output all the commands that are being run
@@ -59,118 +58,7 @@ if [[ ! -z $(which tput) ]]; then
 fi
 
 
-# Start Helpers ################################################################
-#
-#  ██               ██
-# ░██              ░██ ██████
-# ░██       █████  ░██░██░░░██  █████  ██████  ██████
-# ░██████  ██░░░██ ░██░██  ░██ ██░░░██░░██░░█ ██░░░░
-# ░██░░░██░███████ ░██░██████ ░███████ ░██ ░ ░░█████
-# ░██  ░██░██░░░░  ░██░██░░░  ░██░░░░  ░██    ░░░░░██
-# ░██  ░██░░██████ ███░██     ░░██████░███    ██████
-# ░░   ░░  ░░░░░░ ░░░ ░░       ░░░░░░ ░░░    ░░░░░░
 
-# Usage: info "message"
-# Example: info "doing thing"
-# Output (to STDOUT): doing thing
-info() {
-	hook "pre_info_output"
-	printf "%b" "${bold}${yellow}$1${normal} \n"
-	hook "post_info_output"
-}
-
-# Usage: success "message"
-# Example: success "It's Working"
-# Output (to STDOUT): [...] It's Working
-success() {
-	hook "pre_success_output"
-	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
-	hook "post_success_output"
-}
-
-# Usage: warning "message"
-# Example: warning "some warning"
-# Output (to STDOUT): [...] some warning
-warning() {
-	hook "pre_warning_output"
-	printf "%b" "${red} $1 ${normal}\n"
-	hook "post_warning_output"
-}
-
-# Usage: prompt "question"
-# Example: prompt "Site name"
-# Output (to STDOUT): Site Name:
-prompt() {
-	hook "pre_prompt_output"
-	printf "%b" "${magenta} $1: ${normal}"
-	hook "post_prompt_output"
-}
-
-# Usage: error ["message"]
-# Example: error "this is an error"
-# Output (to STDERR): [ERROR] this is an error
-error() {
-	hook "pre_error_output"
-    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
-    hook "post_error_output"
-}
-
-# Usage: fail "message"
-# Example: fail "Unknown Option" 254
-fail() {
-	error "$1"
-	hook "fail_and_exit"
-	exit 1
-}
-
-
-# https://gist.github.com/davejamesmiller/1965569
-# Usage: ask "Yes or No?" [default option]
-# Example: if "Yes or No?" Y; then
-ask() {
-	hook "pre_ask"
-    while true; do
-
-        if [ "${2:-}" = "Y" ]; then
-            prompt_tail="Y/n"
-            default=Y
-        elif [ "${2:-}" = "N" ]; then
-            prompt_tail="y/N"
-            default=N
-        else
-            prompt_tail="y/n"
-            default=
-        fi
-
-        # Ask the question
-        prompt "$1 [$prompt_tail]"
-        read -r REPLY
-
-        # Default?
-        if [ -z "$REPLY" ]; then
-            REPLY=$default
-        fi
-
-        # Check if the reply is valid
-        case "$REPLY" in
-            Y*|y*) return 0 ;;
-            N*|n*) return 1 ;;
-        esac
-
-    done
-    hook "post_ask"
-}
-
-argument_expected() {
-	hook "pre_arg_expected"
-    if [ -z "$2" ] || [[ "$2" == -* ]]; then
-    	hook "error_no_arg_$1"
-        fail "$1 expected an argument"
-    fi
-    hook "post_arg_expected"
-}
-
-# End Helpers ##################################################################
 
 
 about() {
