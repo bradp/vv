@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+echo "loaded debug"
+
+output_debug_vv() {
+	echo "----------"
+	version
+	echo ""
+	echo "vv: $(which vv)"
+	echo ""
+	echo "vvv path: $path"
+	echo "home: $HOME"
+	echo "vv_config: $vv_config"
+	echo ""
+	echo "tput: $(which tput)"
+	echo "cat: $(which cat)"
+	echo "curl: $(which curl)"
+	echo "brew: $(which brew)"
+	echo "tar: $(which tar)"
+	echo "find: $(which find)"
+	echo "git: $(which git)"
+	echo "sed: $(which sed)"
+	echo "paste: $(which paste)"
+	echo "vagrant: $(which vagrant)"
+
+	echo "----------"
+}
