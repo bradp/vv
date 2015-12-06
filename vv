@@ -1749,21 +1749,15 @@ check_args() {
 }
 
 load_modules() {
-	modules=(
-		blueprints
-		create
-		deployment
-		list
-		remove
-		utility
-	)
 
 	vv_install_location=$(which vv)
 	# hacky check for local dev
 	vv_install_location=$(pwd)
 
-	for module in "${modules[@]}"; do
-		test -f "$vv_install_location/modules/$module" && . "$vv_install_location/modules/$module"
+	modules="$vv_install_location/modules/*"
+	# Allow of adding different locations for module to be laoaded
+	for module in $modules; do
+		test -f "$module" && . "$module"
 	done
 }
 
@@ -1779,7 +1773,6 @@ main() {
 	    show_help
 		showing_help="true"
 	fi
-
 
 	# Check for our vv config file
 	check_for_config_file
