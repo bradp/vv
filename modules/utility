@@ -9,6 +9,12 @@ info() {
 	hook "post_info_output"
 }
 
+secondary_info() {
+    hook "pre_info_output"
+    printf "%b" "${yellow}$1${normal} ..."
+    hook "post_info_output"
+}
+
 # Usage: success "message"
 # Example: success "It's Working"
 # Output (to STDOUT): [...] It's Working

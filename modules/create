@@ -227,7 +227,7 @@ confirm_site_creation() {
 }
 
 create_site_maybe_restart_vagrant() {
-	# Inform the user of what's about to happen 
+	# Inform the user of what's about to happen
 	# =========================================
 	info "\nRestarting Vagrant will do the following:"
 	# @ TODO
@@ -269,7 +269,7 @@ create_site_files(){
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
 	cd "$path"/"$sites_folder" || error "Could not change directory."
-	info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
+	secondary_info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
 	if [ ! -d "$site" ]; then
 		mkdir "$site"
 	fi
@@ -435,7 +435,7 @@ PHP"
 	# =============================================================================
 	cd "$path"/"$sites_folder"/"$site" || error "Could not change directory."
 	hook "pre_write_vvv_hosts"
-	info "Adding $domain to new vvv-hosts file... "
+	secondary_info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
 	printf "%s\n" "$domain" >> vvv-hosts
 	hook "post_write_vvv_hosts"
@@ -448,7 +448,7 @@ PHP"
 	# Add site conf file to nginx-config
 	# =============================================================================
 	cd "$path"/config/nginx-config/sites || error "Could not change directory."
-	info "Creating nginx-config/sites/$site.conf... "
+	secondary_info "Creating nginx-config/sites/$site.conf... "
 
 	nginx_domain_text="$domain"
 	if [[ $multisite = 'y' ]] && [[ $ms_type = 'subdomain' ]]; then
