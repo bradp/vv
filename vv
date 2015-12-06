@@ -1748,9 +1748,26 @@ check_args() {
 	exit 0
 }
 
+load_modules() {
+	modules=(
+		blueprints
+		create
+		deployment
+		list
+		remove
+		utility
+	)
+	for module in "${modules[@]}"; do
+		test -f modules/"$module" && . modules/"$module"
+	done
+}
+
 main() {
 	# First thing we do is
 	auto_update_main
+
+	# Load our modules
+	load_modules
 
 	# If no arguments are passed in, we'll show the help menu
 	if [ -z "$1" ]; then
