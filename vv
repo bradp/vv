@@ -36,7 +36,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
 
-version_number=1.9.3
+version_number=2.0.0.beta
 # Set our version number.
 
 if [[ "$1" == "vv_internal_debug" ]]; then
