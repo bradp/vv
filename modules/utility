@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "loaded utility"
 
 # Usage: info "message"
 # Example: info "doing thing"

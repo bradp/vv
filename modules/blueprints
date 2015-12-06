@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "loaded blueprints"
 
 create_blueprints() {
 	if [[ ! -f "$path"/vv-blueprints.json ]]; then

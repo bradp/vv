@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "loaded debug"
 
 output_debug_vv() {
 	echo "----------"

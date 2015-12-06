@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-echo "loaded delete"
 
 remove_site() { # @TODO refactor this if we need to
 	hook "pre_site_removal"

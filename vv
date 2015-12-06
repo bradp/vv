@@ -377,7 +377,8 @@ load_modules() {
 	modules="$vv_install_location/modules/*"
 	# Allow of adding different locations for module to be laoaded
 	for module in $modules; do
-		test -f "$module" && . "$module"
+		echo "Trying to load $module"
+ 		test -f "$module" && . "$module" && echo "loaded $module"
 	done
 }
 
