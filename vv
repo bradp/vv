@@ -1762,11 +1762,12 @@ load_modules() {
 }
 
 main() {
-	# First thing we do is
-	auto_update_main
 
 	# Load our modules
 	load_modules
+
+	# First thing we do is
+	auto_update_main
 
 	# If no arguments are passed in, we'll show the help menu
 	if [ -z "$1" ]; then
