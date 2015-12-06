@@ -1,2 +1,11 @@
 #!/usr/bin/env bash
 echo "loaded blueprints"
+
+create_blueprints() {
+	if [[ ! -f "$path"/vv-blueprints.json ]]; then
+		curl -o "$path"/vv-blueprints.json -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-blueprints.json
+		success "Created sample blueprints file at $path/vv-blueprints.json."
+	else
+		info "You already have a vv-blueprints.json file created."
+	fi
+}
