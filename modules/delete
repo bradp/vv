@@ -1,2 +1,88 @@
 #!/usr/bin/env bash
 echo "loaded delete"
+
+remove_site() { # @TODO refactor this if we need to
+	hook "pre_site_removal"
+	info "VVV Site Removal"
+
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Site directory to delete"
+		read -r site
+		not_valid_site
+	done
+
+	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
+	while [ -z "$continue_delete" ]; do
+		prompt "Continue (y/n) "
+		read -r continue_delete
+		if [ "$continue_delete" = 'y' ]; then
+			info "\nVVV teardown starting for site '$site'"
+			cd "$path" || error "Could not change directory."
+			hook "pre_site_removal_vagrant_halt" "$site" "$path"
+			vagrant halt
+			hook "post_site_removal_vagrant_halt" "$site" "$path"
+
+			# Delete the site folder
+			info "Removing directory $site... "
+			hook "pre_site_removal_delete_files" "$path" "$sites_folder" "$site"
+			rm -rf "${path:?}/${sites_folder:?}/${site:?}"
+			hook "post_site_removal_delete_files" "$path" "$sites_folder" "$site"
+			echo "Done"
+
+			# Remove the nginx conf file
+			info "Removing nginx config file $site.conf... "
+			hook "pre_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
+			rm "$path/config/nginx-config/sites/$site.conf"
+			hook "post_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
+			echo "Done"
+
+			# Remove the database creation from init-custom.sql
+			info "Removing the database creation commands from init-custom.sql... "
+			cd "$path"/database || error "Could not change directory."
+			hook "pre_site_removal_remove_db_creation" "$site" "$path"
+			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
+			rm init-custom.sql
+			mv init-custom.sql.tmp init-custom.sql
+			hook "post_site_removal_remove_db_creation" "$site" "$path"
+			cd "$path" || error "Could not change directory."
+			echo "Done"
+
+			info "Removing database"
+			hook "pre_site_removal_remove_db" "$site" "$path"
+			rm -rf "$path/database/data/$site"
+			hook "post_site_removal_remove_db" "$site" "$path"
+			echo "Done"
+
+			info "Removing database backup"
+			hook "pre_site_removal_remove_db_backup" "$site" "$path"
+			rm -rf "$path/database/backups/$site.sql"
+			hook "post_site_removal_remove_db_backup" "$site" "$path"
+			echo "Done"
+
+			info "Removing any set up deployments. "
+			hook "pre_site_removal_remove_deployments" "$site" "$path"
+			remove_site_remove_all_deployment
+			hook "post_site_removal_remove_deployments" "$site" "$path"
+			echo "Done"
+
+			# Deleted.
+			success "\nVVV Site Teardown: Done!"
+			hook "post_site_removal"
+			exit
+
+		elif [ "$continue_delete" = 'n' ]; then
+			error "Site teardown aborted."
+			exit
+		else
+			error "Answer y or n."
+			unset continue_delete
+		fi
+	done
+	exit
+}
+
