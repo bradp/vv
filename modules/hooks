@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+setup_scripts_folder() {
+	vv_scripts_folder="$path"/vv/
+}
+init_vv_hooks() {
+	mkdir "$path"/vv/
+}
+
+run_hook() {
+	hook "$@"
+}
+hook() {
+	# Display all hooks to screen if the show_hooks flag is set
+	if [[ $show_hooks = 'true' ]]; then
+		echo "${magenta}[Hook]${normal}" "$1" "$2" "$3" "$4"
+	fi
+
+	if [[ -f "$vv_scripts_folder""$1"   ]]; then
+		cd "$vv_scripts_folder" || error "Could not change directory."
+		script_type="$(head -n 1 "$1")"
+		case "$script_type" in
+			*bash*)
+				bash "$1" "$2" "$3" "$4"
+			;;
+			*php*)
+				php "$1" "$2" "$3" "$4"
+			;;
+			*python*)
+				python "$1" "$2" "$3" "$4"
+			;;
+			*node*)
+				node "$1" "$2" "$3" "$4"
+			;;
+			*ruby*)
+				ruby "$1" "$2" "$3" "$4"
+			;;
+			*)
+				error "Could not parse file hooked into $1"
+			;;
+		esac
+	fi
+	# test -f "$vv_scripts_folder"hooks && source "$vv_scripts_folder"hooks && which "$1" && $("$1" "$2")
+	# this is currently not working
+}
+

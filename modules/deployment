@@ -1,2 +1,140 @@
 #!/usr/bin/env bash
-echo "loaded deployment"
+
+deployment_setup_prompt() {
+	info "Setting up a deployment."
+
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Which site would you like to setup a deployment for? "
+		read -r site
+		not_valid_site
+	done
+
+}
+
+deployment_removal_prompt() {
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Which site would you like to remove the deployment for? "
+		read -r site
+		not_valid_site
+	done
+
+	while [ -z "$deployment_name" ]; do
+		prompt "Name of deployment to remove "
+		read -r deployment_name
+	done
+
+	remove_deployment
+
+}
+
+deployment_setup() {
+	deployment_setup_prompt
+	info "Setting up (S)FTP deployment for $site"
+
+	while [ -z "$deployment_name" ]; do
+		prompt "Name of deployment (production, staging, other, etc) "
+		read -r deployment_name
+	done
+
+	while [ -z "$host" ]; do
+		prompt "Host (if SFTP, define port as host:port) "
+		read -r host
+	done
+
+	while [ -z "$username" ]; do
+		prompt "FTP Username "
+		read -r username
+	done
+
+	while [ -z "$password" ]; do
+		prompt "FTP Password "
+		read -r password
+	done
+
+	if [ -z "$passive" ]; then
+		prompt "Use Passive transfer mode? (Y/n) "
+		read -r passive
+	fi
+	if [[ "$passive" = "n" ]]; then
+		passive="false"
+	else
+		passive="true"
+	fi
+
+	while [ -z "$secure" ]; do
+		prompt "Use SFTP? (y/N)"
+		read -r secure
+	done
+	if [[ "$secure" = "y" ]]; then
+		secure="true"
+	else
+		secure="false"
+	fi
+
+	while [ -z "$destination" ]; do
+		prompt "Destination path ( You probably want / or ~/public_html )"
+		read -r destination
+	done
+
+	info "Setting up a deployment in your VVV Vagrantfile with the following information: "
+	echo "	Site: $site"
+	echo "	Deployment name: $deployment_name"
+	echo "	Host: $host"
+	echo "	Username: $username"
+	echo "	Password: $password"
+	echo "	Passive Mode: $passive"
+	echo "	Secure Mode: $secure"
+	echo "	destination: $destination"
+	cp "$path/Vagrantfile" "$path/Vagrantfile-backup"
+
+	vagrant_file=$(sed  '$ d' < "$path/Vagrantfile")
+	echo "$vagrant_file" > "$path/Vagrantfile"
+{
+	echo "# begin-vv-$site-$deployment_name"
+	echo "	config.push.define \"$site-$deployment_name\", strategy: \"ftp\" do |push|"
+	echo "		push.host =\"$host\""
+	echo "		push.username =\"$username\""
+	echo "		push.password =\"$password\""
+	echo "		push.passive =\"$passive\""
+	echo "		push.secure =\"$secure\""
+	echo "		push.destination =\"$destination\""
+	echo "		push.dir = \"$path/$sites_folder/$site/htdocs\""
+	echo "		push.exclude = \"wp-config.php\""
+	echo "	end"
+	echo "# end-vv-$site-$deployment_name"
+} >> "$path/Vagrantfile"
+	echo "end" >> "$path/Vagrantfile"
+	success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
+}
+
+remove_site_remove_all_deployment() {
+	sed "/\# begin-vv-$site/,/\# end-vv-$site/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
+	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
+}
+
+remove_deployment() {
+	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
+		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
+		read -r remove_deployment_confirm
+	done
+	sed "/\# begin-vv-$site-$deployment_name/,/\# end-vv-$site-$deployment_name/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
+	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
+
+	success "Deployment for $site removed."
+}
+
+deployment_config() {
+	$EDITOR "$path/Vagrantfile"
+}
