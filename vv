@@ -1757,8 +1757,13 @@ load_modules() {
 		remove
 		utility
 	)
+
+	vv_install_location=$(which vv)
+	# hacky check for local dev
+	vv_install_location=$(pwd)
+
 	for module in "${modules[@]}"; do
-		test -f modules/"$module" && . modules/"$module"
+		test -f "$vv_install_location/modules/$module" && . "$vv_install_location/modules/$module"
 	done
 }
 
