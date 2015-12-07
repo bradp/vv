@@ -11,3 +11,14 @@ run_vagrant_up() {
 		hook "post_vagrant_provision"
 	fi
 }
+
+vagrant_maybe_halt() {
+	# Test if VVV is running, using `VBoxManage` because it's much faster than `vagrant status`
+	VMTEST="$(VBoxManage list runningvms)"
+	if [[ $VMTEST = *VVV* ]]; then
+		info "Running \`vagrant halt\`"
+		vagrant halt
+	else
+		info "Vagrant not running, skipping \`vagrant halt\`..."
+	fi
+}

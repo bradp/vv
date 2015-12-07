@@ -258,7 +258,7 @@ create_site_maybe_restart_vagrant() {
 			cd "$path" || error "Could not change directory."
 			info "Running vagrant halt"
 			hook "pre_creation_pre_vagrant_halt"
-			vagrant halt
+			vagrant_maybe_halt
 		fi
 	done
 }
