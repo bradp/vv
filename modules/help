@@ -37,7 +37,7 @@ ${bold} COMMANDS: ${normal}
 
     list 			List all VVV sites
     create 			Create a new site
-    remove 			Remove a site
+    delete 			Delete/Remove a site
     vagrant, v 			Pass vagrant command through to VVV
     deployment-create		Create a deployment
     deployment-remove 		Remove a deployment
@@ -49,7 +49,6 @@ ${bold} COMMANDS: ${normal}
 ${bold} SITE OPTIONS: ${normal}
     --domain, -d 		Domain of new site
     --live-url, -u 		Live URL of site
-    --files, -f 		Do not provision Vagrant, just create the site directory and files
     --images, -i 		Load images by proxy from the live site
     --name, -n 			Desired name for the site directory (e.g. mysite)
     --web-root, -wr 		Subdirectory used for web server root
@@ -96,7 +95,7 @@ show_commands() {
 --use_defaults
 list
 create
-remove
+delete
 vagrant
 v
 deployment-create
@@ -108,8 +107,6 @@ configs
 -d
 --live-url
 -u
---files
--f
 --images
 -i
 --name
