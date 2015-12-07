@@ -233,10 +233,6 @@ check_args() {
 				create="true"
 				shift
 				;;
-			-f|--files)
-				files_only="true"
-				shift
-				;;
 			-i|--images)
 				image_proxy="true"
 				shift
