@@ -22,8 +22,15 @@ remove_site() { # @TODO refactor this if we need to
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path" || error "Could not change directory."
+
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
-			vagrant halt
+
+			VMTEST="$(VBoxManage list runningvms)"
+			if [[ $VMTEST = *VVV* ]]; then
+				echo "Halting Vagrant"
+				vagrant halt
+			fi
+
 			hook "post_site_removal_vagrant_halt" "$site" "$path"
 
 			# Delete the site folder
