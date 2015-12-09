@@ -30,7 +30,7 @@ create_site_maybe_restart_vagrant() {
 			skip_restart="false"
 			success "Provisioning New VVV setup starting for site '$site'"
 			cd "$path" || error "Could not change directory."
-			info "Running vagrant halt"
+			info "Checking to see if vagrant halt is needed..."
 			hook "pre_creation_pre_vagrant_halt"
 			vagrant_maybe_halt
 		fi
