@@ -14,8 +14,10 @@ run_vagrant_up() {
 
 vagrant_maybe_halt() {
 	# Test if VVV is running, using `VBoxManage` because it's much faster than `vagrant status`
-	VMTEST="$(VBoxManage list runningvms)"
-	if [[ $VMTEST = *VVV* ]]; then
+	vvv_running="true"
+	/usr/bin/wget "http://local.wordpress.dev/wp-login.php" --timeout 5 -O - 2>/dev/null  | grep "login" || vvv_running="false"
+	echo $vvv_running
+	if [[ "$vvv_running" = "true" ]]; then
 		info "Running \`vagrant halt\`"
 		vagrant halt
 	else
