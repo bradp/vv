@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+load_default_values() {
+	defaults=$(get_config_value defaults)
+	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
+}

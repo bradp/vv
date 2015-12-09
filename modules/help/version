@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+version() {
+    hook "pre_version_output"
+    echo "vv version $version_number"
+    hook "post_version_output"
+}

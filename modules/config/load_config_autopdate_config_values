@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+load_config_autopdate_config_values() {
+	#Load path from config file
+	auto_update_disble_config_var=$(get_config_value auto_update_disable)
+	auto_update_disable_config="$(echo "$auto_update_disble_config_var" | sed -e 's/^"//'  -e 's/"$//')"
+	if [[ $auto_update_disable_config = "true" ]]; then
+		auto_update_disable="true"
+	fi
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+auto_update_main() {
+	hook "pre_auto_update_vv"
+	if [[ ! $auto_update_disable = "true" ]]; then
+		if [ ! -f "$HOME"/.vv-update ]; then
+			_update_vv_update
+		else
+			# TODO fix shellcheck error
+			# shellcheck disable=SC1090
+			source "$HOME"/.vv-update
+
+			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
+			epoch_target=7
+			if [[ $epoch_diff -gt $epoch_target ]]; then
+				info "vv is out of date. Checking for update."
+				github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+				if [[ ! "$version_number" = "$github_version" ]]; then
+					update_vv
+				fi
+
+				rm "$HOME"/.vv-update
+				_update_vv_update
+			fi
+		fi
+	fi
+	hook "post_auto_update_vv"
+}

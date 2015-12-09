@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+confirm_site_creation() {
+	# Inform the user of what's about to happen and give them a chance to back out
+	# =============================================================================
+	info "\nSave Provisioning Scripts will:"
+	# @ TODO
+	echo -e "* Create directory $site in $path/$sites_folder"
+	echo -e "* Create files vvv-init.sh, wp-cli.yml, and vvv-hosts in directory $site"
+	echo -e "* Create file $site.conf in $path/config/nginx-config/sites"
+
+	info "\n"
+	while [ -z "$save_provisioning_scripts" ]; do
+		prompt "Save Provisioning Scripts? (Y/n)"
+		read -r save_provisioning_scripts
+
+		if [ -z "$save_provisioning_scripts" ]; then
+			save_provisioning_scripts='Y'
+			continue
+		elif [[ $save_provisioning_scripts = 'n' ]]; then
+			graceful_exit "Site setup aborted."
+		elif [[ $save_provisioning_scripts != 'y' ]]; then
+			error "Answer y or n."
+			unset save_provisioning_scripts
+		fi
+	done
+}

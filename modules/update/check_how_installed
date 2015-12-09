@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+check_how_installed() {
+	hook "pre_check_how_installed"
+	if [[ ! -z $(which brew) ]]; then
+		brew_install_location=$(brew --prefix)
+		if [[ -f $brew_install_location"/bin/vv" ]]; then
+			installed_with_brew="true"
+		else
+			installed_with_brew="false"
+		fi
+	fi
+	hook "post_check_how_installed"
+}

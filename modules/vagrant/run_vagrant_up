@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+run_vagrant_up() {
+	# vagrant waaaaay up
+	# =============================================================================
+	cd "$path" || error "Could not change directory."
+	if [[ "$skip_restart" = "false" ]]; then
+		info "Running vagrant up --provision... "
+		hook "pre_vagrant_provision"
+		vagrant up --provision
+		hook "post_vagrant_provision"
+	fi
+}

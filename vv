@@ -371,11 +371,12 @@ load_modules() {
 	# hacky check for local dev
 	vv_install_location=$(pwd)
 
-	modules="$vv_install_location/modules/*"
+	modules="$vv_install_location/modules/*/*"
 	# Allow of adding different locations for module to be laoaded
 	for module in $modules; do
  		test -f "$module" && . "$module"
 	done
+
 }
 
 main() {

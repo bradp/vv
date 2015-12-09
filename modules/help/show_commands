@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+# Usage: show_help [exit_code]
+# Example: show_help 254
+show_commands() {
+    hook "pre_help_output"
+    cat <<COMMANDS
+--help
+--version
+--about
+--debug-vv
+--path
+--force-path
+-fp
+--force-sites-folder
+-fsf
+--use_defaults
+list
+create
+delete
+vagrant
+v
+deployment-create
+deployment-remove
+deployment-config
+blueprint-init
+configs
+--domain
+-d
+--live-url
+-u
+--images
+-i
+--name
+-n
+--web-root
+-wr
+--wp-version
+-wv
+--debug
+-x
+--multisite
+-m
+--sample-content
+-sc
+--username
+--password
+--email
+--prefix
+--git-repo
+-gr
+--bedrock
+-bed
+--blueprint
+-b
+--blank
+--blank-with-db
+--wpskeleton
+--skel
+--database
+-db
+--remove-defaults
+-rd
+--language
+--locale
+COMMANDS
+}

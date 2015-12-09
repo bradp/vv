@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Usage: warning "message"
+# Example: warning "some warning"
+# Output (to STDOUT): [...] some warning
+warning() {
+	hook "pre_warning_output"
+	printf "%b" "${red} $1 ${normal}\n"
+	hook "post_warning_output"
+}
+

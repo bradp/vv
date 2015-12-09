@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Usage: info "message"
+# Example: info "doing thing"
+# Output (to STDOUT): doing thing
+info() {
+	hook "pre_info_output"
+	printf "%b" "${bold}${yellow}$1${normal} \n"
+	hook "post_info_output"
+}

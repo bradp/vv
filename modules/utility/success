@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Usage: success "message"
+# Example: success "It's Working"
+# Output (to STDOUT): [...] It's Working
+success() {
+	hook "pre_success_output"
+	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
+	hook "post_success_output"
+}

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+about() {
+	cat <<ABOUT
+	${magenta}
+	 ██    ██ ██    ██
+	░██   ░██░██   ░██ 	 ▓▓▓▓▓▓▓▓▓▓
+	░░██ ░██ ░░██ ░██  	░▓ author ▓  Brad Parbs <brad@bradparbs.com>
+	 ░░████   ░░████  	░▓ github ▓  http://github.com/bradp/vv
+	  ░░██     ░░██  	░▓▓▓▓▓▓▓▓▓▓
+	   ░░       ░░  	░░░░░░░░░░
+	${normal}
+ABOUT
+}

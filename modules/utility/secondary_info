@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+secondary_info() {
+    hook "pre_info_output"
+    printf "%b" "${yellow}$1${normal} ..."
+    hook "post_info_output"
+}

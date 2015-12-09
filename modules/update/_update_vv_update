@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+_update_vv_update() {
+	hook "pre_vv_auto_update_update"
+	touch "$HOME"/.vv-update
+	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > "$HOME"/.vv-update
+	hook "post_vv_auto_update_update"
+}

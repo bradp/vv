@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+update_vv() {
+	hook "pre_update_vv"
+	if [[ $installed_with_brew = "true" ]]; then
+		info "Updating vv via Brew..."
+		hook "pre_brew_update_vv"
+		brew cleanup
+		brew reinstall vv
+		hook "post_brew_update_vv"
+	else
+		hook "pre_bootstrap_update_vv"
+		info "Updating vv..."
+		vv_bootstrap_update
+		hook "post_bootstrap_update_vv"
+	fi
+	hook "post_update_vv"
+}

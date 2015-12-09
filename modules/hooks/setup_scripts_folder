@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+setup_scripts_folder() {
+	vv_scripts_folder="$path"/vv/
+}

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+creation_success_message() {
+	# OMG we're done.
+	# =============================================================================
+
+	success "New VVV Site Setup: Done!"
+	echo "Directory: $path/$sites_folder/$site"
+	echo "URL:       $domain"
+	echo "Username:  $username"
+	echo "Password:  $password"
+	hook "post_site_creation_finished" "$site" "$domain" "$path"
+}

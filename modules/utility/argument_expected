@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+argument_expected() {
+	hook "pre_arg_expected"
+    if [ -z "$2" ] || [[ "$2" == -* ]]; then
+    	hook "error_no_arg_$1"
+        fail "$1 expected an argument"
+    fi
+    hook "post_arg_expected"
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Usage: error ["message"]
+# Example: error "this is an error"
+# Output (to STDERR): [ERROR] this is an error
+error() {
+	hook "pre_error_output"
+    printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
+    hook "post_error_output"
+}

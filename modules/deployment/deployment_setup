@@ -1,42 +1,5 @@
 #!/usr/bin/env bash
 
-deployment_setup_prompt() {
-	info "Setting up a deployment."
-
-	if [[ ! -z $site ]]; then
-		not_valid_site
-	fi
-
-	# Get site dir name if not supplied as argument
-	while [ -z "$site" ]; do
-		prompt "Which site would you like to setup a deployment for? "
-		read -r site
-		not_valid_site
-	done
-
-}
-
-deployment_removal_prompt() {
-	if [[ ! -z $site ]]; then
-		not_valid_site
-	fi
-
-	# Get site dir name if not supplied as argument
-	while [ -z "$site" ]; do
-		prompt "Which site would you like to remove the deployment for? "
-		read -r site
-		not_valid_site
-	done
-
-	while [ -z "$deployment_name" ]; do
-		prompt "Name of deployment to remove "
-		read -r deployment_name
-	done
-
-	remove_deployment
-
-}
-
 deployment_setup() {
 	deployment_setup_prompt
 	info "Setting up (S)FTP deployment for $site"
@@ -115,26 +78,4 @@ deployment_setup() {
 } >> "$path/Vagrantfile"
 	echo "end" >> "$path/Vagrantfile"
 	success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
-}
-
-remove_site_remove_all_deployment() {
-	sed "/\# begin-vv-$site/,/\# end-vv-$site/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
-	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
-	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
-}
-
-remove_deployment() {
-	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
-		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
-		read -r remove_deployment_confirm
-	done
-	sed "/\# begin-vv-$site-$deployment_name/,/\# end-vv-$site-$deployment_name/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
-	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
-	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
-
-	success "Deployment for $site removed."
-}
-
-deployment_config() {
-	$EDITOR "$path/Vagrantfile"
 }

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+get_list_sites() {
+	clean_saved=$clean
+	clean="true"
+	list_sites
+	clean=$clean_saved
+}

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+_current_epoch() {
+  seconds=$(date +%s)
+  echo $((seconds/60/60/24))
+}

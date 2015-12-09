@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+create_site_maybe_restart_vagrant() {
+	# Inform the user of what's about to happen
+	# =========================================
+	info "\nRestarting Vagrant will do the following:"
+	# @ TODO
+	echo -e "* Halt Vagrant (if running)"
+	echo -e "* Run \`vagrant up --provision\` to initialize site"
+	info "\nProvisioning Vagrant will do the following:"
+	echo -e "* Create database $site"
+	echo -e "* Install WordPress $version in the $web_root directory"
+	echo -e "* Make the site visible at $site"
+	info "\n"
+	while [ -z "$restart_and_provision" ]; do
+		prompt "Restart and provision Vagrant now? (y/N)"
+		read -r restart_and_provision
+
+		if [ -z "$restart_and_provision" ]; then
+			restart_and_provision='n'
+		fi
+
+		if [[ $restart_and_provision = 'n' ]]; then
+			warning "\nNote: You will need to run \`vagrant up --provision\` to initialize the new site before $domain will load in a browser.\n"
+			continue
+		elif [[ $restart_and_provision != 'y' ]]; then
+			error "Answer y or n."
+			unset restart_and_provision
+		elif [[ $restart_and_provision = 'y' ]]; then
+			skip_restart="false"
+			success "Provisioning New VVV setup starting for site '$site'"
+			cd "$path" || error "Could not change directory."
+			info "Running vagrant halt"
+			hook "pre_creation_pre_vagrant_halt"
+			vagrant_maybe_halt
+		fi
+	done
+}
+

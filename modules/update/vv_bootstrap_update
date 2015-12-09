@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+vv_bootstrap_update() {
+	hook "pre_vv_bootstrap_update"
+	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
+	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
+	vv_install_location=$(which vv)
+	curl -L -o "$HOME/$github_version.tar.gz" "$download_link" 2>/dev/null
+	tar -C "$HOME" -zxvf "$HOME/$github_version.tar.gz" 2>/dev/null
+	rm "$HOME/$github_version.tar.gz"
+	cat "$HOME/vv-$github_version/vv" > "$vv_install_location"
+	rm "$HOME/vv-$github_version"
+	success "vv has been updated to the latest version. Thanks!"
+	hook "post_vv_bootstrap_update"
+}

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+load_config_values() {
+	path=$(get_config_value path)
+}

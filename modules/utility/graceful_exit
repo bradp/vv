@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+graceful_exit() {
+    hook "graceful_exit" "$@"
+    exit 0
+}

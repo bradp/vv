@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+create_config_file() {
+	hook "pre_create_vv_config"
+{
+	echo "{"
+	echo "	\"path\": \"$path\""
+	echo "}"
+} >> "$HOME"/.vv-config
+	info "$HOME/.vv-config was created."
+	info "	"
+	hook "post_create_vv_config"
+}

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Usage: prompt "question"
+# Example: prompt "Site name"
+# Output (to STDOUT): Site Name:
+prompt() {
+	hook "pre_prompt_output"
+	printf "%b" "${magenta} $1: ${normal}"
+	hook "post_prompt_output"
+}

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+deployment_config() {
+	$EDITOR "$path/Vagrantfile"
+}

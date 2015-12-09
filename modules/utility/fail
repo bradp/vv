@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Usage: fail "message"
+# Example: fail "Unknown Option" 254
+fail() {
+	error "$1"
+	hook "fail_and_exit"
+	exit 1
+}

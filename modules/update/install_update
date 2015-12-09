@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+install_update() {
+	hook "pre_install_update"
+	check_how_installed
+	update_vv
+	hook "post_install_update"
+}
+

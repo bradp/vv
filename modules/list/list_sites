@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-get_list_sites() {
-	clean_saved=$clean
-	clean="true"
-	list_sites
-	clean=$clean_saved
-}
-
 list_sites() {
 	cd "$path"/"$sites_folder" || error "Could not change directory."
 	hook "pre_list_sites"

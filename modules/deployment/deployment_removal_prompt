@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+deployment_removal_prompt() {
+	if [[ ! -z $site ]]; then
+		not_valid_site
+	fi
+
+	# Get site dir name if not supplied as argument
+	while [ -z "$site" ]; do
+		prompt "Which site would you like to remove the deployment for? "
+		read -r site
+		not_valid_site
+	done
+
+	while [ -z "$deployment_name" ]; do
+		prompt "Name of deployment to remove "
+		read -r deployment_name
+	done
+
+	remove_deployment
+
+}

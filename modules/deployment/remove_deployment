@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+remove_deployment() {
+	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
+		prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
+		read -r remove_deployment_confirm
+	done
+	sed "/\# begin-vv-$site-$deployment_name/,/\# end-vv-$site-$deployment_name/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
+	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
+	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
+
+	success "Deployment for $site removed."
+}

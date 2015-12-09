@@ -1,15 +1,5 @@
 #!/usr/bin/env bash
 
-setup_scripts_folder() {
-	vv_scripts_folder="$path"/vv/
-}
-init_vv_hooks() {
-	mkdir "$path"/vv/
-}
-
-run_hook() {
-	hook "$@"
-}
 hook() {
 	# Display all hooks to screen if the show_hooks flag is set
 	if [[ $show_hooks = 'true' ]]; then

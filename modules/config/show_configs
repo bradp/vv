@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+show_configs() {
+	echo ""
+	echo "Path $path"
+
+}

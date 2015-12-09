@@ -1,0 +1,201 @@
+#!/usr/bin/env bash
+
+# @todo go through this and optimize / replace
+site_creation_questions() {
+
+	hook "pre_site_creation_wizard"
+
+	info "New VVV Site Setup"
+
+	# Prompt user for vars
+	# =============================================================================
+
+	# Get site dir name if not supplied as argument
+	if [ ! -z "$site" ]; then
+		if [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
+			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
+			unset site
+		elif [ -d "$path/$sites_folder/$site" ]; then
+			warning "Directory $path/$sites_folder/$site already exists. Existing VVV configuration files will be overwritten."
+		fi
+	fi
+	while [ -z "$site" ]; do
+		prompt "Name of new site directory"
+		read -r site
+
+		if [ -z "$site" ]; then
+			error "You must enter a directory name."
+		elif [ -f "$path/config/nginx-config/sites/$site.conf" ]; then
+			error "Site $site already exists. Remove config/nginx-config/sites/$site.conf to run setup again."
+			unset site
+		elif [ -d "$path/$sites_folder/$site" ]; then
+			warning "Directory $path/$sites_folder/$site already exists. Existing VVV configuration files will be overwritten."
+		fi
+	done
+
+	# Get database name
+	db_name=$site
+
+	# Get web root of site
+	if [ -z "$web_root" ]; then
+		web_root="htdocs"
+	fi
+
+	if [ "$no_wp" = "false" ]; then
+		if [[ -f "$path"/vv-blueprints.json ]]; then
+			# Get local URL
+			if [ "$use_defaults" = "false" ]; then
+				if [ -z "$blueprint" ]; then
+					prompt "Blueprint to use (leave blank for none)"
+					read -r blueprint
+					if [ -z "$blueprint" ]; then
+						unset blueprint
+					fi
+				fi
+			fi
+		fi
+	fi
+
+	# Get local URL
+	while [ -z "$domain" ]; do
+		if [ "$use_defaults" = "false" ]; then
+			prompt "Domain to use (leave blank for $site.dev)"
+			read -r domain
+		fi
+		if [ -z "$domain" ]; then
+			domain="$site.dev"
+		fi
+	done
+
+	if [ "$no_wp" = "false" ]; then
+		if [ ! -z "$version" ]; then
+			# Attempt to verify the existence of the version (hacky)
+			if curl -s http://codex.wordpress.org/Version_"$version" | grep --color=never 'currently no text' > /dev/null; then
+				error "Version $version not found, try again"
+				unset version
+			else
+				installversion=" --version=$version"
+			fi
+		fi
+		use_trunk="false"
+		while [[ -z "$version" ]]; do
+			# Get WordPress version
+			if [ "$use_defaults" = "false" ]; then
+				prompt "WordPress version to install (leave blank for latest version or trunk for trunk/nightly version)"
+				read -r version
+			fi
+			if [ -z "$version" ]; then
+				installversion=""
+				version="(release version)"
+			elif [ "$version" = "trunk" ]; then
+				installversion=""
+				version="(release version)"
+				use_trunk="true"
+			else
+				# Attempt to verify the existence of the version (hacky)
+				if curl -s http://codex.wordpress.org/Version_"$version" | grep --color=never 'currently no text' > /dev/null; then
+					error "Version \"$version\" not found, try again"
+					unset version
+				else
+					installversion=" --version=$version"
+				fi
+			fi
+		done
+
+		if [ -z "$multisite" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Install as multisite? (y/N)"
+				read -r multisite
+			fi
+			if [[ $multisite = 'y' ]]; then
+				install_text='multisite-install'
+			else
+				install_text='install'
+			fi
+		fi
+
+		if [[ $multisite = "y" ]]; then
+			while [[ -z $ms_type ]]; do
+				if [ "$use_defaults" = "false" ]; then
+					prompt "Install as subdomain or subdirectory?"
+					read -r ms_type
+				fi
+				if [[ $ms_type != 'subdomain' && $ms_type != 'subdirectory' ]]; then
+					error "Type must be subdomain or subdirectory."
+					unset ms_type
+				fi
+			done
+		fi
+
+		if [[ $ms_type = 'subdomain' ]]; then
+			install_text='multisite-install --subdomains'
+		fi
+
+		if [[ ! -z $git_repo && -d "$path/$sites_folder/$site" ]]; then
+			error "$path/$sites_folder/$site already exists. Skipping git clone."
+			unset git_repo
+		elif [[ -z "$git_repo" && ! -d "$path/$sites_folder/$site" ]]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Git repo to clone as wp-content (leave blank to skip)"
+				read -r git_repo
+			fi
+		fi
+
+		if [ -z "$db_import" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Local SQL file to import for database (leave blank to skip)"
+				read -r db_import
+			fi
+		fi
+
+		if [ -z "$remove_defaults" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Remove default themes and plugins? (y/N)"
+				read -r remove_defaults
+			fi
+		fi
+
+		add_placeholder_content="";
+		if [ -z "$placeholder_content" ]; then
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Add sample content to site? (y/N)"
+				read -r placeholder_content
+			fi
+			if [[ $placeholder_content = "y" ]]; then
+				add_placeholder_content="curl -s https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml > import.xml && wp plugin install wordpress-importer --allow-root  && wp plugin activate wordpress-importer --allow-root  && wp import import.xml --authors=skip --allow-root && rm import.xml"
+			fi
+		fi
+
+		# Ask if WP_DEBUG should be turned on
+		while [ -z "$wp_debug" ]; do
+			if [ "$use_defaults" = "false" ]; then
+				prompt "Enable WP_DEBUG and WP_DEBUG_LOG? (y/N)"
+				read -r wp_debug
+			fi
+			if [[ $wp_debug != 'y' && $wp_debug != 'n' ]]; then
+				wp_debug="n"
+			fi
+		done
+
+		if [[ $image_proxy = "true" ]]; then
+			while [ -z "$live_site_url" ]; do
+				if [ "$use_defaults" = "false" ]; then
+					prompt "Live site URL (no http:// or trailing slash)"
+					read -r live_site_url
+				fi
+			done
+		fi
+	fi
+
+	if [[ -z "$username" ]]; then
+		username="admin"
+	fi
+	if [[ -z "$password" ]]; then
+		password="password"
+	fi
+	if [[ -z "$email" ]]; then
+		email="admin@localhost.dev"
+	fi
+
+	hook "post_site_creation_wizard"
+}
