@@ -518,7 +518,7 @@ get_vvv_path(){
 			create_config_file
 		else
 			unset path
-		fi
+		
 
 		while [ -z "$path" ]; do
 			read -r -e -p "VVV install directory: " path
@@ -530,6 +530,8 @@ get_vvv_path(){
 			fi
 			path=$(eval echo "${path//>}")
 		done
+		create_config_file
+		fi
 	fi
 	path=${path%/}
 }
