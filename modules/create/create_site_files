@@ -18,11 +18,14 @@ create_site_files(){
 	wp_debug_text=''
 	if [[ $wp_debug = 'y' ]]; then
 		wp_debug_text=" --extra-php <<PHP
-define('WP_DEBUG', true);
-define('WP_DEBUG_DISPLAY', false);
-define('WP_DEBUG_LOG', true);
-define('SCRIPT_DEBUG', true);
-define('JETPACK_DEV_DEBUG', true);
+define( 'WP_DEBUG', true );
+define( 'JETPACK_DEV_DEBUG', true );
+define( 'WP_DEBUG_LOG', true );
+define( 'SCRIPT_DEBUG', true );
+define( 'WP_DEBUG_DISPLAY', false );
+if ( defined( 'DOING_AJAX' ) && DOING_AJAX || defined( 'DOING_CRON' ) && DOING_CRON ) {
+    @ini_set( 'display_errors', 0 );
+}
 PHP"
 	fi
 
