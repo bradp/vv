@@ -44,7 +44,7 @@ if [[ "$1" == "vv_internal_debug" ]]; then
 	shift
 fi
 
-if [[ ! -z $(whichtput 2>/dev/null) ]]; then
+if [[ ! -z $(which tput 2>/dev/null) ]]; then
 	normal=$(tput sgr0)
 	bold=$(tput bold)
 	red=$(tput setaf 1)
