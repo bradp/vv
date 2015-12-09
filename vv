@@ -413,9 +413,10 @@ argument_expected() {
 
 check_for_config_file() {
 	hook "pre_vv_config_check"
-	test -f "$HOME"/.vv-config && got_config="true"
+	test -f "$HOME"/.vv-config && vv_config="${HOME}/.vv-config"
+	test -f ./.vv-config && vv_config="./.vv-config"
 
-	if [ ! -z $got_config ]; then
+	if [ ! -z $vv_config ]; then
 		load_config_values
 	else
 		if [[ ! $showing_help = "true" ]]; then
@@ -443,7 +444,7 @@ create_config_file() {
 }
 
 get_config_value() {
-	value=$(grep --color=never "$1" "$HOME"/.vv-config | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
+	value=$(grep --color=never "$1" "$vv_config" | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
 	echo "$value"
 }
 
@@ -865,9 +866,9 @@ confirm_site_creation() {
 	success "New VVV setup starting for site '$site'"
 	cd "$path" || error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
-		info "Running vagrant halt"
+		info "Maybe running vagrant halt"
 		hook "pre_creation_pre_vagrant_halt"
-		vagrant halt
+		vagrant_maybe_halt
 	fi
 }
 
@@ -1103,6 +1104,19 @@ creation_success_message() {
 	hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
+vagrant_maybe_halt() {
+	# Test if VVV is running, This is hardcoded with a VVV default site, and should be switched to something a bit more robust
+	vvv_running="true"
+	/usr/bin/wget "http://local.wordpress.dev/wp-login.php" --timeout 5 -O - 2>/dev/null  | grep "login" || vvv_running="false"
+	if [[ "$vvv_running" = "true" ]]; then
+		info "Running \`vagrant halt\`"
+		vagrant halt
+	else
+		info "Vagrant not running, skipping \`vagrant halt\`..."
+	fi
+}
+
+
 create_site() {
 	hook "pre_site_creation_questions"
 	site_creation_questions
@@ -1162,7 +1176,7 @@ remove_site() { # @TODO refactor this if we need to
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path" || error "Could not change directory."
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
-			vagrant halt
+			vagrant_maybe_halt
 			hook "post_site_removal_vagrant_halt" "$site" "$path"
 
 			# Delete the site folder
@@ -1382,6 +1396,7 @@ output_debug_vv() {
 	echo ""
 	echo "vv: $(which vv)"
 	echo ""
+	echo "vv_config: $vv_config"
 	echo "vvv path: $path"
 	echo "home: $HOME"
 	echo ""

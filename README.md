@@ -99,7 +99,7 @@ If you are using a subdomain multisite, you must edit vvv-hosts file inside of t
     siteA.mysite.dev
     siteB.mysite.dev
 
-After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either remove and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
+After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either delete and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
 ## Site Deletion
 
@@ -231,7 +231,7 @@ Because vv knows where you VVV installation is, you can run it from anywhere. vv
 |-------|-----------|
 |`list`, `--list`,  `-l`|List all VVV sites|
 |`create`, `--create`, `-c`|Create a new site|
-|`remove`, `--remove`, `-r`|Remove a site|
+|`delete`, `--delete`, `-r`|Delete a site|
 |`deployment-create`, `--deployment-create`|Set up deployment for a site|
 |`deployment-remove`, `--deployment-remove`|Remove deployment for a site|
 |`deployment-config`, `--deployment-config`|Manually edit deployment configuration|
