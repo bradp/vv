@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+about() {
+	cat <<ABOUT
+	${magenta}
+	This is a test of the module-extending functionality
+	${normal}
+ABOUT
+}

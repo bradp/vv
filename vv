@@ -367,15 +367,28 @@ check_args() {
 
 load_modules() {
 
-	vv_install_location=$(which vv)
+	vv_install_location="$(which vv)"
 	# hacky check for local dev
-	vv_install_location=$(pwd)
+	vv_install_location="$(pwd)"
 
 	modules="$vv_install_location/modules/*/*"
 	# Allow of adding different locations for module to be laoaded
 	for module in $modules; do
  		test -f "$module" && . "$module"
 	done
+
+
+	# Because bash will use the second function that gets sourced, this allows us to replace existing modules / functions
+	extended_modules_dir="$(pwd)/extended-modules"
+	if [ -d "$extended_modules_dir" ]; then
+
+		extended_modules_dir_glob="$(pwd)/extended-modules/*/*"
+		echo $extended_modules_dir_glob
+		# Allow of adding different locations for module to be laoaded
+		for module in $extended_modules_dir_glob; do
+	 		test -f "$module" && . "$module"
+		done
+	fi
 
 }
 
