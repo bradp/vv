@@ -47,7 +47,7 @@ if [[ "$1" == "vv_internal_debug" ]]; then
 fi
 
 # Set our colors for output
-if [[ ! -z $(which tput) ]]; then
+if [[ ! -z $(which tput 2>/dev/null ) ]]; then
 	normal=$(tput sgr0)
 	bold=$(tput bold)
 	red=$(tput setaf 1)
@@ -383,7 +383,6 @@ load_modules() {
 	if [ -d "$extended_modules_dir" ]; then
 
 		extended_modules_dir_glob="$(pwd)/extended-modules/*/*"
-		echo $extended_modules_dir_glob
 		# Allow of adding different locations for module to be laoaded
 		for module in $extended_modules_dir_glob; do
 	 		test -f "$module" && . "$module"
