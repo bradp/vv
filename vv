@@ -44,7 +44,7 @@ if [[ "$1" == "vv_internal_debug" ]]; then
 	shift
 fi
 
-if [[ ! -z $(which tput) ]]; then
+if [[ ! -z $(whichtput 2>/dev/null) ]]; then
 	normal=$(tput sgr0)
 	bold=$(tput bold)
 	red=$(tput setaf 1)
@@ -1402,7 +1402,7 @@ output_debug_vv() {
 	echo "vvv path: $path"
 	echo "home: $HOME"
 	echo ""
-	echo "tput: $(which tput)"
+	echo "tput: $(whichtput 2>/dev/null)"
 	echo "cat: $(which cat)"
 	echo "curl: $(which curl)"
 	echo "brew: $(which brew)"
