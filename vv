@@ -467,6 +467,7 @@ load_default_values() {
 }
 
 get_vvv_path(){
+
     if [ ! -z "$force_path" ]; then
 		unset path
 	fi
@@ -512,14 +513,17 @@ get_vvv_path(){
 		elif [ -e "$HOME"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
 			path="$HOME"/vvv
 		fi
-		info "Automagically found $path"
-		prompt "Is this where VVV is installed? (Y/n)"
-		read -r path_confirmation
-		if [ "$path_confirmation" = 'Y' ]; then
-			create_config_file
-		else
-			unset path
-		
+
+		if [ ! -z "$path" ]; then
+			info "Automagically found $path"
+			prompt "Is this where VVV is installed? (Y/n)"
+			read -r path_confirmation
+			if [ "$path_confirmation" = 'Y' ]; then
+				create_config_file
+			else
+				unset path
+			fi
+		fi
 
 		while [ -z "$path" ]; do
 			read -r -e -p "VVV install directory: " path
@@ -530,11 +534,15 @@ get_vvv_path(){
 				unset path
 			fi
 			path=$(eval echo "${path//>}")
+
+			if [ ! -z "$path" ]; then
+				create_config_file
+			fi
 		done
-		create_config_file
-		fi
 	fi
 	path=${path%/}
+
+
 }
 setup_scripts_folder() {
 	vv_scripts_folder="$path"/vv/
