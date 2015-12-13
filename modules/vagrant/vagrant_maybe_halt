@@ -3,7 +3,7 @@
 vagrant_maybe_halt() {
 	# Test if VVV is running, This is hardcoded with a VVV default site, and should be switched to something a bit more robust
 	vvv_running="true"
-	/usr/bin/wget "http://local.wordpress.dev/wp-login.php" --timeout 5 -O - 2>/dev/null  | grep "login" || vvv_running="false"
+	 curl --silent --head "http://local.wordpress.dev/wp-login.php" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
 	if [[ "$vvv_running" = "true" ]]; then
 		info "Running \`vagrant halt\`"
 		vagrant halt
