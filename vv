@@ -321,7 +321,7 @@ vv_bootstrap_update() {
 	tar -C "$HOME" -zxvf "$HOME/$github_version.tar.gz" 2>/dev/null
 	rm "$HOME/$github_version.tar.gz"
 	cat "$HOME/vv-$github_version/vv" > "$vv_install_location"
-	rm "$HOME/vv-$github_version"
+	rm -r "$HOME/vv-$github_version"
 	success "vv has been updated to the latest version. Thanks!"
 	hook "post_vv_bootstrap_update"
 }
