@@ -518,7 +518,7 @@ get_vvv_path(){
 			info "Automagically found $path"
 			prompt "Is this where VVV is installed? (Y/n)"
 			read -r path_confirmation
-			if [ "$path_confirmation" = 'Y' ]; then
+			if [ "$path_confirmation" != 'n' ]; then
 				create_config_file
 			else
 				unset path
