@@ -1056,6 +1056,15 @@ PHP"
 	info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
 	printf "%s\n" "$domain" >> vvv-hosts
+	if [ ! -z "$blueprint" ] && [[ $ms_type == "subdomain" ]]; then
+		info "Adding subdomains from $blueprint to vvv-hosts file..."
+		local subdomains
+		subdomains=$(grep "$blueprint::subdomains" "$path"/vv-blueprints.json | sed -e 's/"//g' | cut -d ':' -f 4)
+		subdomains=${subdomains%,}
+		for subdomain in $subdomains; do
+			printf "%s\n" "$subdomain.$domain" >> vvv-hosts
+		done
+	fi
 	hook "post_write_vvv_hosts"
 	echo "Done"
 
