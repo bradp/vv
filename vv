@@ -1211,10 +1211,11 @@ remove_site() { # @TODO refactor this if we need to
 			hook "post_site_removal_vagrant_up" "$site" "$path"
 
 			# Delete the database from within VVV's MySQl
-			info "Dropping database $site..."
-			hook "pre_site_removal_database_drop" "$site" "$path"
+			info "Removing database $site..."
+			hook "pre_site_removal_remove_db" "$site" "$path"
 			vagrant ssh --command "mysql -u root -e 'DROP DATABASE $site;'"
-			hook "post_site_removal_database_drop" "$site" "$path"
+			hook "post_site_removal_remove_db" "$site" "$path"
+			echo "Done"
 
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant_maybe_halt
@@ -1243,12 +1244,6 @@ remove_site() { # @TODO refactor this if we need to
 			mv init-custom.sql.tmp init-custom.sql
 			hook "post_site_removal_remove_db_creation" "$site" "$path"
 			cd "$path" || error "Could not change directory."
-			echo "Done"
-
-			info "Removing database"
-			hook "pre_site_removal_remove_db" "$site" "$path"
-			rm -rf "$path/database/data/$site"
-			hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
 			info "Removing database backup"
