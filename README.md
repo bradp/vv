@@ -26,7 +26,7 @@ Otherwise, clone this repositoy and edit your `$PATH` to include the `vv` core f
 
 1. Clone this repo: `git clone https://github.com/bradp/vv.git`
 1. Add the `vv` core script to your shell's `$PATH`:
-    * If you're using `bash`: `touch ~/.bash_profile && echo "export PATH=\$PATH:`pwd`/vv" >> ~/.bash_profile`
+    * If you're using `bash`: ``touch ~/.bash_profile && echo "export PATH=\$PATH:`pwd`/vv" >> ~/.bash_profile``
 
 ### Windows Installation
 
