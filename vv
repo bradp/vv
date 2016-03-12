@@ -1114,12 +1114,30 @@ creation_success_message() {
 	hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
-vagrant_maybe_halt() {
-	vvv_running="true"
+vagrant_is_running() {
+	local vvv_running
 	local vvv_path
 	vvv_path="$(get_config_value path | tr -d '[:space:]')"
 	vvv_path=${vvv_path%/}
+	vvv_running="true"
 	vagrant global-status | grep "$vvv_path\s*"'$' | grep -q running || vvv_running="false"
+	echo "$vvv_running"
+}
+
+vagrant_maybe_up() {
+	local vvv_running
+	vvv_running=$(vagrant_is_running)
+	if [[ "$vvv_running" = "false" ]]; then
+		info "Running \`vagrant up\`"
+		vagrant up
+	else
+		info "Vagrant already running, skipping \`vagrant up\`..."
+	fi
+}
+
+vagrant_maybe_halt() {
+	local vvv_running
+	vvv_running=$(vagrant_is_running)
 	if [[ "$vvv_running" = "true" ]]; then
 		info "Running \`vagrant halt\`"
 		vagrant halt
@@ -1180,13 +1198,24 @@ remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Start Vagrant (if not running)\n* Remove database $site from MySQL\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path" || error "Could not change directory."
+
+			hook "pre_site_removal_vagrant_up" "$site" "$path"
+			vagrant_maybe_up
+			hook "post_site_removal_vagrant_up" "$site" "$path"
+
+			# Delete the database from within VVV's MySQl
+			info "Dropping database $site..."
+			hook "pre_site_removal_database_drop" "$site" "$path"
+			vagrant ssh --command "mysql -u root -e 'DROP DATABASE $site;'"
+			hook "post_site_removal_database_drop" "$site" "$path"
+
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant_maybe_halt
 			hook "post_site_removal_vagrant_halt" "$site" "$path"
