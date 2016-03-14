@@ -22,7 +22,11 @@ If you have [Homebrew](http://brew.sh/) installed, you run the following in your
 
 	$ brew install bradp/vv/vv
 
-Otherwise you'll want to clone and edit your `$PATH` to include the vv core file.
+Otherwise, clone this repositoy and edit your `$PATH` to include the `vv` core file:
+
+1. Clone this repo: `git clone https://github.com/bradp/vv.git`
+1. Add the `vv` core script to your shell's `$PATH`:
+    * If you're using `bash`: ``touch ~/.bash_profile && echo "export PATH=\$PATH:`pwd`/vv" >> ~/.bash_profile``
 
 ### Windows Installation
 
