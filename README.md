@@ -48,6 +48,20 @@ Alternately, you can use cmd.exe with `bash vv`.
 
 Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If you're having issues, please see [this issue](https://github.com/bradp/vv/issues/33).
 
+### Linux Installation
+
+* Clone vv into a folder.
+
+    `$ git clone https://github.com/bradp/vv.git`
+
+* Access the directory that you cloned vv into.
+
+* Copy the vv executable to /usr/local/bin
+
+    `$ sudo cp vv /usr/local/bin`
+
+* You should now be able to easily run vv from anywhere in your system.
+ 
 ## Adding tab-completion to `vv`
 
 Currently, `vv` supports tab-completion of arguments and options in both bash and ZSH. To enable this, you'll first want to make sure you're on the most current version of `vv`. Then simply add `source $( echo $(which vv)-completions)` to the end of your .bash_profile, .bashrc or .zshrc.
