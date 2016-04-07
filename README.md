@@ -113,9 +113,13 @@ Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it
 ### Subdomain Multisite Installation
 
 If you are using a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
-    mysite.dev
-    siteA.mysite.dev
-    siteB.mysite.dev
+
+ > mysite.dev
+ 
+ > siteA.mysite.dev
+ 
+ > siteB.mysite.dev
+ 
 
 After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either delete and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
