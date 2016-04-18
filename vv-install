@@ -32,6 +32,12 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 			add_option( $option );
 		}
 	}
+	if ( ! empty( $blueprints->$blueprint->widgets ) ) {
+		echo "Setting up widgets...\n";
+		foreach ( $blueprints->$blueprint->widgets as $widget ) {
+			add_widget( $widget );
+		}
+	}
 	if ( ! empty( $blueprints->$blueprint->defines ) ) {
 		echo 'Adding constants to wp-config.php...';
 		foreach ( $blueprints->$blueprint->defines as $define ) {
@@ -221,6 +227,27 @@ define(\"'. $object[0] . '\",' . $object[1]  . ');
 define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
 	}
+}
+
+/**
+ * @param $object
+ */
+function add_widget( $object ) {
+	echo "  Adding widget {$object->name} to {$object->location}...\n";
+	$cmd = sprintf(
+		'wp --allow-root widget add %s %s',
+		escapeshellarg( $object->name ),
+		escapeshellarg( $object->location )
+	);
+	if ( isset($object->position) ) {
+		$cmd .= ' ' . escapeshellarg( $object->position );
+	}
+	if ( isset( $object->options ) ) {
+		foreach ( $object->options as $key => $value ) {
+			$cmd .= ' ' . escapeshellarg( "--$key=$value" );
+		}
+	}
+	exec( $cmd );
 }
 
 main( $argv[1], $argv[2], $argv[3], $argv[4] );
