@@ -8,6 +8,16 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
 	$blueprints = json_decode( file_get_contents( 'vv-blueprints.json' ) );
 
+	if ( ! empty( $blueprints->$blueprint->demo_content ) ) {
+		system( 'wp --allow-root plugin is-installed wordpress-importer', $importer_missing );
+		if ( $importer_missing ) {
+			exec( 'wp --allow-root plugin install wordpress-importer --activate' );
+		}
+		echo "Importing content...\n";
+		foreach ( $blueprints->$blueprint->demo_content as $demo ) {
+			import_demo_content( $demo );
+		}
+	}
 	if ( ! empty( $blueprints->$blueprint->themes ) ) {
 		echo "Installing themes...\n";
 		foreach ( $blueprints->$blueprint->themes as $theme ) {
@@ -244,7 +254,7 @@ function activate_wordpress_importer() {
 function import_demo_content( $demo ) {
 	$object = explode( '::', $demo );
 	$link = $object[1];
-	exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
+	exec( 'curl -s ' . escapeshellarg( $link ) . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
 	echo "  Import Complete!\n";
 }
 
