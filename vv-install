@@ -198,7 +198,7 @@ function install( $type, $object, $path, $site_name, $domain ) {
 function parse_option( $opt_string ) {
 	$x = explode( '::', $opt_string );
 	$key = array_shift( $x );
-	$val = implode( '', $x );
+	$val = implode( '::', $x );
 	return array( $key => $val );
 }
 
@@ -252,8 +252,8 @@ function activate_wordpress_importer() {
  * @param $demo
  */
 function import_demo_content( $demo ) {
-	$object = explode( '::', $demo );
-	$link = $object[1];
+	$opt = parse_option( $demo );
+	$link = array_pop( $opt );
 	exec( 'curl -s ' . escapeshellarg( $link ) . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
 	echo "  Import Complete!\n";
 }
@@ -263,20 +263,22 @@ function import_demo_content( $demo ) {
  * @param $path
  */
 function add_define( $object, $path ) {
-	$object = explode( '::', $object );
-	echo "  Insert constants $object[0]...\n";
+	$opt = parse_option( $object );
+	$def = key( $opt );
+	$val = array_pop( $opt );
+	echo "  Insert constants $def...\n";
 
 	/**
 	 * Changed is_bool to a string comparison because is_bool only works for real booleans, not strings
 	 * Reference: http://stackoverflow.com/questions/7336861/how-to-convert-string-to-boolean-php
 	 */
-	if ( 'true' == strtolower( $object[1] ) || 'false' == strtolower( $object[1] ) ) {
+	if ( 'true' == strtolower( $val ) || 'false' == strtolower( $val ) ) {
 		exec( '     echo "$(sed "34a\\
-define(\"'. $object[0] . '\",' . $object[1]  . ');
+define(\"'. $def . '\",' . $val  . ');
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
 	} else {
 		exec( '		echo "$(sed "34a\\
-define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
+define(\"'. $def . '\",\"' . $val  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
 	}
 }
