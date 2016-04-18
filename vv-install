@@ -171,11 +171,19 @@ function install( $type, $object, $path, $site_name, $domain ) {
  */
 function add_option( $option ) {
 	$object = explode( '::', $option );
-	$a = $object[0];
-	$b = $object[1];
-	exec( "wp --allow-root option delete '$a'" );
-	exec( "wp --allow-root option add '$a' '$b'" );
-	echo "  Insert settings $a...\n";
+	$name = array_shift( $object );
+	exec( 'wp --allow-root option delete ' . escapeshellarg( $name ) );
+
+	$vals = implode( '', $object );
+	$php_vals = @unserialize( $vals );
+	if ( false === $php_vals ) {
+		exec( 'wp --allow-root option add ' . escapeshellarg( $name ) . ' ' . escapeshellarg( $vals ) );
+	} else {
+		$json = json_encode( $php_vals );
+		exec( 'wp --allow-root option add ' . escapeshellarg( $name ) . " '$json'" . ' --format=json' );
+	}
+
+	echo "  Insert settings $name...\n";
 }
 
 function activate_wordpress_importer() {
