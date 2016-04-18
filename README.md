@@ -165,7 +165,7 @@ To use a custom database prefix, simply use the `vv create --prefix myprefix` wh
 
 Blueprints allow you to set up different plugins, themes, mu-plugins, options, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
 
-The blueprint should look like this:
+A simple blueprint should look like this:
 ```json
 {
   "sample": {
@@ -228,6 +228,106 @@ You can create as many named blueprints in this file as you would like, all with
 When creating a site, the name you've specified (in this example, "sample") is what you'll need to specify to use this blueprint.
 
 You can use 'SITENAME' or 'SITEDOMAIN' anywhere in the blueprint, and that will be replaced with the actual site name or local domain when installing.
+
+### Blueprints for Multisite configurations
+
+Blueprints also let you set up individual subsites in a Multisite network. For example, you can define a blueprint for a multisite network in which certain plugins or themes are activated across the whole network, or just for specific subsites.
+
+To add multisite support to your blueprint, add a `sites` key to a specific blueprint, like this:
+
+```json
+"sites": {
+  "site2": {
+    "plugins": [
+      ...(same as above)...
+    ]
+  }
+}
+```
+
+The `sites` object holds a subsite definition, which has the same capabilities as a regular site's blueprint (so `plugins`, `themes`, etc. are all the same), and also includes keys for [WP-CLI's `wp site create` command](http://wp-cli.org/commands/site/create/). For example, to create a subsite whose slug is `subsite2`, titled "Second Subsite" with an admin email address of `subsite2admin@localhost.dev` with `robots.txt` exclusions, use:
+
+```json
+"sites": {
+  "subsite2": {
+    "title": "Second Subsite",
+    "email": "subsite2admin@localhost.dev"
+  }
+}
+```
+
+If your multisite network uses subdomains, you can include a blueprint-level key named like `BLUEPRINT_NAME::subdomains` to have `vv` configure your subdomains for you. `BLUEPRINT_NAME` should match the name of your blueprint, and the value should be a space-separated list of subdomains that match your subsite slugs. A complete example for the `sample` blueprint shown above using subdomain-based multisite configurations might look like this:
+
+```json
+{
+  "sample": {
+    "sample::subdomains": "site2 site3",
+    "sites": {
+      "site2": {
+        "title": "Child Site (subsite2)",
+        "plugins": [
+          {
+            "location": "buddypress",
+            "activate": true
+          }
+        ]
+      },
+      "site3": {
+        "title": "Private Child Site",
+        "private": true,
+        "email": "site2admin@local.dev",
+        "themes": [
+          {
+            "location": "https://github.com/glocalcoop/anp-network-main-child/archive/master.zip",
+            "activate": true
+          }
+        ]
+      }
+    },
+    "themes": [
+      {
+        "location": "automattic/_s",
+        "enable_network": true
+      },
+      {
+        "location": "glocalcoop/anp-network-main-v2",
+        "activate": true
+      }
+    ],
+    "mu_plugins": [
+      {
+        "location": "https://github.com/WebDevStudios/WDS-Required-Plugins.git"
+      }
+    ],
+    "plugins": [
+      {
+        "location": "https://github.com/clef/wordpress/archive/master.zip",
+        "version": null,
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      },
+      {
+        "location": "cmb2",
+        "version": "2.0.5",
+        "force": false,
+        "activate": true,
+        "activate_network": false
+      },
+    ],
+    "demo_content": [
+      "link::https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml"
+    ],
+    "defines": [
+      "WP_CACHE::false"
+    ]
+  }
+}
+```
+
+The above installs [BuddyPress](https://buddypress.org/) but activates it only for `site2`, enables the `_s` theme for the entire network but activates `anp-network-main-v2` for the network's main site and `anp-network-main-child` for `site3`, which is also given its own site admin user.
+
+Be sure to run `vv` with the `--multisite subdomain` option when you use a blueprint like this.
 
 ## Vagrant Proxy
 
