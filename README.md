@@ -242,6 +242,8 @@ For options, demo content, and constants, please note the `::` as a separator be
 
 Custom demo content can be imported through the blueprint. Be sure to use a link that points to just the xml code, like [this](https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml). You can add as many demo content files as you'd like, just separate each line with a comma as usual.
 
+A multisite's Network Settings can be configured using a `network_options` array in the blueprint.
+
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
 When creating a site, the name you've specified (in this example, "sample") is what you'll need to specify to use this blueprint.
