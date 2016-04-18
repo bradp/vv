@@ -22,7 +22,11 @@ If you have [Homebrew](http://brew.sh/) installed, you run the following in your
 
 	$ brew install bradp/vv/vv
 
-Otherwise you'll want to clone and edit your `$PATH` to include the vv core file.
+Otherwise, clone this repositoy and edit your `$PATH` to include the `vv` core file:
+
+1. Clone this repo: `git clone https://github.com/bradp/vv.git`
+1. Add the `vv` core script to your shell's `$PATH`:
+    * If you're using `bash`: ``touch ~/.bash_profile && echo "export PATH=\$PATH:`pwd`/vv" >> ~/.bash_profile``
 
 ### Windows Installation
 
@@ -44,6 +48,20 @@ Alternately, you can use cmd.exe with `bash vv`.
 
 Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If you're having issues, please see [this issue](https://github.com/bradp/vv/issues/33).
 
+### Linux Installation
+
+* Clone vv into a folder.
+
+    `$ git clone https://github.com/bradp/vv.git`
+
+* Access the directory that you cloned vv into.
+
+* Copy the vv executable to /usr/local/bin
+
+    `$ sudo cp vv /usr/local/bin`
+
+* You should now be able to easily run vv from anywhere in your system.
+ 
 ## Adding tab-completion to `vv`
 
 Currently, `vv` supports tab-completion of arguments and options in both bash and ZSH. To enable this, you'll first want to make sure you're on the most current version of `vv`. Then simply add `source $( echo $(which vv)-completions)` to the end of your .bash_profile, .bashrc or .zshrc.
@@ -95,9 +113,13 @@ Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it
 ### Subdomain Multisite Installation
 
 If you are using a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
-    mysite.dev
-    siteA.mysite.dev
-    siteB.mysite.dev
+
+ > mysite.dev
+ 
+ > siteA.mysite.dev
+ 
+ > siteB.mysite.dev
+ 
 
 After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either delete and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
@@ -416,10 +438,12 @@ For example, saving this file as the name of any hook will output 'Hello' when t
 ```
 
 Another example would be running npm install inside of wp-content for all new sites.
-Make a file named post_site_creation_finished - this file gets 4 variables passed in, the hook name, the site name, the site domain, and the name of the site folder
+
+Make a file named post_site_creation_finished. This file gets 4 variables passed in: the hook name, the name of the site folder, the site domain, and the VVV path.
+
 ```bash
     #!/bin/bash
-    cd www/"$4"/htdocs/wp-content || exit
+    cd www/"$2"/htdocs/wp-content || exit
     npm install
 ```
 

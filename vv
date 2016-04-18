@@ -518,7 +518,7 @@ get_vvv_path(){
 			info "Automagically found $path"
 			prompt "Is this where VVV is installed? (Y/n)"
 			read -r path_confirmation
-			if [ "$path_confirmation" = 'Y' ]; then
+			if [ "$path_confirmation" != 'n' ]; then
 				create_config_file
 			else
 				unset path
@@ -701,11 +701,11 @@ site_creation_questions() {
 	# Get local URL
 	while [ -z "$domain" ]; do
 		if [ "$use_defaults" = "false" ]; then
-			prompt "Domain to use (leave blank for $site.dev)"
+			prompt "Domain to use (leave blank for ${site// /-}.dev)"
 			read -r domain
 		fi
 		if [ -z "$domain" ]; then
-			domain="$site.dev"
+			domain="${site// /-}.dev"
 		fi
 	done
 
@@ -1081,11 +1081,11 @@ PHP"
 	if [[ $multisite = 'y' ]] && [[ $ms_type = 'subdomain' ]]; then
 		nginx_domain_text="$domain *.$domain"
 	fi
-	xip_domain=" ~^$site\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
+	xip_domain=" ~^${site// /-}\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
 	nginx_domain_text="$nginx_domain_text""$xip_domain"
 
 	sed -e "s/testserver\.com/$nginx_domain_text/" \
-		-e "s|wordpress-local|$site/$web_root|" local-nginx-example.conf-sample > "$site".conf
+		-e "s|/srv/www/wordpress-local|\"/srv/www/$site/$web_root\"|" local-nginx-example.conf-sample > "$site".conf
 
 	if [[ $image_proxy = "true" ]]; then
 		sed -e $'s|\}| location ~ ^/wp-content/uploads/(.*) \{ if (!-f $request_filename) \{ rewrite ^/wp-content/uploads/(.*)$ http://LIVE_URL/wp-content/uploads/$1 redirect; \} \} \}|' -e "s|LIVE_URL|$live_site_url|" "$site".conf > tmp.conf
@@ -1123,10 +1123,30 @@ creation_success_message() {
 	hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
-vagrant_maybe_halt() {
-	# Test if VVV is running, This is hardcoded with a VVV default site, and should be switched to something a bit more robust
+vagrant_is_running() {
+	local vvv_running
+	local vvv_path
+	vvv_path="$(get_config_value path | tr -d '[:space:]')"
+	vvv_path=${vvv_path%/}
 	vvv_running="true"
-	curl --silent --head "http://local.wordpress.dev/wp-login.php" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
+	vagrant global-status | grep "$vvv_path\s*"'$' | grep -q running || vvv_running="false"
+	echo "$vvv_running"
+}
+
+vagrant_maybe_up() {
+	local vvv_running
+	vvv_running=$(vagrant_is_running)
+	if [[ "$vvv_running" = "false" ]]; then
+		info "Running \`vagrant up\`"
+		vagrant up
+	else
+		info "Vagrant already running, skipping \`vagrant up\`..."
+	fi
+}
+
+vagrant_maybe_halt() {
+	local vvv_running
+	vvv_running=$(vagrant_is_running)
 	if [[ "$vvv_running" = "true" ]]; then
 		info "Running \`vagrant halt\`"
 		vagrant halt
@@ -1187,13 +1207,25 @@ remove_site() { # @TODO refactor this if we need to
 		not_valid_site
 	done
 
-	info "\nAbout to perform the following:\n\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
+	info "\nAbout to perform the following:\n\n* Start Vagrant (if not running)\n* Remove database $site from MySQL\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
 	while [ -z "$continue_delete" ]; do
 		prompt "Continue (y/n) "
 		read -r continue_delete
 		if [ "$continue_delete" = 'y' ]; then
 			info "\nVVV teardown starting for site '$site'"
 			cd "$path" || error "Could not change directory."
+
+			hook "pre_site_removal_vagrant_up" "$site" "$path"
+			vagrant_maybe_up
+			hook "post_site_removal_vagrant_up" "$site" "$path"
+
+			# Delete the database from within VVV's MySQl
+			info "Removing database $site..."
+			hook "pre_site_removal_remove_db" "$site" "$path"
+			vagrant ssh --command "mysql -u root -e 'DROP DATABASE $site;'"
+			hook "post_site_removal_remove_db" "$site" "$path"
+			echo "Done"
+
 			hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant_maybe_halt
 			hook "post_site_removal_vagrant_halt" "$site" "$path"
@@ -1221,12 +1253,6 @@ remove_site() { # @TODO refactor this if we need to
 			mv init-custom.sql.tmp init-custom.sql
 			hook "post_site_removal_remove_db_creation" "$site" "$path"
 			cd "$path" || error "Could not change directory."
-			echo "Done"
-
-			info "Removing database"
-			hook "pre_site_removal_remove_db" "$site" "$path"
-			rm -rf "$path/database/data/$site"
-			hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
 			info "Removing database backup"
