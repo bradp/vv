@@ -1,8 +1,12 @@
+#!/usr/bin/php
 <?php
-#/usr/bin/php
 /**
- * @param $blueprint
+ * Parses a JSON-formatted blueprint and applies its configuration.
+ *
+ * @param string $blueprint Name of the blueprint to apply.
  * @param string $path
+ * @param string $site_name
+ * @param string $domain
  */
 function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
@@ -18,23 +22,19 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 			import_demo_content( $demo );
 		}
 	}
+
+	// Install network-wide and mainsite components.
 	if ( ! empty( $blueprints->$blueprint->themes ) ) {
 		echo "Installing themes...\n";
-		foreach ( $blueprints->$blueprint->themes as $theme ) {
-			install( 'theme', $theme, $path, $site_name, $domain );
-		}
+		install_themes($blueprints->$blueprint->themes, $path, $site_name, $domain);
 	}
 	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
 		echo "Installing plugins...\n";
-		foreach ( $blueprints->$blueprint->plugins as $plugin ) {
-			install( 'plugin', $plugin, $path, $site_name, $domain );
-		}
+		install_plugins($blueprints->$blueprint->plugins, $path, $site_name, $domain);
 	}
 	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
 		echo "Installing mu-plugins...\n";
-		foreach ( $blueprints->$blueprint->mu_plugins as $mu_plugin ) {
-			install( 'mu-plugin', $mu_plugin, $path, $site_name, $domain );
-		}
+		install_mu_plugins($blueprints->$blueprint->mu_plugins, $path, $site_name, $domain);
 	}
 	if ( ! empty( $blueprints->$blueprint->network_options ) ) {
 		echo "Setting up network options...\n";
@@ -61,20 +61,117 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 		}
 	}
 
+	if ( ! empty( $blueprints->$blueprint->sites ) ) {
+		echo 'Setting up subsites...';
+		foreach ( $blueprints->$blueprint->sites as $subsite_slug => $subsite ) {
+			add_site( $subsite_slug, $subsite, $domain );
+			if ( ! empty( $subsite->themes ) ) {
+				install_themes( $subsite->themes, $path, $site_name, $domain, $subsite_slug );
+			}
+			if ( ! empty( $subsite->plugins ) ) {
+				install_plugins( $subsite->plugins, $path, $site_name, $domain, $subsite_slug );
+			}
+		}
+		echo 'Subsites set up.';
+	}
 	echo "Blueprint set up.\n";
 }
 
 /**
- * @param $type
- * @param $object
- * @param $path
+ * Creates a subsite in Multisite using WP-CLI
+ *
+ * @param string $slug Name of the site.
+ * @param stdClass $subsite Subsite definition from blueprint
+ * @param string $domain
  */
-function install( $type, $object, $path, $site_name, $domain ) {
+function add_site( $slug, $subsite, $domain ) {
+	$command = 'wp site create --allow-root --slug=' . escapeshellarg( $slug );
+	if ( ! empty( $subsite->title ) ) {
+		$command .= ' --title=' . escapeshellarg( $subsite->title );
+	}
+	if ( ! empty( $subsite->email ) ) {
+		$command .= ' --email=' . escapeshellarg( $subsite->email );
+	}
+	if ( ! empty( $subsite->network_id ) ) {
+		$command .= ' --network_id=' . escapeshellarg( $subsite->network_id );
+	}
+	if ( ! empty( $subsite->private ) && true === $subsite->private ) {
+		$command .= ' --private';
+	}
+	if ( ! empty( $subsite->porcelain ) && true === $subsite->porcelain ) {
+		$command .= ' --porcelain';
+	}
+	system( $command, $return_var );
+	if ( 0 === $return_var ) {
+		$fh = fopen( 'vvv-hosts', 'a' );
+		fwrite( $fh, "$slug.$domain" . PHP_EOL );
+		fclose( $fh );
+	}
+}
+
+/**
+ * Installs themes.
+ *
+ * @param stdClass[] $objects
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param string $subsite_slug
+ */
+function install_themes( $objects, $path, $site_name, $domain, $subsite_slug = null) {
+	foreach ( $objects as $theme ) {
+		install( 'theme', $theme, $path, $site_name, $domain, $subsite_slug );
+	}
+}
+
+/**
+ * Installs plugins.
+ *
+ * @param stdClass[] $objects
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param string $subsite_slug
+ */
+function install_plugins( $objects, $path, $site_name, $domain, $subsite_slug = null) {
+	foreach ( $objects as $plugin ) {
+		install( 'plugin', $plugin, $path, $site_name, $domain, $subsite_slug );
+	}
+}
+
+/**
+ * Installs mu-plugins.
+ *
+ * @param stdClass[] $objects
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param string $subsite_slug
+ */
+function install_mu_plugins( $objects, $path, $site_name, $domain, $subsite_slug = null) {
+	foreach ( $objects as $mu_plugin ) {
+		install( 'mu-plugin', $mu_plugin, $path, $site_name, $domain, $subsite_slug );
+	}
+}
+
+/**
+ * Installs specific theme or plugin into the WordPress site.
+ *
+ * Possibly activates it, too, depending on Blueprint configuration.
+ *
+ * @param string $type
+ * @param stdClass $object
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param string $subsite_slug
+ */
+function install( $type, $object, $path, $site_name, $domain, $subsite_slug = null ) {
 	/**
 	 * Set up the base command, make the wp-content folders and move into them
 	 * (-p: no error if existing, make parent directories as needed)
 	 */
-	$command = "mkdir -p $path/wp-content/{$type}s && cd $path/wp-content/{$type}s";
+	$command = 'mkdir -p ' . escapeshellarg( "$path/wp-content/{$type}s" ) . ' && cd ' . escapeshellarg( "$path/wp-content/{$type}s" );
 
 	/**
 	 * Set up the string variable that will hold the WP-CLI options
@@ -108,7 +205,7 @@ function install( $type, $object, $path, $site_name, $domain ) {
 		$wpcli_compat = true;
 
 		if ( isset( $object->version ) ) {
-			$wpcli_options .= " --version=$object->version";
+			$wpcli_options .= ' --version=' . escapeshellarg( $object->version );
 		}
 		if ( isset( $object->force ) && true == $object->force ) {
 			$wpcli_options .= ' --force';
@@ -119,6 +216,10 @@ function install( $type, $object, $path, $site_name, $domain ) {
 		if ( isset( $object->activate_network ) && true == $object->activate_network && 'plugin' == $type ) {
 			$wpcli_options .= ' --activate-network';
 		}
+		if ( ! empty( $subsite_slug ) ) {
+			$wpcli_options .= ' --url=' . escapeshellarg( "{$subsite_slug}.{$domain}" );
+		}
+
 	}
 
 	/**
@@ -132,14 +233,14 @@ function install( $type, $object, $path, $site_name, $domain ) {
 	 */
 	// Clone a git repository
 	if ( false !== strpos( $target, '.git' ) ) {
-		$command .= " && git clone $target";
+		$command .= ' && git clone ' . escapeshellarg( $target );
 		if ( $wpcli_compat ) {
 			$command .= $wpcli_options;
 		}
 	}
 	// Download a zip file from a specified location
 	elseif ( false !== strpos( $target, '.zip' ) ) {
-		$command .= " && wp --allow-root $type install $target";
+		$command .= ' && wp --allow-root ' . escapeshellarg( $type ) . ' install ' . escapeshellarg( $target );
 		if ( $wpcli_compat ) {
 			$command .= $wpcli_options;
 		}
@@ -152,29 +253,37 @@ function install( $type, $object, $path, $site_name, $domain ) {
 
 		// Check if the blueprint is WP-CLI compatible
 		if ( ! $wpcli_compat ) {
-			$command .= " && wp --allow-root $type install https://github.com/$target/archive/master.zip && pwd && mv $folder-master $folder";
+			$command .= ' && wp --allow-root ' . escapeshellarg( $type ) . ' install ' . escapeshellarg( "https://github.com/$target/archive/master.zip" ) . ' && pwd && mv ' . escapeshellarg( "$folder-master" ) . ' ' . escapeshellarg( $folder );
 		} else {
-			$command .= " && curl -s -S \"https://codeload.github.com/$target/tar.gz/master\" -o \"$folder-master.tar.gz\"".    // Download the tarball from the repository, do it silent but show errors
-			" && tar xpvf $folder-master.tar.gz". // Unzip the file
+			$command .= ' && curl -s -S ' . escapeshellarg( "https://codeload.github.com/$target/tar.gz/master" ) . ' -o ' . escapeshellarg( "$folder-master.tar.gz" ).	// Download the tarball from the repository, do it silent but show errors
+			' && tar xpvf ' . escapeshellarg( "$folder-master.tar.gz" ). // Unzip the file
 			' && pwd'. // Print working directory
-			" && mv $folder-master $folder" . // Move the files so te folder has the same name as the repository
-			" && rm $folder-master.tar.gz"; // Remove our file
+			' && mv ' . escapeshellarg( "$folder-master" ) . ' ' . escapeshellarg( $folder ). // Move the files so te folder has the same name as the repository
+			' && rm ' . escapeshellarg( "$folder-master.tar.gz" ); // Remove our file
 
 			// Activate the plugin using WP-CLI
 			if ( isset( $object->activate ) && true == $object->activate ) {
-				$command .= " && wp --allow-root $type activate $folder";
+				$command .= ' && wp --allow-root ' . escapeshellarg( $type ) . ' activate ' . escapeshellarg( $folder );
 			}
 			if ( isset( $object->activate_network ) && true == $object->activate_network && 'plugin' == $type ) {
-				$command .= " && wp --allow-root $type activate $folder --network";
+				$command .= ' && wp --allow-root ' . escapeshellarg( $type ) . ' activate ' . escapeshellarg( $folder ) . ' --network';
 			}
 		}
 	}
 	// Download the plugin from the WP Plugin repository based on the URL slug
 	else {
-		$command .= " && wp --allow-root $type install $target";
+		$command .= ' && wp --allow-root ' . escapeshellarg( $type ) . ' install ' . escapeshellarg( $target );
 		if ( $wpcli_compat ) {
 			$command .= $wpcli_options;
 		}
+	}
+
+	// Enable themes in Multisite install using WP-CLI
+	if ( isset( $object->enable ) && 'theme' == $type ) {
+		$command .= ' && wp --allow-root theme enable ' . escapeshellarg( $folder );
+	}
+	if ( isset( $object->enable_network ) && true == $object->enable_network && 'theme' == $type ) {
+		$command .= ' && wp --allow-root theme enable ' . escapeshellarg( $folder ) . ' --network';
 	}
 
 	/**
