@@ -163,7 +163,7 @@ To use a custom database prefix, simply use the `vv create --prefix myprefix` wh
 
 ## Blueprints
 
-Blueprints allow you to set up different plugins, themes, mu-plugins, options, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
+Blueprints allow you to set up different plugins, themes, mu-plugins, options, widgets, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
 
 A simple blueprint should look like this:
 ```json
@@ -199,6 +199,25 @@ A simple blueprint should look like this:
     "options": [
       "current_theme::_s"
     ],
+    "widgets": [
+      {
+        "name": "meta",
+        "location": "sidebar-1",
+        "position": 1,
+        "options": {
+          "title": "Site login or logout"
+        }
+      },
+      {
+        "name": "text",
+        "location": "sidebar-2",
+        "position": 4,
+        "options": {
+          "title": "Hello world.",
+          "text": "I'm a new widget."
+        }
+      }
+    ],
     "demo_content": [
       "link::https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml"
     ],
@@ -217,11 +236,13 @@ For themes, plugins, and mu-plugins, you can use:
 * Url to zip file
 * WordPress.org slug
 
-The options for plugins and themes correspond to the equivalent [WP CLI](http://wp-cli.org) option.
+The options for plugins, themes, and widgets correspond to the equivalent [WP CLI](http://wp-cli.org) option.
 
 For options, demo content, and constants, please note the `::` as a separator between the key and value.
 
 Custom demo content can be imported through the blueprint. Be sure to use a link that points to just the xml code, like [this](https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml). You can add as many demo content files as you'd like, just separate each line with a comma as usual.
+
+A multisite's Network Settings can be configured using a `network_options` array in the blueprint.
 
 You can create as many named blueprints in this file as you would like, all with as many different settings as you'd like.
 
