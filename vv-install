@@ -12,46 +12,98 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
 	$blueprints = json_decode( file_get_contents( 'vv-blueprints.json' ) );
 
-	// Install network-wide and mainsite components.
-	if ( ! empty( $blueprints->$blueprint->themes ) ) {
-		echo "Installing themes...\n";
-		install_themes($blueprints->$blueprint->themes, $path, $site_name, $domain);
-	}
-	if ( ! empty( $blueprints->$blueprint->plugins ) ) {
-		echo "Installing plugins...\n";
-		install_plugins($blueprints->$blueprint->plugins, $path, $site_name, $domain);
-	}
-	if ( ! empty( $blueprints->$blueprint->mu_plugins ) ) {
-		echo "Installing mu-plugins...\n";
-		install_mu_plugins($blueprints->$blueprint->mu_plugins, $path, $site_name, $domain);
-	}
-	if ( ! empty( $blueprints->$blueprint->options ) ) {
-		echo "Setting up options...\n";
-		foreach ( $blueprints->$blueprint->options as $option ) {
-			add_option( $option );
-		}
-	}
+	// Add constants first, so they're available to plugins and themes
+	// upon activation or future manipulation.
 	if ( ! empty( $blueprints->$blueprint->defines ) ) {
 		echo 'Adding constants to wp-config.php...';
 		foreach ( $blueprints->$blueprint->defines as $define ) {
 			add_define( $define, $path );
 		}
 	}
+	if ( ! empty( $blueprints->$blueprint->network_options ) ) {
+		echo "Setting up network options...\n";
+		foreach ( $blueprints->$blueprint->network_options as $option ) {
+			add_network_option( $option );
+		}
+	}
 
-	if ( ! empty( $blueprints->$blueprint->sites ) ) {
+	$site_blueprints = get_site_blueprints( $blueprints->$blueprint );
+
+	// Insall network-wide and mainsite components.
+	install_site_from_blueprint( $site_blueprints->mainsite, $path, $site_name, $domain );
+
+	if ( ! empty( $site_blueprints->subsites ) ) {
 		echo 'Setting up subsites...';
-		foreach ( $blueprints->$blueprint->sites as $subsite_slug => $subsite ) {
+		foreach ( $site_blueprints->subsites as $subsite_slug => $subsite ) {
 			add_site( $subsite_slug, $subsite, $domain );
-			if ( ! empty( $subsite->themes ) ) {
-				install_themes( $subsite->themes, $path, $site_name, $domain, $subsite_slug );
-			}
-			if ( ! empty( $subsite->plugins ) ) {
-				install_plugins( $subsite->plugins, $path, $site_name, $domain, $subsite_slug );
-			}
+			install_site_from_blueprint( $subsite, $path, $site_name, $domain, $subsite_slug );
 		}
 		echo 'Subsites set up.';
 	}
+
+}
+
+/**
+ * @param object $site_blueprint
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param null|string $subsite_slug
+ */
+function install_site_from_blueprint( $site_blueprint, $path, $site_name, $domain, $subsite_slug = null ) {
+
+	if ( ! empty( $site_blueprint->demo_content ) ) {
+		echo "Importing content...\n";
+		activate_wordpress_importer();
+		foreach ( $site_blueprint->demo_content as $demo ) {
+			import_demo_content( $demo, $path, $site_name, $domain, $subsite_slug );
+		}
+		echo "  Import Complete!\n";
+	}
+	if ( ! empty( $site_blueprint->themes ) ) {
+		echo "Installing themes...\n";
+		install_themes( $site_blueprint->themes, $path, $site_name, $domain, $subsite_slug );
+	}
+	if ( ! empty( $site_blueprint->plugins ) ) {
+		echo "Installing plugins...\n";
+		install_plugins( $site_blueprint->plugins, $path, $site_name, $domain, $subsite_slug );
+	}
+	if ( ! empty( $site_blueprint->mu_plugins ) ) {
+		echo "Installing mu-plugins...\n";
+		install_mu_plugins( $site_blueprint->mu_plugins, $path, $site_name, $domain, $subsite_slug );
+	}
+	if ( ! empty( $site_blueprint->options ) ) {
+		echo "Setting up options...\n";
+		foreach ( $site_blueprint->options as $option ) {
+			add_option( $option, $domain, $subsite_slug );
+		}
+	}
+	if ( ! empty( $site_blueprint->widgets ) ) {
+		echo "Setting up widgets...\n";
+		foreach ( $site_blueprint->widgets as $widget ) {
+			add_widget( $widget, $domain, $subsite_slug );
+		}
+	}
+
 	echo "Blueprint set up.\n";
+}
+
+/**
+ * Returns the blueprint with the subsite definitions as a sibling
+ * of the mainsite, rather than a child.
+ *
+ * @param object $blueprint
+ *
+ * @return object
+ */
+function get_site_blueprints( $blueprint ) {
+	$site_blueprints = new stdClass();
+	if ( ! empty( $blueprint->sites ) ) {
+		$site_blueprints->subsites = $blueprint->sites;
+		unset( $blueprint->sites );
+	}
+	$site_blueprints->mainsite = $blueprint;
+	return $site_blueprints;
 }
 
 /**
@@ -275,29 +327,96 @@ function install( $type, $object, $path, $site_name, $domain, $subsite_slug = nu
 }
 
 /**
- * @param $option
+ * Reads a double-colon separated option from a blueprint.
+ *
+ * @param $opt_string
+ *
+ * @return array
  */
-function add_option( $option ) {
-	$object = explode( '::', $option );
-	$a = $object[0];
-	$b = $object[1];
-	exec( "wp --allow-root option delete '$a'" );
-	exec( "wp --allow-root option add '$a' '$b'" );
-	echo "  Insert settings $a...\n";
-}
-
-function activate_wordpress_importer() {
-	exec( 'wp plugin install wordpress-importer --allow-root && wp plugin activate wordpress-importer --allow-root' );
+function parse_option( $opt_string ) {
+	$x = explode( '::', $opt_string );
+	$key = array_shift( $x );
+	$val = implode( '::', $x );
+	return array( $key => $val );
 }
 
 /**
- * @param $demo
+ * @todo Make the network ID a variable, too. Right now it's hardcoded as `1`.
+ *
+ * @param $option
  */
-function import_demo_content( $demo ) {
-	$object = explode( '::', $demo );
-	$link = $object[1];
-	exec( 'curl -s ' . $link . ' > import.xml && wp import import.xml --authors=create --allow-root && rm import.xml' );
-	echo "  Import Complete!\n";
+function add_network_option( $option ) {
+	$opt = parse_option( $option );
+	$name = key( $opt );
+	exec( 'wp --allow-root network meta delete 1 ' . escapeshellarg( $name ) );
+
+	$vals = array_pop( $opt );
+	$php_vals = @unserialize( $vals );
+	if ( false === $php_vals ) {
+		exec( 'wp --allow-root network meta add 1 ' . escapeshellarg( $name ) . ' ' . escapeshellarg( $vals ) );
+	} else {
+		$json = json_encode( $php_vals );
+		exec( 'wp --allow-root network meta add 1 ' . escapeshellarg( $name ) . ' ' . escapeshellarg( $json) . ' --format=json');
+	}
+
+	echo "  Insert network settings $name...\n";
+}
+
+/**
+ * @param string $option
+ * @param string $domain
+ * @param null|string $subsite_slug
+ */
+function add_option( $option, $domain = '' , $subsite_slug = null ) {
+	$opt = parse_option( $option );
+	$name = key( $opt );
+	$cmd = 'wp --allow-root option delete ' . escapeshellarg( $name );
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	exec( $cmd );
+
+	$vals = array_pop( $opt );
+	$php_vals = @unserialize( $vals );
+	if ( false === $php_vals ) {
+		$cmd = 'wp --allow-root option add ' . escapeshellarg( $name ) . ' ' . escapeshellarg( $vals );
+	} else {
+		$json = json_encode( $php_vals );
+		$cmd = 'wp --allow-root option add ' . escapeshellarg( $name ) . ' ' . escapeshellarg( $json ) . ' --format=json';
+	}
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	exec( $cmd );
+
+	echo "  Insert settings $name...\n";
+}
+
+function activate_wordpress_importer() {
+	system( 'wp --allow-root plugin is-installed wordpress-importer', $importer_missing );
+	if ( $importer_missing ) {
+		exec( 'wp --allow-root plugin install wordpress-importer --activate' );
+	}
+}
+
+/**
+ * Downloads a WordPress WXR file and imports it with the WordPress Importer plugin.
+ *
+ * @param string $demo
+ * @param string $path
+ * @param string $site_name
+ * @param string $domain
+ * @param null|string $subsite_slug
+ */
+function import_demo_content( $demo, $path, $site_name, $domain, $subsite_slug = null ) {
+	$opt = parse_option( $demo );
+	$link = array_pop( $opt );
+	$cmd = 'curl -s ' . escapeshellarg( $link ) . ' > import.xml && wp import import.xml --authors=create --allow-root';
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	$cmd .= ' && rm import.xml';
+	exec( $cmd );
 }
 
 /**
@@ -305,22 +424,50 @@ function import_demo_content( $demo ) {
  * @param $path
  */
 function add_define( $object, $path ) {
-	$object = explode( '::', $object );
-	echo "  Insert constants $object[0]...\n";
+	$opt = parse_option( $object );
+	$def = key( $opt );
+	$val = array_pop( $opt );
+	echo "  Insert constants $def...\n";
 
 	/**
 	 * Changed is_bool to a string comparison because is_bool only works for real booleans, not strings
 	 * Reference: http://stackoverflow.com/questions/7336861/how-to-convert-string-to-boolean-php
 	 */
-	if ( 'true' == strtolower( $object[1] ) || 'false' == strtolower( $object[1] ) ) {
+	if ( 'true' == strtolower( $val ) || 'false' == strtolower( $val ) ) {
 		exec( '     echo "$(sed "34a\\
-define(\"'. $object[0] . '\",' . $object[1]  . ');
+define(\"'. $def . '\",' . $val  . ');
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
 	} else {
 		exec( '		echo "$(sed "34a\\
-define(\"'. $object[0] . '\",\"' . $object[1]  . '\");
+define(\"'. $def . '\",\"' . $val  . '\");
 " ./' . $path . '/wp-config.php);" > ./' . $path . '/wp-config.php' );
 	}
+}
+
+/**
+ * @param object $object
+ * @param string $domain
+ * @param null|string $subsite_slug
+ */
+function add_widget( $object, $domain = '', $subsite_slug = null ) {
+	echo "  Adding widget {$object->name} to {$object->location}...\n";
+	$cmd = sprintf(
+		'wp --allow-root widget add %s %s',
+		escapeshellarg( $object->name ),
+		escapeshellarg( $object->location )
+	);
+	if ( isset($object->position) ) {
+		$cmd .= ' ' . escapeshellarg( $object->position );
+	}
+	if ( isset( $object->options ) ) {
+		foreach ( $object->options as $key => $value ) {
+			$cmd .= ' ' . escapeshellarg( "--$key=$value" );
+		}
+	}
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	exec( $cmd );
 }
 
 main( $argv[1], $argv[2], $argv[3], $argv[4] );
