@@ -163,7 +163,7 @@ To use a custom database prefix, simply use the `vv create --prefix myprefix` wh
 
 ## Blueprints
 
-Blueprints allow you to set up different plugins, themes, mu-plugins, options, widgets, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
+Blueprints allow you to set up different plugins, themes, mu-plugins, options, widgets, menus, or constants that will be installed to a new site you create. First, run `vv --blueprint-init` to have vv create a `vv-blueprints.json` file in your VVV directory. You can edit this file to create and set up different blueprints.
 
 A simple blueprint should look like this:
 ```json
@@ -218,6 +218,40 @@ A simple blueprint should look like this:
         }
       }
     ],
+    "menus": [
+      {
+        "name": "Example Menu",
+        "locations": [
+          "primary",
+          "social"
+        ],
+        "items": [
+          {
+            "type": "post",
+            "post_id": 2,
+            "options": {
+              "title": "Read the 'Sample Post'"
+            }
+          },
+          {
+            "type": "custom",
+            "title": "Our Partner Site",
+            "link": "//example.com/",
+            "options": {
+              "description": "Check out our partner's awesome website."
+            }
+          },
+          {
+            "type": "term",
+            "taxonomy": "category",
+            "term_id": 1,
+            "options": {
+              "title": "Example category"
+            }
+          }
+        ]
+      }
+    ],
     "demo_content": [
       "link::https://raw.githubusercontent.com/manovotny/wptest/master/wptest.xml"
     ],
@@ -236,7 +270,7 @@ For themes, plugins, and mu-plugins, you can use:
 * Url to zip file
 * WordPress.org slug
 
-The options for plugins, themes, and widgets correspond to the equivalent [WP CLI](http://wp-cli.org) option.
+The options for plugins, themes, widgets, and menus correspond to the equivalent [WP CLI](http://wp-cli.org) option.
 
 For options, demo content, and constants, please note the `::` as a separator between the key and value.
 
