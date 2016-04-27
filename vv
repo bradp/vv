@@ -1222,7 +1222,7 @@ remove_site() { # @TODO refactor this if we need to
 			# Delete the database from within VVV's MySQl
 			info "Removing database $site..."
 			hook "pre_site_removal_remove_db" "$site" "$path"
-			vagrant ssh --command "mysql -u root -e 'DROP DATABASE $site;'"
+			vagrant ssh --command "mysql -u root -e 'DROP DATABASE \`$site\`;'"
 			hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
