@@ -84,6 +84,12 @@ function install_site_from_blueprint( $site_blueprint, $path, $site_name, $domai
 			add_widget( $widget, $domain, $subsite_slug );
 		}
 	}
+	if ( ! empty( $site_blueprint->menus ) ) {
+		echo "Setting up menus...\n";
+		foreach ( $site_blueprint->menus as $menu ) {
+			add_menu( $menu, $domain, $subsite_slug );
+		}
+	}
 
 	echo "Blueprint set up.\n";
 }
@@ -468,6 +474,79 @@ function add_widget( $object, $domain = '', $subsite_slug = null ) {
 		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
 	}
 	exec( $cmd );
+}
+
+/**
+ * @param object $object
+ * @param string $domain
+ * @param null|string $subsite_slug
+ */
+function add_menu( $object, $domain = '', $subsite_slug = null ) {
+	echo "  Adding menu {$object->name} to " . join( ',', $object->locations ) . "...\n";
+	$cmd = sprintf(
+		'wp --allow-root menu create %s',
+		escapeshellarg( $object->name )
+	);
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	foreach ( $object->locations as $location ) {
+		$cmd .= sprintf(
+			' && wp --allow-root menu location assign %s %s',
+			escapeshellarg( $object->name ),
+			escapeshellarg( $location )
+		);
+		if ( ! empty( $subsite_slug ) ) {
+			$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+		}
+	}
+	exec( $cmd );
+	if ( ! empty( $object->items ) ) {
+		foreach ( $object->items as $item ) {
+			add_menu_item( $object->name, $item, $domain, $subsite_slug );
+		}
+	}
+}
+
+/**
+ * @param string $menu The name, slug, or term ID for the menu.
+ * @param object $item
+ * @param string $domain
+ * @param string $subsite_slug
+ *
+ * @return int `0` if the underlying WP-CLI call succeeds, non-zero otherwise.
+ */
+function add_menu_item( $menu, $item ) {
+	echo " Adding {$item->type} menu item to $menu...\n";
+	$cmd = sprintf(
+		'wp --allow-root menu item %s %s',
+		escapeshellarg( "add-{$item->type}" ),
+		escapeshellarg( $menu )
+	);
+	switch( $item->type ) {
+		case 'post':
+			$cmd .= ' ' . escapeshellarg( $item->post_id );
+			break;
+		case 'custom':
+			$cmd .= ' ' . escapeshellarg( $item->title ) . ' ' . escapeshellarg( $item->link );
+			break;
+		case 'term':
+			$cmd .= ' ' . escapeshellarg( $item->taxonomy ) . ' ' . escapeshellarg( $item->term_id );
+			break;
+		default:
+			fwrite( STDERR, "ERROR: Unrecognized menu item type '{$item->type}'\n" );
+			return false;
+	}
+	if ( ! empty( $item->options ) ) {
+		foreach ( $item->options as $key => $value ) {
+			$cmd .= ' ' . escapeshellarg( "--$key=$value" );
+		}
+	}
+	if ( ! empty( $subsite_slug ) ) {
+		$cmd .= ' ' . escapeshellarg( "--url={$subsite_slug}.{$domain}" );
+	}
+	system( $cmd, $return );
+	return $return;
 }
 
 main( $argv[1], $argv[2], $argv[3], $argv[4] );
