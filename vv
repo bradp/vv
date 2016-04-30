@@ -894,7 +894,11 @@ create_site_files(){
 	cd "$site" || error "Could not change directory."
 
 	if [ "$no_wp" = "false" ]; then
-		printf "path: %s" "$web_root" > wp-cli.yml
+		if [ "$bedrock_init" = "true" ]; then
+			printf "path: %s" "$web_root/web" > wp-cli.yml
+		else
+			printf "path: %s" "$web_root" > wp-cli.yml
+		fi
 	fi
 
 	wp_debug_text=''
@@ -1025,10 +1029,14 @@ PHP"
 			echo "$hooked_pre_vvv_init"
 			echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 			echo "	echo 'Installing WordPress $version in $site/$web_root...'"
-			echo "	if [ ! -d \"./$web_root\" ]; then"
-			echo "		mkdir ./$web_root"
-			echo "	fi"
-			echo "	cd ./$web_root" || error "Could not change directory."
+
+			if [ "$bedrock_init" != "true" ]; then
+				echo "	if [ ! -d \"./$web_root\" ]; then"
+				echo "		mkdir ./$web_root"
+				echo "	fi"
+				echo "	cd ./$web_root" || error "Could not change directory."
+			fi
+
 			echo "	$install_method"
 			echo "	$config"
 			echo "	$core"
