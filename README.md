@@ -12,7 +12,7 @@
 
 [![Travis](https://img.shields.io/travis/bradp/vv.svg)](https://travis-ci.org/bradp/vv)
 
-*Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility I built to solve that issue.
+*Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility to solve that issue.
 
 ## Installation
 
@@ -61,7 +61,7 @@ Props to [Vinsanity](https://github.com/Vinsanity) for these instructions. If yo
     `$ sudo cp vv /usr/local/bin`
 
 * You should now be able to easily run vv from anywhere in your system.
- 
+
 ## Adding tab-completion to `vv`
 
 Currently, `vv` supports tab-completion of arguments and options in both bash and ZSH. To enable this, you'll first want to make sure you're on the most current version of `vv`. Then simply add `source $( echo $(which vv)-completions)` to the end of your .bash_profile, .bashrc or .zshrc.
@@ -115,11 +115,11 @@ Provisioning Vagrant takes a couple of minutes, but this is a crucial step as it
 If you are using a subdomain multisite, you must edit vvv-hosts file inside of that site's folder with each subdomain on a new line. For example:
 
  > mysite.dev
- 
+
  > siteA.mysite.dev
- 
+
  > siteB.mysite.dev
- 
+
 
 After this, run `vagrant reload --provision` and your subdomains should resolve. *Please note*, any sites set up prior to version 1.7.3 will need more configuration for this, either delete and re-set up the site or [ping me on Twitter](http://twitter.com/bradparbs) for help.
 
