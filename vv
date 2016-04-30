@@ -731,7 +731,7 @@ site_creation_questions() {
 				version="(release version)"
 			elif [ "$version" = "trunk" ]; then
 				installversion=""
-				version="(release version)"
+				version="(trunk)"
 				use_trunk="true"
 			else
 				# Attempt to verify the existence of the version (hacky)
@@ -1006,7 +1006,7 @@ PHP"
 		fi
 		maybe_trunk=""
 		if [ "$use_trunk" = "true" ];then
-			maybe_trunk="wp core update https://wordpress.org/nightly-builds/wordpress-latest.zip --allow-root"
+			maybe_trunk="svn checkout https://core.svn.wordpress.org/trunk/"
 		fi
 
 		if [ "$bedrock_init" = "true" ]; then
