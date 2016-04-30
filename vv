@@ -325,11 +325,11 @@ vv_bootstrap_update() {
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
-	curl -L -o "$HOME/$github_version.tar.gz" "$download_link" 2>/dev/null
-	tar -C "$HOME" -zxvf "$HOME/$github_version.tar.gz" 2>/dev/null
-	rm "$HOME/$github_version.tar.gz"
-	cat "$HOME/vv-$github_version/vv" > "$vv_install_location"
-	rm -r "$HOME/vv-$github_version"
+	curl -L -o "$home/$github_version.tar.gz" "$download_link" 2>/dev/null
+	tar -C "$home" -zxvf "$home/$github_version.tar.gz" 2>/dev/null
+	rm "$home/$github_version.tar.gz"
+	cat "$home/vv-$github_version/vv" > "$vv_install_location"
+	rm -r "$home/vv-$github_version"
 	success "vv has been updated to the latest version. Thanks!"
 	hook "post_vv_bootstrap_update"
 }
@@ -337,12 +337,12 @@ vv_bootstrap_update() {
 auto_update_main() {
 	hook "pre_auto_update_vv"
 	if [[ ! $auto_update_disable = "true" ]]; then
-		if [ ! -f "$HOME"/.vv-update ]; then
+		if [ ! -f "$home"/.vv-update ]; then
 			_update_vv_update
 		else
 			# TODO fix shellcheck error
 			# shellcheck disable=SC1090
-			source "$HOME"/.vv-update
+			source "$home"/.vv-update
 
 			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
 			epoch_target=7
@@ -353,7 +353,7 @@ auto_update_main() {
 					update_vv
 				fi
 
-				rm "$HOME"/.vv-update
+				rm "$home"/.vv-update
 				_update_vv_update
 			fi
 		fi
@@ -368,8 +368,8 @@ _current_epoch() {
 
 _update_vv_update() {
 	hook "pre_vv_auto_update_update"
-	touch "$HOME"/.vv-update
-	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > "$HOME"/.vv-update
+	touch "$home"/.vv-update
+	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > "$home"/.vv-update
 	hook "post_vv_auto_update_update"
 }
 
@@ -421,7 +421,7 @@ argument_expected() {
 
 check_for_config_file() {
 	hook "pre_vv_config_check"
-	test -f "$HOME"/.vv-config && vv_config="${HOME}/.vv-config"
+	test -f "$home"/.vv-config && vv_config="${HOME}/.vv-config"
 	test -f ./.vv-config && vv_config="./.vv-config"
 
 	if [ ! -z $vv_config ]; then
@@ -445,8 +445,8 @@ create_config_file() {
 	echo "{"
 	echo "	\"path\": \"$path\""
 	echo "}"
-} >> "$HOME"/.vv-config
-	info "$HOME/.vv-config was created."
+} >> "$home"/.vv-config
+	info "$home/.vv-config was created."
 	info "	"
 	hook "post_create_vv_config"
 }
@@ -506,27 +506,31 @@ get_vvv_path(){
 		current_dir=$(pwd)
 		if [ -e "$current_dir/Vagrantfile" ]; then
 			path=$(pwd)
-		elif [ -e "$HOME"/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/Sites
-		elif [ -e "$HOME"/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/Sites/Vagrant
-		elif [ -e "$HOME"/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/vagrant
-		elif [ -e "$HOME"/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/vagrant-local
-		elif [ -e "$HOME"/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/projects/vvv
-		elif [ -e "$HOME"/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/working/vvv
-		elif [ -e "$HOME"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
-			path="$HOME"/vvv
+		elif [ -e "$home"/Sites/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/Sites
+		elif [ -e "$home"/Sites/Vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/Sites/Vagrant
+		elif [ -e "$home"/vagrant/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/vagrant
+		elif [ -e "$home"/vagrant-local/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/vagrant-local
+		elif [ -e "$home"/projects/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/projects/vvv
+		elif [ -e "$home"/working/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/working/vvv
+		elif [ -e "$home"/vvv/Vagrantfile ] && [ -z "$force_path" ]; then
+			path="$home"/vvv
 		fi
 
 		if [ ! -z "$path" ]; then
 			info "Automagically found $path"
 			prompt "Is this where VVV is installed? (Y/n)"
 			read -r path_confirmation
-			if [ "$path_confirmation" != 'n' ]; then
+			if [ "$path_confirmation" = 'y' ]; then
+				create_config_file
+			elif [ "$path_confirmation" = 'Y' ]; then
+				create_config_file
+			elif [ "$path_confirmation" != 'n' ]; then
 				create_config_file
 			else
 				unset path
@@ -550,11 +554,12 @@ get_vvv_path(){
 	fi
 	path=${path%/}
 
-
 }
+
 setup_scripts_folder() {
 	vv_scripts_folder="$path"/vv/
 }
+
 init_vv_hooks() {
 	mkdir "$path"/vv/
 }
@@ -562,6 +567,7 @@ init_vv_hooks() {
 run_hook() {
 	hook "$@"
 }
+
 hook() {
 	# Display all hooks to screen if the show_hooks flag is set
 	if [[ $show_hooks = 'true' ]]; then
@@ -1463,7 +1469,7 @@ output_debug_vv() {
 	echo ""
 	echo "vv_config: $vv_config"
 	echo "vvv path: $path"
-	echo "home: $HOME"
+	echo "home: $home"
 	echo ""
 	echo "tput: $(whichtput 2>/dev/null)"
 	echo "cat: $(which cat)"
