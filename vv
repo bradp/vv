@@ -876,7 +876,7 @@ confirm_site_creation() {
 	success "New VVV setup starting for site '$site'"
 	cd "$path" || error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
-		info "Maybe running vagrant halt"
+		info "Checking to see if vagrant halt should be run..."
 		hook "pre_creation_pre_vagrant_halt"
 		vagrant_maybe_halt
 	fi
