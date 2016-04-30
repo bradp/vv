@@ -10,7 +10,7 @@
 
 `vv` makes it extremely easy to create a new WordPress site using [Varying Vagrant Vagrants](https://github.com/Varying-Vagrant-Vagrants/VVV). `vv` supports site creation with many different options; site blueprints to set up all your plugins, themes, and more; deployments; and lots more features.
 
-[![Travis](https://img.shields.io/travis/bradp/vv.svg)]()
+[![Travis](https://img.shields.io/travis/bradp/vv.svg)](https://travis-ci.org/bradp/vv)
 
 *Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility I built to solve that issue.
 
