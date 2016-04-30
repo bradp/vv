@@ -1118,8 +1118,12 @@ creation_success_message() {
 	success "New VVV Site Setup: Done!"
 	echo "Directory: $path/$sites_folder/$site"
 	echo "URL:       $domain"
-	echo "Username:  $username"
-	echo "Password:  $password"
+
+	if [ "$no_wp" = "false" ]; then
+		echo "Username:  $username"
+		echo "Password:  $password"
+	fi
+
 	hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
