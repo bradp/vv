@@ -37,12 +37,12 @@
 #
 version_number=1.9.3
 
-if [ -z $HOME ]; then
+if [ -z "$HOME" ]; then
 	home="~";
 else
-	home=$HOME
+	home="$HOME"
 fi
-eval HOME=$home
+eval HOME="$home"
 
 
 if [[ "$1" == "vv_internal_debug" ]]; then
