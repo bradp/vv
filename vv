@@ -451,6 +451,7 @@ create_config_file() {
 	info "	"
 	info "If for some reason, vv still fails to find the path, please run the following command:"
 	info "	";
+	# shellcheck disable=SC2028
 	echo "	sudo printf \"{\\n\"\\tpath\": \"$path\"\\n}\" > ~/.vv-config"
 	info "	";
 	hook "post_create_vv_config"
