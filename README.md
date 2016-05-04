@@ -194,7 +194,7 @@ A simple blueprint should look like this:
         "force": false,
         "activate": true,
         "activate_network": false
-      },
+      }
     ],
     "options": [
       "current_theme::_s"
