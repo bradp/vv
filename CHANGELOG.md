@@ -1,5 +1,40 @@
 ## Change Log
 
+#### 1.10.0 - *2016-5-16* ####
+
+  * After vv-config gets created, display a command that will populate the file correctly in case it failed
+  * use new HOME var for all usages
+  * If HOME is not set, force it
+  * Fix wording for maybe vagrant halt
+  * Fix trunk installation.
+  * Document support for configuring `menus` through a VV blueprint, too.
+  * Fix bug where spaces in a DB name would cause VV to fail removing it.
+  * Document the ability to use `network_options` to configure multisite.
+  * Document ability to configure widgets using the blueprint file.
+  * Added Linux install instructions
+  * Edit README.md to better describe post_site_creation_finished hook.
+  * Use same hook name as prior attempt to remove the site database.
+  * Add better Mac OS X instructions to the `README.md` file.
+  * Bring Vagrant up if it's not running and `DROP` the site DB.
+  * Also remove the PHP `vv-install` script after a successful run.
+  * Add support for defining `vvv-host` subdomains in a blueprint.
+  * Use `vagrant global-status` output to check if VVV is running.
+  * Convert spaces to dashes in domains, support spaces in file paths.
+  * Yes should be default if captialized
+  * Use recursive flag for removing directories
+  * Fix booleans in deployment-create
+  * Merge pull request #205 from eriktdesign/patch-1
+  * Added note to the README.md about the possibility to override the config file in the home directory by one in the local directory.
+  * Fix vvv path prompting issues
+  * Fixed issue with config file not created on first run, causing repeated prompts for VVV directory path.
+  * Check for local `.vv-config` file that overrides the one in `$HOME`.
+  * Adds vagrant_maybe_halt, test is VVV is running before running time consuming `vagrant halt` closes #194
+  * Change the command to restart & provision a vagrant VM
+  * https all the links!
+  * Fix tab completion commas
+  * Merge pull request #180 from Ipstenu/patch-1
+  * Set color=never for all grep commands to fix bug in version and path functions
+
 #### 1.9.3 - *2015-10-4* ####
 
  * Add Hooks system for extensibility and modifications
@@ -27,7 +62,6 @@
  * Remove 2016 when removing defaults
  * Fix blank site webroot folder creation
  * Fix remove site not actually removing backups from vagrant-triggers
-
 
 #### 1.8.0 - *2015-7-25* ####
  * Adds flag to download a search/replace db tool
