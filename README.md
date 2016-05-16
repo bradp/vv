@@ -92,7 +92,7 @@ The main commands are `list`, `create`, `delete`. These will list your sites, cr
 
 To start creating a site, simply do `vv create` ( you can also do `vv --create`, or simply `vv -c`). You will then be prompted for all required options.
 
-All options and flags are [listed below](#options).
+All options and flags are [listed below](#vv-options).
 
 ## Site Creation
 
@@ -194,7 +194,7 @@ A simple blueprint should look like this:
         "force": false,
         "activate": true,
         "activate_network": false
-      },
+      }
     ],
     "options": [
       "current_theme::_s"
