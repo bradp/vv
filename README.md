@@ -294,7 +294,7 @@ To add multisite support to your blueprint, add a `sites` key to a specific blue
 "sites": {
   "site2": {
     "plugins": [
-     #  ...(same as above)...
+      "...(same as above)..."
     ]
   }
 }
