@@ -149,6 +149,11 @@ When removing a deployment, your current Vagrantfile will be backed up as Vagran
 
 ## Advanced Usage
 
+### Airplane Mode
+
+Using `x` as the first argument with `vv` will force airplane mode. This will cut off update checks on usage. This is useful if you're using `vv` without an internet connection. The provision state of VVV will probably fail at some point, though.
+
+### Flags
 Anything that vv prompts you for, you can pass in as an argument. Most of this is realized in the site creation. In fact, there are a few arguments you can pass in that aren't prompted. This gives you total control over creating a new site.
 
 To create a new site named 'mysite' that has the domain 'mysite.dev' and is a multisite with subdomains, with `WP_Debug` turned on would be:
