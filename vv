@@ -924,11 +924,13 @@ create_site_files(){
 	wp_debug_text=''
 	if [[ $wp_debug = 'y' ]]; then
 		wp_debug_text=" --extra-php <<PHP
-define('WP_DEBUG', true);
-define('WP_DEBUG_DISPLAY', false);
-define('WP_DEBUG_LOG', true);
-define('SCRIPT_DEBUG', true);
-define('JETPACK_DEV_DEBUG', true);
+define( 'WP_DEBUG', true );
+define( 'WP_DEBUG_DISPLAY', false );
+define( 'WP_DEBUG_LOG', true );
+define( 'SCRIPT_DEBUG', true );
+define( 'JETPACK_DEV_DEBUG', true );
+define( 'WP_HOME', 'http://' . \$_SERVER['HTTP_HOST'] );
+define( 'WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST'] );
 PHP"
 	fi
 
