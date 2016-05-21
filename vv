@@ -52,6 +52,9 @@ if [[ "$1" == "vv_internal_debug" ]]; then
 	shift
 fi
 
+# Airplane mode. Pass x as the first argument to kill all internet things
+# vv x create, vv x list, etc. This will probably break the creation scripts
+# and stuff though.
 if [[ "$1" == "x" ]]; then
 	# if our first argument is 'x', kill all the internet-enabled checks.
 	internet=false
