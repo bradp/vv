@@ -347,13 +347,13 @@ __vv__auto_update_main() {
 	hook "pre_auto_update_vv"
 	if [[ ! $auto_update_disable = "true" ]]; then
 		if [ ! -f "$home"/.vv-update ]; then
-			_update_vv_update
+			__vv___update_vv_update
 		else
 			# TODO fix shellcheck error
 			# shellcheck disable=SC1090
 			source "$home"/.vv-update
 
-			epoch_diff=$(($(_current_epoch) - DAYS_SINCE_UPDATE_CHECK))
+			epoch_diff=$(($(__vv___current_epoch) - DAYS_SINCE_UPDATE_CHECK))
 			epoch_target=7
 			if [[ $epoch_diff -gt $epoch_target ]]; then
 				__vv__info "vv is out of date. Checking for update."
@@ -363,22 +363,22 @@ __vv__auto_update_main() {
 				fi
 
 				rm "$home"/.vv-update
-				_update_vv_update
+				__vv___update_vv_update
 			fi
 		fi
 	fi
 	hook "post_auto_update_vv"
 }
 
-_current_epoch() {
+__vv___current_epoch() {
   seconds=$(date +%s)
   echo $((seconds/60/60/24))
 }
 
-_update_vv_update() {
+__vv___update_vv_update() {
 	hook "pre_vv_auto_update_update"
 	touch "$home"/.vv-update
-	echo "DAYS_SINCE_UPDATE_CHECK=$(_current_epoch)" > "$home"/.vv-update
+	echo "DAYS_SINCE_UPDATE_CHECK=$(__vv___current_epoch)" > "$home"/.vv-update
 	hook "post_vv_auto_update_update"
 }
 
