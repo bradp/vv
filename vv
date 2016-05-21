@@ -89,7 +89,7 @@ ABOUT
 # Usage: __vv__show_help [exit_code]
 # Example: __vv__show_help 254
 __vv__show_help() {
-	hook "pre_help_output"
+	__vv__hook "pre_help_output"
     cat <<HELP
 
 ${bold} USAGE: ${normal}
@@ -146,13 +146,13 @@ ${bold} EXAMPLE:${normal}
     vv create -d mysite.dev -n mysite -x
 
 HELP
-hook "post_help_output"
+__vv__hook "post_help_output"
 }
 
 # Usage: __vv__show_commands
 # Example: __vv__show_commands
 __vv__show_commands() {
-	hook "pre_help_output"
+	__vv__hook "pre_help_output"
     cat <<COMMANDS
 --help
 --version
@@ -217,83 +217,83 @@ COMMANDS
 }
 
 __vv__version() {
-	hook "pre_version_output"
+	__vv__hook "pre_version_output"
 	echo "vv version $version_number"
-	hook "post_version_output"
+	__vv__hook "post_version_output"
 }
 
 # Usage: __vv__info "message"
 # Example: __vv__info "doing thing"
 # Output (to STDOUT): doing thing
 __vv__info() {
-	hook "pre_info_output"
+	__vv__hook "pre_info_output"
 	printf "%b" "${bold}${yellow}$1${normal} \n"
-	hook "post_info_output"
+	__vv__hook "post_info_output"
 }
 
 # Usage: __vv__success "message"
 # Example: __vv__success "It's Working"
 # Output (to STDOUT): [...] It's Working
 __vv__success() {
-	hook "pre_success_output"
+	__vv__hook "pre_success_output"
 	printf "%b" "[${green}Success${normal}]${green} $1 ${normal}\n"
-	hook "post_success_output"
+	__vv__hook "post_success_output"
 }
 
 # Usage: __vv__warning "message"
 # Example: __vv__warning "some warning"
 # Output (to STDOUT): [...] some warning
 __vv__warning() {
-	hook "pre_warning_output"
+	__vv__hook "pre_warning_output"
 	printf "%b" "${red} $1 ${normal}\n"
-	hook "post_warning_output"
+	__vv__hook "post_warning_output"
 }
 
 # Usage: __vv__prompt "question"
 # Example: __vv__prompt "Site name"
 # Output (to STDOUT): Site Name:
 __vv__prompt() {
-	hook "pre_prompt_output"
+	__vv__hook "pre_prompt_output"
 	printf "%b" "${magenta} $1: ${normal}"
-	hook "post_prompt_output"
+	__vv__hook "post_prompt_output"
 }
 
 # Usage: __vv__error "message"
 # Example: __vv__error "this is an error"
 # Output (to STDERR): [ERROR] this is an error
 __vv__error() {
-	hook "pre_error_output"
+	__vv__hook "pre_error_output"
     printf "%b" "[${bold}${red}Error${normal}]${bold}${red} ${1:-'Unknown Error'}${normal}\n" >&2
-    hook "post_error_output"
+    __vv__hook "post_error_output"
 }
 
 # Usage: __vv__fail "message"
 # Example: __vv__fail "Unknown Option"
 __vv__fail() {
 	__vv__error "$1"
-	hook "fail_and_exit"
+	__vv__hook "fail_and_exit"
 	exit 1
 }
 
 __vv__check_for_update() {
-	hook "pre_update_check"
+	__vv__hook "pre_update_check"
 	if [[ ! -z $(which curl) ]]; then
-		hook "pre_github_update_check"
+		__vv__hook "pre_github_update_check"
 		github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
-		hook "post_github_update_check"
+		__vv__hook "post_github_update_check"
 		if [[ ! -z "$github_version" ]]; then
 			if [[ ! "$version_number" = "$github_version" ]]; then
-				hook "pre_out_of_date_vv"
+				__vv__hook "pre_out_of_date_vv"
 				__vv__info "Your version of vv ( $version_number )  does not match the current Github version ( $github_version ). Please update with vv --update"
-				hook "post_out_of_date_vv"
+				__vv__hook "post_out_of_date_vv"
 			fi
 		fi
 	fi
-	hook "post_update_check"
+	__vv__hook "post_update_check"
 }
 
 __vv__check_how_installed() {
-	hook "pre_check_how_installed"
+	__vv__hook "pre_check_how_installed"
 	if [[ ! -z $(which brew) ]]; then
 		brew_install_location=$(brew --prefix)
 		if [[ -f $brew_install_location"/bin/vv" ]]; then
@@ -302,35 +302,35 @@ __vv__check_how_installed() {
 			installed_with_brew="false"
 		fi
 	fi
-	hook "post_check_how_installed"
+	__vv__hook "post_check_how_installed"
 }
 
 __vv__install_update() {
-	hook "pre_install_update"
+	__vv__hook "pre_install_update"
 	__vv__check_how_installed
 	update_vv
-	hook "post_install_update"
+	__vv__hook "post_install_update"
 }
 
 update_vv() {
-	hook "pre_update_vv"
+	__vv__hook "pre_update_vv"
 	if [[ $installed_with_brew = "true" ]]; then
 		__vv__info "Updating vv via Brew..."
-		hook "pre_brew_update_vv"
+		__vv__hook "pre_brew_update_vv"
 		brew cleanup
 		brew reinstall vv
-		hook "post_brew_update_vv"
+		__vv__hook "post_brew_update_vv"
 	else
-		hook "pre_bootstrap_update_vv"
+		__vv__hook "pre_bootstrap_update_vv"
 		__vv__info "Updating vv..."
 		vv_bootstrap_update
-		hook "post_bootstrap_update_vv"
+		__vv__hook "post_bootstrap_update_vv"
 	fi
-	hook "post_update_vv"
+	__vv__hook "post_update_vv"
 }
 
 vv_bootstrap_update() {
-	hook "pre_vv_bootstrap_update"
+	__vv__hook "pre_vv_bootstrap_update"
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
 	vv_install_location=$(which vv)
@@ -340,11 +340,11 @@ vv_bootstrap_update() {
 	cat "$home/vv-$github_version/vv" > "$vv_install_location"
 	rm -r "$home/vv-$github_version"
 	__vv__success "vv has been updated to the latest version. Thanks!"
-	hook "post_vv_bootstrap_update"
+	__vv__hook "post_vv_bootstrap_update"
 }
 
 __vv__auto_update_main() {
-	hook "pre_auto_update_vv"
+	__vv__hook "pre_auto_update_vv"
 	if [[ ! $auto_update_disable = "true" ]]; then
 		if [ ! -f "$home"/.vv-update ]; then
 			__vv___update_vv_update
@@ -367,7 +367,7 @@ __vv__auto_update_main() {
 			fi
 		fi
 	fi
-	hook "post_auto_update_vv"
+	__vv__hook "post_auto_update_vv"
 }
 
 __vv___current_epoch() {
@@ -376,23 +376,23 @@ __vv___current_epoch() {
 }
 
 __vv___update_vv_update() {
-	hook "pre_vv_auto_update_update"
+	__vv__hook "pre_vv_auto_update_update"
 	touch "$home"/.vv-update
 	echo "DAYS_SINCE_UPDATE_CHECK=$(__vv___current_epoch)" > "$home"/.vv-update
-	hook "post_vv_auto_update_update"
+	__vv__hook "post_vv_auto_update_update"
 }
 
 __vv__argument_expected() {
-	hook "pre_arg_expected"
+	__vv__hook "pre_arg_expected"
     if [ -z "$2" ] || [[ "$2" == -* ]]; then
-    	hook "error_no_arg_$1"
+    	__vv__hook "error_no_arg_$1"
         __vv__fail "$1 expected an argument"
     fi
-    hook "post_arg_expected"
+    __vv__hook "post_arg_expected"
 }
 
 __vv__check_for_config_file() {
-	hook "pre_vv_config_check"
+	__vv__hook "pre_vv_config_check"
 	test -f "$home"/.vv-config && vv_config="${HOME}/.vv-config"
 	test -f ./.vv-config && vv_config="./.vv-config"
 
@@ -408,11 +408,11 @@ __vv__check_for_config_file() {
 			__vv__get_vvv_path
 		fi
 	fi
-	hook "post_vv_config_check"
+	__vv__hook "post_vv_config_check"
 }
 
-create_config_file() {
-	hook "pre_create_vv_config"
+__vv__create_config_file() {
+	__vv__hook "pre_create_vv_config"
 {
 	echo "{"
 	echo "	\"path\": \"$path\""
@@ -426,7 +426,7 @@ create_config_file() {
 	# shellcheck disable=SC2028
 	echo "	sudo printf \"{\\n\"\\tpath\": \"$path\"\\n}\" > ~/.vv-config"
 	__vv__info "	";
-	hook "post_create_vv_config"
+	__vv__hook "post_create_vv_config"
 }
 
 get_config_value() {
@@ -505,11 +505,11 @@ __vv__get_vvv_path(){
 			__vv__prompt "Is this where VVV is installed? (Y/n)"
 			read -r path_confirmation
 			if [ "$path_confirmation" = 'y' ]; then
-				create_config_file
+				__vv__create_config_file
 			elif [ "$path_confirmation" = 'Y' ]; then
-				create_config_file
+				__vv__create_config_file
 			elif [ "$path_confirmation" != 'n' ]; then
-				create_config_file
+				__vv__create_config_file
 			else
 				unset path
 			fi
@@ -526,7 +526,7 @@ __vv__get_vvv_path(){
 			path=$(eval echo "${path//>}")
 
 			if [ ! -z "$path" ]; then
-				create_config_file
+				__vv__create_config_file
 			fi
 		done
 	fi
@@ -538,15 +538,15 @@ __vv__setup_scripts_folder() {
 	vv_scripts_folder="$path"/vv/
 }
 
-init_vv_hooks() {
+__vv__init_vv_hooks() {
 	mkdir "$path"/vv/
 }
 
-run_hook() {
-	hook "$@"
+__vv__run_hook() {
+	__vv__hook "$@"
 }
 
-hook() {
+__vv__hook() {
 	# Display all hooks to screen if the show_hooks flag is set
 	if [[ $show_hooks = 'true' ]]; then
 		echo "${magenta}[Hook]${normal}" "$1" "$2" "$3" "$4"
@@ -589,13 +589,13 @@ get_list_sites() {
 
 list_sites() {
 	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
-	hook "pre_list_sites"
+	__vv__hook "pre_list_sites"
 	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
 		filename=${filename:2}
 		if [[ $filename != 'default' && $filename != 'phpcs' && $filename != 'wp-cli' ]]; then
 			if [[ $filename = 'wordpress-default' || $filename = 'wordpress-develop' || $filename = 'wordpress-trunk' ]]; then
-				hook "pre_list_site_$filename"
-				hook "list_site" "$filename"
+				__vv__hook "pre_list_site_$filename"
+				__vv__hook "list_site" "$filename"
 				if [[ $filename = 'wordpress-default' ]]; then
 					url=local.wordpress.dev
 				elif [[ $filename = 'wordpress-develop' ]]; then
@@ -606,13 +606,13 @@ list_sites() {
 
 				if [[ ! $clean = "true" ]]; then
 					printf "	* %-30s %s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}" "${cyan}[VVV default]${normal}"
-					hook "post_list_site_$filename"
+					__vv__hook "post_list_site_$filename"
 				fi
 			else
 				if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
-					hook "pre_list_site_$filename"
-					hook "list_site" "$filename"
-					hook "list_custom_site" "$filename"
+					__vv__hook "pre_list_site_$filename"
+					__vv__hook "list_site" "$filename"
+					__vv__hook "list_custom_site" "$filename"
 					url=$(<"$path"/"$sites_folder"/"$filename"/vvv-hosts)
 					url=$(echo "$url" | sed -e 's/#.*$//' -e '/^$/d')
 					urls=$(echo "$url" | wc -l)
@@ -623,18 +623,18 @@ list_sites() {
 					fi
 					if [[ ! $clean = "true" ]]; then
 						printf "	* %-30s %s\n" "${green}$filename${normal}" "${yellow}( $url )${normal}"
-						hook "post_list_site_$filename"
+						__vv__hook "post_list_site_$filename"
 					fi
 				fi
 			fi
 		fi
 	done
-	hook "post_list_sites"
+	__vv__hook "post_list_sites"
 	exit
 }
 
 site_creation_questions() {
-	hook "pre_site_creation_wizard"
+	__vv__hook "pre_site_creation_wizard"
 	files_only_text=''
 	if [[ "$files_only" = "true" ]]; then
 		files_only_text=" (file creation only)"
@@ -831,7 +831,7 @@ site_creation_questions() {
 		email="admin@localhost.dev"
 	fi
 
-	hook "post_site_creation_wizard"
+	__vv__hook "post_site_creation_wizard"
 }
 
 confirm_site_creation() {
@@ -869,13 +869,13 @@ confirm_site_creation() {
 	cd "$path" || __vv__error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
 		__vv__info "Checking to see if vagrant halt should be run..."
-		hook "pre_creation_pre_vagrant_halt"
+		__vv__hook "pre_creation_pre_vagrant_halt"
 		vagrant_maybe_halt
 	fi
 }
 
 create_site_files(){
-	hook "pre_create_site_files" "$site" "$domain" "$path"
+	__vv__hook "pre_create_site_files" "$site" "$domain" "$path"
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
 	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
@@ -918,15 +918,15 @@ PHP"
 	blueprint_text=''
 	if [[ ! -z "$blueprint" ]]; then
 		cp "$path"/vv-blueprints.json "$path"/"$sites_folder"/"$site"/vv-blueprints.json
-		hook "pre_blueprint_text_output"
+		__vv__hook "pre_blueprint_text_output"
 		blueprint_text="curl -o vv-install -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-install && php vv-install $blueprint $web_root $site $domain && rm vv-blueprints.json vv-install"
-		hook "post_blueprint_text_output"
+		__vv__hook "post_blueprint_text_output"
 	fi
 
 	if [[ ! -z "$db_import" ]]; then
-		hook "pre_site_creation_db_import"
+		__vv__hook "pre_site_creation_db_import"
 		cp "$db_import" "$path"/"$sites_folder"/"$site"/"$site".sql
-		hook "post_site_creation_db_import"
+		__vv__hook "post_site_creation_db_import"
 	fi
 
 	db_init=""
@@ -934,9 +934,9 @@ PHP"
 		db_init="wp db import ../$site.sql --allow-root && rm ../$site.sql"
 	fi
 
-	hooked_pre_vvv_init_no_wp=$(hook "hooked_pre_vvv_init_no_wp")
-	hooked_extra_wp_vvv_init_no_wp=$(hook "hooked_extra_wp_vvv_init_no_wp")
-	hooked_post_vvv_init_no_wp=$(hook "hooked_post_vvv_init_no_wp")
+	hooked_pre_vvv_init_no_wp=$(__vv__hook "hooked_pre_vvv_init_no_wp")
+	hooked_extra_wp_vvv_init_no_wp=$(__vv__hook "hooked_extra_wp_vvv_init_no_wp")
+	hooked_post_vvv_init_no_wp=$(__vv__hook "hooked_post_vvv_init_no_wp")
 
 	if [ "$no_wp" = "true" ]; then
 		{
@@ -1022,12 +1022,12 @@ PHP"
 			config="printf \"DB_NAME=$db_name\nDB_USER=wp\nDB_PASSWORD=wp\nDB_HOST=localhost\n\nWP_ENV=development\nWP_HOME=http://$domain\nWP_SITEURL=http://$domain/wp\" >> htdocs/.env"
 			core="$core --path=\"htdocs/web/wp\""
 		fi
-		hook "pre_write_vvv_init"
+		__vv__hook "pre_write_vvv_init"
 		printf "\nCREATE DATABASE IF NOT EXISTS \`%s\`;\n GRANT ALL PRIVILEGES ON \`%s\`.* TO 'wp'@'localhost' IDENTIFIED BY 'wp';\n" "$db_name" "$db_name" >> "$path"/database/init-custom.sql
 
-		hooked_pre_vvv_init=$(hook "hooked_pre_vvv_init")
-		hooked_extra_wp_vvv_init=$(hook "hooked_extra_wp_vvv_init")
-		hooked_post_vvv_init=$(hook "hooked_post_vvv_init")
+		hooked_pre_vvv_init=$(__vv__hook "hooked_pre_vvv_init")
+		hooked_extra_wp_vvv_init=$(__vv__hook "hooked_extra_wp_vvv_init")
+		hooked_post_vvv_init=$(__vv__hook "hooked_post_vvv_init")
 
 		{
 			echo "$hooked_pre_vvv_init"
@@ -1056,7 +1056,7 @@ PHP"
 			echo "fi"
 			echo "$hooked_post_vvv_init"
 		} >> vvv-init.sh
-		hook "post_write_vvv_init"
+		__vv__hook "post_write_vvv_init"
 	fi
 
 	echo "Done"
@@ -1064,7 +1064,7 @@ PHP"
 	# Add vvv-hosts file for domain in the site's "$sites_folder" root
 	# =============================================================================
 	cd "$path"/"$sites_folder"/"$site" || __vv__error "Could not change directory."
-	hook "pre_write_vvv_hosts"
+	__vv__hook "pre_write_vvv_hosts"
 	__vv__info "Adding $domain to new vvv-hosts file... "
 	touch vvv-hosts
 	printf "%s\n" "$domain" >> vvv-hosts
@@ -1077,7 +1077,7 @@ PHP"
 			printf "%s\n" "$subdomain.$domain" >> vvv-hosts
 		done
 	fi
-	hook "post_write_vvv_hosts"
+	__vv__hook "post_write_vvv_hosts"
 	echo "Done"
 
 	if [ ! -z "$git_repo" ]; then
@@ -1114,9 +1114,9 @@ run_vagrant_up() {
 	cd "$path" || __vv__error "Could not change directory."
 	if [[ -z "$files_only" ]]; then
 		__vv__info "Running vagrant up --provision... "
-		hook "pre_vagrant_provision"
+		__vv__hook "pre_vagrant_provision"
 		vagrant up --provision
-		hook "post_vagrant_provision"
+		__vv__hook "post_vagrant_provision"
 	fi
 }
 
@@ -1136,7 +1136,7 @@ creation_success_message() {
 		echo "Password:  $password"
 	fi
 
-	hook "post_site_creation_finished" "$site" "$domain" "$path"
+	__vv__hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
 vagrant_is_running() {
@@ -1174,21 +1174,21 @@ vagrant_maybe_halt() {
 
 
 create_site() {
-	hook "pre_site_creation_questions"
+	__vv__hook "pre_site_creation_questions"
 	site_creation_questions
-	hook "post_site_creation_questions"
-	hook "pre_site_creation_confirm"
+	__vv__hook "post_site_creation_questions"
+	__vv__hook "pre_site_creation_confirm"
 	confirm_site_creation
-	hook "post_site_creation_confirm"
-	hook "pre_site_creation_create_files"
+	__vv__hook "post_site_creation_confirm"
+	__vv__hook "pre_site_creation_create_files"
 	create_site_files
-	hook "post_site_creation_create_files"
-	hook "pre_site_creation_vagrant_up"
+	__vv__hook "post_site_creation_create_files"
+	__vv__hook "pre_site_creation_vagrant_up"
 	run_vagrant_up
-	hook "post_site_creation_vagrant_up"
-	hook "pre_site_creation_finished_message"
+	__vv__hook "post_site_creation_vagrant_up"
+	__vv__hook "pre_site_creation_finished_message"
 	creation_success_message
-	hook "post_site_creation_finished_message"
+	__vv__hook "post_site_creation_finished_message"
 	exit
 }
 
@@ -1210,7 +1210,7 @@ not_valid_site() {
 }
 
 remove_site() { # @TODO refactor this if we need to
-	hook "pre_site_removal"
+	__vv__hook "pre_site_removal"
 	__vv__info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
@@ -1232,61 +1232,61 @@ remove_site() { # @TODO refactor this if we need to
 			__vv__info "\nVVV teardown starting for site '$site'"
 			cd "$path" || __vv__error "Could not change directory."
 
-			hook "pre_site_removal_vagrant_up" "$site" "$path"
+			__vv__hook "pre_site_removal_vagrant_up" "$site" "$path"
 			vagrant_maybe_up
-			hook "post_site_removal_vagrant_up" "$site" "$path"
+			__vv__hook "post_site_removal_vagrant_up" "$site" "$path"
 
 			# Delete the database from within VVV's MySQl
 			__vv__info "Removing database $site..."
-			hook "pre_site_removal_remove_db" "$site" "$path"
+			__vv__hook "pre_site_removal_remove_db" "$site" "$path"
 			vagrant ssh --command "mysql -u root -e 'DROP DATABASE \`$site\`;'"
-			hook "post_site_removal_remove_db" "$site" "$path"
+			__vv__hook "post_site_removal_remove_db" "$site" "$path"
 			echo "Done"
 
-			hook "pre_site_removal_vagrant_halt" "$site" "$path"
+			__vv__hook "pre_site_removal_vagrant_halt" "$site" "$path"
 			vagrant_maybe_halt
-			hook "post_site_removal_vagrant_halt" "$site" "$path"
+			__vv__hook "post_site_removal_vagrant_halt" "$site" "$path"
 
 			# Delete the site folder
 			__vv__info "Removing directory $site... "
-			hook "pre_site_removal_delete_files" "$path" "$sites_folder" "$site"
+			__vv__hook "pre_site_removal_delete_files" "$path" "$sites_folder" "$site"
 			rm -rf "${path:?}/${sites_folder:?}/${site:?}"
-			hook "post_site_removal_delete_files" "$path" "$sites_folder" "$site"
+			__vv__hook "post_site_removal_delete_files" "$path" "$sites_folder" "$site"
 			echo "Done"
 
 			# Remove the nginx conf file
 			__vv__info "Removing nginx config file $site.conf... "
-			hook "pre_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
+			__vv__hook "pre_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
 			rm "$path/config/nginx-config/sites/$site.conf"
-			hook "post_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
+			__vv__hook "post_site_removal_delete_nginx_config" "$path" "$sites_folder" "$site"
 			echo "Done"
 
 			# Remove the database creation from init-custom.sql
 			__vv__info "Removing the database creation commands from init-custom.sql... "
 			cd "$path"/database || __vv__error "Could not change directory."
-			hook "pre_site_removal_remove_db_creation" "$site" "$path"
+			__vv__hook "pre_site_removal_remove_db_creation" "$site" "$path"
 			sed "/\`$site\`/d" < init-custom.sql > init-custom.sql.tmp
 			rm init-custom.sql
 			mv init-custom.sql.tmp init-custom.sql
-			hook "post_site_removal_remove_db_creation" "$site" "$path"
+			__vv__hook "post_site_removal_remove_db_creation" "$site" "$path"
 			cd "$path" || __vv__error "Could not change directory."
 			echo "Done"
 
 			__vv__info "Removing database backup"
-			hook "pre_site_removal_remove_db_backup" "$site" "$path"
+			__vv__hook "pre_site_removal_remove_db_backup" "$site" "$path"
 			rm -rf "$path/database/backups/$site.sql"
-			hook "post_site_removal_remove_db_backup" "$site" "$path"
+			__vv__hook "post_site_removal_remove_db_backup" "$site" "$path"
 			echo "Done"
 
 			__vv__info "Removing any set up deployments. "
-			hook "pre_site_removal_remove_deployments" "$site" "$path"
+			__vv__hook "pre_site_removal_remove_deployments" "$site" "$path"
 			remove_site_remove_all_deployment
-			hook "post_site_removal_remove_deployments" "$site" "$path"
+			__vv__hook "post_site_removal_remove_deployments" "$site" "$path"
 			echo "Done"
 
 			# Deleted.
 			__vv__success "\nVVV Site Teardown: Done!"
-			hook "post_site_removal"
+			__vv__hook "post_site_removal"
 			exit
 
 		elif [ "$continue_delete" = 'n' ]; then
