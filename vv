@@ -37,14 +37,6 @@
 #
 version_number=1.10.2
 
-if [ -z "$HOME" ]; then
-	home="~";
-else
-	home="$HOME"
-fi
-eval HOME="$home"
-
-
 if [[ "$1" == "vv_internal_debug" ]]; then
 	# We check this before anything else, so we can debug all of vv
 	# This will output all the commands that are being run
@@ -61,6 +53,15 @@ if [[ "$1" == "x" ]]; then
 	shift
 fi
 
+# Verify we have a home variable set, and force it if we can
+if [ -z "$HOME" ]; then
+	home="~";
+else
+	home="$HOME"
+fi
+eval HOME="$home"
+
+# If we have tput, let's set our colors
 if [[ ! -z $(which tput 2>/dev/null) ]]; then
 	normal=$(tput sgr0)
 	bold=$(tput bold)
@@ -1478,7 +1479,7 @@ __vv__output_debug_vv() {
 __vv__parse_the_args() {
 
     if [ ! -z "$list" ]; then
-    	_vv__list_sites
+    	__vv__list_sites
    	fi
     if [ ! -z "$create" ]; then
     	__vv__create_site
