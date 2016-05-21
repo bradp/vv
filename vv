@@ -77,9 +77,9 @@ ABOUT
 }
 
 
-# Usage: show_help [exit_code]
-# Example: show_help 254
-show_help() {
+# Usage: __vv__show_help [exit_code]
+# Example: __vv__show_help 254
+__vv__show_help() {
 	hook "pre_help_output"
     cat <<HELP
 
@@ -140,9 +140,9 @@ HELP
 hook "post_help_output"
 }
 
-# Usage: show_help [exit_code]
-# Example: show_help 254
-show_commands() {
+# Usage: __vv__show_commands
+# Example: __vv__show_commands
+__vv__show_commands() {
 	hook "pre_help_output"
     cat <<COMMANDS
 --help
@@ -283,7 +283,7 @@ check_for_update() {
 	hook "post_update_check"
 }
 
-check_how_installed() {
+__vv__check_how_installed() {
 	hook "pre_check_how_installed"
 	if [[ ! -z $(which brew) ]]; then
 		brew_install_location=$(brew --prefix)
@@ -296,9 +296,9 @@ check_how_installed() {
 	hook "post_check_how_installed"
 }
 
-install_update() {
+__vv__install_update() {
 	hook "pre_install_update"
-	check_how_installed
+	__vv__check_how_installed
 	update_vv
 	hook "post_install_update"
 }
@@ -1515,7 +1515,7 @@ parse_the_args() {
 		create_blueprints
 	fi
 	if [ ! -z "$lets_update" ]; then
-		install_update
+		__vv__install_update
 	fi
 	if [ ! -z "$force_update" ]; then
 		vv_bootstrap_update
@@ -1772,7 +1772,7 @@ check_args() {
 				shift
 				;;
 			show_commands)
-				show_commands
+				__vv__show_commands
 				shift
 				;;
 			*)
@@ -1783,7 +1783,7 @@ check_args() {
 	done
 
 	if [ ! -z $help ]; then
-		show_help $help
+		__vv__show_help $help
 	fi
 
 	get_vvv_path
@@ -1796,7 +1796,7 @@ main() {
 	auto_update_main
 
 	if [ -z "$1" ]; then
-	    show_help
+	    __vv__show_help
 		showing_help="true"
 	fi
 
