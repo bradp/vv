@@ -1173,7 +1173,7 @@ vagrant_is_running() {
 	vvv_path="$(get_config_value path | tr -d '[:space:]')"
 	vvv_path=${vvv_path%/}
 	vvv_running="true"
-	curl --silent --head "http://vvv.dev/" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
+	curl --silent --head --connect-timeout 2 "http://vvv.dev/" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
 	# vagrant global-status | grep "$vvv_path\s*"'$' | grep -q running || vvv_running="false"
 	echo "$vvv_running"
 }
