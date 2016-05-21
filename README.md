@@ -16,7 +16,7 @@
 
 # Table of Contents
 
-- [Variable VVV - The Best VVV Site Wizard](#variable-vvv---the-best-vvv-site-wizard)
+- [`vv`](#variable-vvv---the-best-vvv-site-wizard)
   - [Installation](#installation)
     - [OS X Installation](#os-x-installation)
     - [Windows Installation](#windows-installation)
