@@ -308,11 +308,11 @@ __vv__check_how_installed() {
 __vv__install_update() {
 	__vv__hook "pre_install_update"
 	__vv__check_how_installed
-	update_vv
+	__vv__update_vv
 	__vv__hook "post_install_update"
 }
 
-update_vv() {
+__vv__update_vv() {
 	__vv__hook "pre_update_vv"
 	if [[ $installed_with_brew = "true" ]]; then
 		__vv__info "Updating vv via Brew..."
@@ -323,13 +323,13 @@ update_vv() {
 	else
 		__vv__hook "pre_bootstrap_update_vv"
 		__vv__info "Updating vv..."
-		vv_bootstrap_update
+		__vv__vv_bootstrap_update
 		__vv__hook "post_bootstrap_update_vv"
 	fi
 	__vv__hook "post_update_vv"
 }
 
-vv_bootstrap_update() {
+__vv__vv_bootstrap_update() {
 	__vv__hook "pre_vv_bootstrap_update"
 	github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep --color=never "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 	download_link=https://github.com/bradp/vv/archive/"$github_version".tar.gz
@@ -359,7 +359,7 @@ __vv__auto_update_main() {
 				__vv__info "vv is out of date. Checking for update."
 				github_version=$(curl -s https://api.github.com/repos/bradp/vv/tags | grep "\"name\": \"" | head -n 1 | sed 's/"name": "//' | sed 's/",//' | sed 's/ //g' )
 				if [[ ! "$version_number" = "$github_version" ]]; then
-					update_vv
+					__vv__update_vv
 				fi
 
 				rm "$home"/.vv-update
@@ -397,7 +397,7 @@ __vv__check_for_config_file() {
 	test -f ./.vv-config && vv_config="./.vv-config"
 
 	if [ ! -z $vv_config ]; then
-		load_config_values
+		__vv__load_config_values
 	else
 		if [[ ! $showing_help = "true" ]]; then
 			__vv__info "	"
@@ -429,18 +429,18 @@ __vv__create_config_file() {
 	__vv__hook "post_create_vv_config"
 }
 
-get_config_value() {
+__vv__get_config_value() {
 	value=$(grep --color=never "$1" "$vv_config" | sed 's/"//g' | sed "s/$1://g" | sed "s/,//g" )
 	echo "$value"
 }
 
-load_config_values() {
-	path=$(get_config_value path)
+__vv__load_config_values() {
+	path=$(__vv__get_config_value path)
 }
 
-load_config_autopdate_config_values() {
+__vv__load_config_autopdate_config_values() {
 	#Load path from config file
-	auto_update_disble_config_var=$(get_config_value auto_update_disable)
+	auto_update_disble_config_var=$(__vv__get_config_value auto_update_disable)
 	auto_update_disable_config="$(echo "$auto_update_disble_config_var" | sed -e 's/^"//'  -e 's/"$//')"
 	if [[ $auto_update_disable_config = "true" ]]; then
 		auto_update_disable="true"
@@ -448,7 +448,7 @@ load_config_autopdate_config_values() {
 }
 
 load_default_values() {
-	defaults=$(get_config_value defaults)
+	defaults=$(__vv__get_config_value defaults)
 	defaults="$(echo "$defaults" | sed -e 's/^"//'  -e 's/"$//')"
 }
 
@@ -580,14 +580,14 @@ __vv__hook() {
 	# this is currently not working
 }
 
-get_list_sites() {
+__vv__get_list_sites() {
 	clean_saved=$clean
 	clean="true"
-	list_sites
+	__vv__list_sites
 	clean=$clean_saved
 }
 
-list_sites() {
+__vv__list_sites() {
 	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
 	__vv__hook "pre_list_sites"
 	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
@@ -633,7 +633,7 @@ list_sites() {
 	exit
 }
 
-site_creation_questions() {
+__vv__site_creation_questions() {
 	__vv__hook "pre_site_creation_wizard"
 	files_only_text=''
 	if [[ "$files_only" = "true" ]]; then
@@ -834,7 +834,7 @@ site_creation_questions() {
 	__vv__hook "post_site_creation_wizard"
 }
 
-confirm_site_creation() {
+__vv__confirm_site_creation() {
 	# Inform the user of what's about to happen and give them a chance to back out
 	# =============================================================================
 	__vv__info "\nAbout to perform the following:"
@@ -870,11 +870,11 @@ confirm_site_creation() {
 	if [[ -z "$files_only" ]]; then
 		__vv__info "Checking to see if vagrant halt should be run..."
 		__vv__hook "pre_creation_pre_vagrant_halt"
-		vagrant_maybe_halt
+		__vv__vagrant_maybe_halt
 	fi
 }
 
-create_site_files(){
+__vv__create_site_files(){
 	__vv__hook "pre_create_site_files" "$site" "$domain" "$path"
 	# Create site folder with vvv-init.sh file
 	# =============================================================================
@@ -1108,7 +1108,7 @@ PHP"
 	echo "Done"
 }
 
-run_vagrant_up() {
+__vv__run_vagrant_up() {
 	# vagrant waaaaay up
 	# =============================================================================
 	cd "$path" || __vv__error "Could not change directory."
@@ -1120,7 +1120,7 @@ run_vagrant_up() {
 	fi
 }
 
-creation_success_message() {
+__vv__creation_success_message() {
 	# OMG we're done.
 	# =============================================================================
 	if [[ "$files_only" = "true" ]]; then
@@ -1139,10 +1139,10 @@ creation_success_message() {
 	__vv__hook "post_site_creation_finished" "$site" "$domain" "$path"
 }
 
-vagrant_is_running() {
+__vv__vagrant_is_running() {
 	local vvv_running
 	local vvv_path
-	vvv_path="$(get_config_value path | tr -d '[:space:]')"
+	vvv_path="$(__vv__get_config_value path | tr -d '[:space:]')"
 	vvv_path=${vvv_path%/}
 	vvv_running="true"
 	curl --silent --head --connect-timeout 2 "http://vvv.dev/" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
@@ -1150,9 +1150,9 @@ vagrant_is_running() {
 	echo "$vvv_running"
 }
 
-vagrant_maybe_up() {
+__vv__vagrant_maybe_up() {
 	local vvv_running
-	vvv_running=$(vagrant_is_running)
+	vvv_running=$(__vv__vagrant_is_running)
 	if [[ "$vvv_running" = "false" ]]; then
 		__vv__info "Running \`vagrant up\`"
 		vagrant up
@@ -1161,9 +1161,9 @@ vagrant_maybe_up() {
 	fi
 }
 
-vagrant_maybe_halt() {
+__vv__vagrant_maybe_halt() {
 	local vvv_running
-	vvv_running=$(vagrant_is_running)
+	vvv_running=$(__vv__vagrant_is_running)
 	if [[ "$vvv_running" = "true" ]]; then
 		__vv__info "Running \`vagrant halt\`"
 		vagrant halt
@@ -1173,26 +1173,26 @@ vagrant_maybe_halt() {
 }
 
 
-create_site() {
+__vv__create_site() {
 	__vv__hook "pre_site_creation_questions"
-	site_creation_questions
+	__vv__site_creation_questions
 	__vv__hook "post_site_creation_questions"
 	__vv__hook "pre_site_creation_confirm"
-	confirm_site_creation
+	__vv__confirm_site_creation
 	__vv__hook "post_site_creation_confirm"
 	__vv__hook "pre_site_creation_create_files"
-	create_site_files
+	__vv__create_site_files
 	__vv__hook "post_site_creation_create_files"
 	__vv__hook "pre_site_creation_vagrant_up"
-	run_vagrant_up
+	__vv__run_vagrant_up
 	__vv__hook "post_site_creation_vagrant_up"
 	__vv__hook "pre_site_creation_finished_message"
-	creation_success_message
+	__vv__creation_success_message
 	__vv__hook "post_site_creation_finished_message"
 	exit
 }
 
-not_valid_site() {
+__vv__not_valid_site() {
 	if [[ -z $site || ! -d "$path/$sites_folder/$site" ]]; then
 		__vv__error "You must enter a valid directory from $path/$sites_folder/."
 		__vv__info "Would you like to continue the process to remove left-over objects?"
@@ -1209,19 +1209,19 @@ not_valid_site() {
 	fi
 }
 
-remove_site() { # @TODO refactor this if we need to
+__vv__remove_site() { # @TODO refactor this if we need to
 	__vv__hook "pre_site_removal"
 	__vv__info "VVV Site Removal"
 
 	if [[ ! -z $site ]]; then
-		not_valid_site
+		__vv__not_valid_site
 	fi
 
 	# Get site dir name if not supplied as argument
 	while [ -z "$site" ]; do
 		__vv__prompt "Site directory to delete"
 		read -r site
-		not_valid_site
+		__vv__not_valid_site
 	done
 
 	__vv__info "\nAbout to perform the following:\n\n* Start Vagrant (if not running)\n* Remove database $site from MySQL\n* Halt Vagrant (if running)\n* Delete directory $site in $path/$sites_folder\n* Delete file $site.conf in $path/config/nginx-config/sites\n* Remove database creation commands from init-custom.sql\n* Remove any deployments for $site set up with vv\n"
@@ -1233,7 +1233,7 @@ remove_site() { # @TODO refactor this if we need to
 			cd "$path" || __vv__error "Could not change directory."
 
 			__vv__hook "pre_site_removal_vagrant_up" "$site" "$path"
-			vagrant_maybe_up
+			__vv__vagrant_maybe_up
 			__vv__hook "post_site_removal_vagrant_up" "$site" "$path"
 
 			# Delete the database from within VVV's MySQl
@@ -1244,7 +1244,7 @@ remove_site() { # @TODO refactor this if we need to
 			echo "Done"
 
 			__vv__hook "pre_site_removal_vagrant_halt" "$site" "$path"
-			vagrant_maybe_halt
+			__vv__vagrant_maybe_halt
 			__vv__hook "post_site_removal_vagrant_halt" "$site" "$path"
 
 			# Delete the site folder
@@ -1280,7 +1280,7 @@ remove_site() { # @TODO refactor this if we need to
 
 			__vv__info "Removing any set up deployments. "
 			__vv__hook "pre_site_removal_remove_deployments" "$site" "$path"
-			remove_site_remove_all_deployment
+			__vv__remove_site_remove_all_deployment
 			__vv__hook "post_site_removal_remove_deployments" "$site" "$path"
 			echo "Done"
 
@@ -1300,32 +1300,31 @@ remove_site() { # @TODO refactor this if we need to
 	exit
 }
 
-deployment_setup_prompt() {
+__vv__deployment_setup_prompt() {
 	__vv__info "Setting up a deployment."
 
 	if [[ ! -z $site ]]; then
-		not_valid_site
+		__vv__not_valid_site
 	fi
-
 	# Get site dir name if not supplied as argument
 	while [ -z "$site" ]; do
 		__vv__prompt "Which site would you like to setup a deployment for? "
 		read -r site
-		not_valid_site
+		__vv__not_valid_site
 	done
 
 }
 
-deployment_removal_prompt() {
+__vv__deployment_removal_prompt() {
 	if [[ ! -z $site ]]; then
-		not_valid_site
+		__vv__not_valid_site
 	fi
 
 	# Get site dir name if not supplied as argument
 	while [ -z "$site" ]; do
 		__vv__prompt "Which site would you like to remove the deployment for? "
 		read -r site
-		not_valid_site
+		__vv__not_valid_site
 	done
 
 	while [ -z "$deployment_name" ]; do
@@ -1333,12 +1332,12 @@ deployment_removal_prompt() {
 		read -r deployment_name
 	done
 
-	remove_deployment
+	__vv__remove_deployment
 
 }
 
-deployment_setup() {
-	deployment_setup_prompt
+__vv__deployment_setup() {
+	__vv__deployment_setup_prompt
 	__vv__info "Setting up (S)FTP deployment for $site"
 
 	while [ -z "$deployment_name" ]; do
@@ -1417,13 +1416,13 @@ deployment_setup() {
 	__vv__success "Deployment setup finished. You can now deploy with a 'vv -v push $site-$deployment_name'"
 }
 
-remove_site_remove_all_deployment() {
+__vv__remove_site_remove_all_deployment() {
 	sed "/\# begin-vv-$site/,/\# end-vv-$site/d" "$path/Vagrantfile" > "$path/Vagrantfile.tmp"
 	mv "$path/Vagrantfile" "$path/Vagrantfile-backup"
 	mv "$path/Vagrantfile.tmp" "$path/Vagrantfile"
 }
 
-remove_deployment() {
+__vv__remove_deployment() {
 	while [ ! "$remove_deployment_confirm" = "confirm" ]; do
 		__vv__prompt "Are you sure you want to remove this site's deployment? (type confirm for yes )"
 		read -r remove_deployment_confirm
@@ -1435,11 +1434,11 @@ remove_deployment() {
 	__vv__success "Deployment for $site removed."
 }
 
-deployment_config() {
+__vv__deployment_config() {
 	$EDITOR "$path/Vagrantfile"
 }
 
-create_blueprints() {
+__vv__create_blueprints() {
 	if [[ ! -f "$path"/vv-blueprints.json ]]; then
 		curl -o "$path"/vv-blueprints.json -s https://raw.githubusercontent.com/bradp/vv/vv-install/vv-blueprints.json
 		__vv__success "Created sample blueprints file at $path/vv-blueprints.json."
@@ -1449,7 +1448,7 @@ create_blueprints() {
 }
 
 __vv__autocomplete_list() {
-	echo "list create remove deployment_setup deployment_remove deployment_config blueprint_init lets_update force_update"
+	echo "list create remove eployment_setup deployment_remove deployment_config blueprint_init update force_update"
 }
 
 __vv__output_debug_vv() {
@@ -1479,35 +1478,35 @@ __vv__output_debug_vv() {
 __vv__parse_the_args() {
 
     if [ ! -z "$list" ]; then
-    	list_sites
+    	_vv__list_sites
    	fi
     if [ ! -z "$create" ]; then
-    	create_site
+    	__vv__create_site
     fi
     if [ ! -z "$remove" ]; then
-    	remove_site
+    	__vv__remove_site
     fi
    	if [ ! -z "$deployment_setup" ]; then
-    	deployment_setup
+    	__vv__deployment_setup
     fi
     if [ ! -z "$deployment_remove" ]; then
-    	deployment_removal_prompt
+    	__vv__deployment_removal_prompt
     fi
    	if [ ! -z "$deployment_config" ]; then
-   		deployment_config
+   		__vv__deployment_config
    	fi
    	if [ ! -z "$blueprint_init" ]; then
-		create_blueprints
+		__vv__create_blueprints
 	fi
 	if [ ! -z "$lets_update" ]; then
 		__vv__install_update
 	fi
 	if [ ! -z "$force_update" ]; then
-		vv_bootstrap_update
+		__vv__vv_bootstrap_update
 	fi
 }
 
-check_args() {
+__vv__check_args() {
 	while [ ! -z "$1" ]; do
 		case "$1" in
 			-h|--help|help|h|what)
@@ -1707,8 +1706,7 @@ check_args() {
 			--deployment-remove|deployment-remove|--deploy-remove|deploy-remove|--deployment-teardown|deployment-teardown|--deploy-teardown|deploy-teardown|--deployment-delete|deployment-delete|--deploy-delete|deploy-delete)
 				deployment_remove="true"
 				shift
-				;;
-			--confirm-removal|--confirm_removal|--confirmremoval)
+				;;confirm-removal|--confirm_removal|--confirmremoval)
 				remove_deployment_confirm="confirm"
 				shift
 				;;
@@ -1798,7 +1796,7 @@ __vv__main() {
 	no_wp="false"
 	no_wp_with_db="false"
 	sites_folder="www"
-	check_args "$@"
+	__vv__check_args "$@"
 }
 
 if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
