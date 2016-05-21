@@ -382,43 +382,6 @@ __vv___update_vv_update() {
 	hook "post_vv_auto_update_update"
 }
 
-# https://gist.github.com/davejamesmiller/1965569
-# Usage: ask "Yes or No?" [default option]
-# Example: if "Yes or No?" Y; then
-ask() {
-	hook "pre_ask"
-    while true; do
-
-        if [ "${2:-}" = "Y" ]; then
-            prompt_tail="Y/n"
-            default=Y
-        elif [ "${2:-}" = "N" ]; then
-            prompt_tail="y/N"
-            default=N
-        else
-            prompt_tail="y/n"
-            default=
-        fi
-
-        # Ask the question
-        __vv__prompt "$1 [$prompt_tail]"
-        read -r REPLY
-
-        # Default?
-        if [ -z "$REPLY" ]; then
-            REPLY=$default
-        fi
-
-        # Check if the reply is valid
-        case "$REPLY" in
-            Y*|y*) return 0 ;;
-            N*|n*) return 1 ;;
-        esac
-
-    done
-    hook "post_ask"
-}
-
 __vv__argument_expected() {
 	hook "pre_arg_expected"
     if [ -z "$2" ] || [[ "$2" == -* ]]; then
