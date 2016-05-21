@@ -932,6 +932,11 @@ define( 'JETPACK_DEV_DEBUG', true );
 define( 'WP_HOME', 'http://' . \$_SERVER['HTTP_HOST'] );
 define( 'WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST'] );
 PHP"
+	else
+		wp_debug_text=" --extra-php <<PHP
+define( 'WP_HOME', 'http://' . \$_SERVER['HTTP_HOST'] );
+define( 'WP_SITEURL', 'http://' . \$_SERVER['HTTP_HOST'] );
+PHP"
 	fi
 
 	blueprint_text=''
