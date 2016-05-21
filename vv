@@ -1041,7 +1041,8 @@ PHP"
 		fi
 		maybe_trunk=""
 		if [ "$use_trunk" = "true" ];then
-			maybe_trunk="svn checkout https://core.svn.wordpress.org/trunk/"
+			maybe_trunk="cd ../ && svn checkout https://core.svn.wordpress.org/trunk/ $web_root && cd -"
+			install_method="$maybe_trunk"
 		fi
 
 		if [ "$bedrock_init" = "true" ]; then
@@ -1076,11 +1077,11 @@ PHP"
 			echo "  $maybe_remove_defaults"
 			echo "  $maybe_download_search_and_replace"
 			echo "	$hooked_extra_wp_vvv_init"
+			echo "  $maybe_trunk"
 			echo "	"
 			echo "	cd -" || error "Could not change directory."
 			echo "$blueprint_text"
 			echo "fi"
-			echo "$maybe_trunk"
 			echo "$hooked_post_vvv_init"
 		} >> vvv-init.sh
 		hook "post_write_vvv_init"
