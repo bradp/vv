@@ -14,7 +14,7 @@
 
 *Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility to solve that issue.
 
-**Table of Contents**
+# Table of Contents
 
 - [Variable VVV - The Best VVV Site Wizard](#variable-vvv---the-best-vvv-site-wizard)
   - [Installation](#installation)
