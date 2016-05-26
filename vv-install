@@ -4,9 +4,9 @@
  * Parses a JSON-formatted blueprint and applies its configuration.
  *
  * @param string $blueprint Name of the blueprint to apply.
- * @param string $path
- * @param string $site_name
- * @param string $domain
+ * @param string $path Path to the WordPress installation's WWW document root.
+ * @param string $site_name Name of the main WP site.
+ * @param string $domain Root domain of the main WP site.
  */
 function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	echo "Setting up blueprint $blueprint...\n";
@@ -27,6 +27,16 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 		}
 	}
 
+	// Install additional (sub)networks.
+	if( ! empty ( $blueprints->$blueprint->networks ) ) {
+		echo 'Setting up subnetworks...';
+		activate_plugin( 'wp-multi-network' );
+		foreach ( $blueprints->$blueprint->networks as $network_domain => $network ) {
+			add_network( $network_domain, $network );
+		}
+		echo 'Subnetworks set up.';
+	}
+
 	$site_blueprints = get_site_blueprints( $blueprints->$blueprint );
 
 	// Insall network-wide and mainsite components.
@@ -35,15 +45,19 @@ function main( $blueprint, $path = 'htdocs', $site_name, $domain ) {
 	if ( ! empty( $site_blueprints->subsites ) ) {
 		echo 'Setting up subsites...';
 		foreach ( $site_blueprints->subsites as $subsite_slug => $subsite ) {
+			$domain = ( empty( $subsite->network_domain ) ) ? $domain : $subsite->network_domain;
 			add_site( $subsite_slug, $subsite, $domain );
 			install_site_from_blueprint( $subsite, $path, $site_name, $domain, $subsite_slug );
 		}
 		echo 'Subsites set up.';
 	}
 
+	echo 'Blueprint set up.';
 }
 
 /**
+ * Creates a subsite from a blueprint subsite defintion.
+ *
  * @param object $site_blueprint
  * @param string $path
  * @param string $site_name
@@ -54,7 +68,7 @@ function install_site_from_blueprint( $site_blueprint, $path, $site_name, $domai
 
 	if ( ! empty( $site_blueprint->demo_content ) ) {
 		echo "Importing content...\n";
-		activate_wordpress_importer();
+		activate_plugin( 'wordpress-importer' );
 		foreach ( $site_blueprint->demo_content as $demo ) {
 			import_demo_content( $demo, $path, $site_name, $domain, $subsite_slug );
 		}
@@ -91,7 +105,7 @@ function install_site_from_blueprint( $site_blueprint, $path, $site_name, $domai
 		}
 	}
 
-	echo "Blueprint set up.\n";
+	echo "Site set up.\n";
 }
 
 /**
@@ -113,11 +127,53 @@ function get_site_blueprints( $blueprint ) {
 }
 
 /**
+ * Ensures the given plugin is installed and active.
+ *
+ * @param string $plugin_slug The plugin's slug from the WordPress.org plugin repository.
+ * @param bool $network_activate Whether to activate network-wide or not. (Defaults to `false`.)
+ * @param string $url Pass the given URL as the `--url` global option. (Useful for Multi-Network setups where the `DOMAIN_CURRENT_SITE` constant in `wp-config.php` is set from server HTTP headers dynamically.)
+ */
+function activate_plugin ( $plugin_slug, $network_activate = false, $url = '' ) {
+	system( 'wp --allow-root plugin is-installed wp-multi-network', $plugin_missing );
+	if ( $plugin_missing ) {
+		$cmd = sprintf(
+			'wp --allow-root plugin install %s %s',
+			escapeshellarg( $plugin_slug ),
+			($network_activate) ? '--activate-network' : '--activate'
+		);
+		if ( ! empty( $url ) ) {
+			$cmd .= ' ' . escapeshellarg( "--url=$url" );
+		}
+		exec( $cmd );
+	}
+}
+
+/**
+ * Creates a subnetwork in a WP Multi-Network install.
+ *
+ * @param string $network_domain Root domain of the subnetwork.
+ * @param stdClass $network Network definition from blueprint.
+ */
+function add_network( $network_domain, $network ) {
+	$command = 'wp --allow-root wp-multi-network create ' . escapeshellarg( $network_domain );
+	if ( empty( $network->path ) ) {
+		$command .= ' /';
+	} else {
+		$command .= ' ' . escapeshellarg( $network->path );
+	}
+	if ( ! empty( $network->site_name ) ) {
+		$command .= ' --site_name=' . escapeshellarg( $network->site_name );
+	}
+	$command .= ' --user=admin';
+	exec( $command );
+}
+
+/**
  * Creates a subsite in Multisite using WP-CLI
  *
  * @param string $slug Name of the site.
  * @param stdClass $subsite Subsite definition from blueprint
- * @param string $domain
+ * @param string $domain Domain of main WP Multisite network. Required and as a default unless a `network_domain` key exists in the `$subsite` object.
  */
 function add_site( $slug, $subsite, $domain ) {
 	$command = 'wp site create --allow-root --slug=' . escapeshellarg( $slug );
@@ -136,6 +192,7 @@ function add_site( $slug, $subsite, $domain ) {
 	if ( ! empty( $subsite->porcelain ) && true === $subsite->porcelain ) {
 		$command .= ' --porcelain';
 	}
+	$command .= ' --url=' . escapeshellarg( $domain ); // always, in case Multi-Network is used without a network_id
 	system( $command, $return_var );
 	if ( 0 === $return_var ) {
 		$fh = fopen( 'vvv-hosts', 'a' );
@@ -396,13 +453,6 @@ function add_option( $option, $domain = '' , $subsite_slug = null ) {
 	exec( $cmd );
 
 	echo "  Insert settings $name...\n";
-}
-
-function activate_wordpress_importer() {
-	system( 'wp --allow-root plugin is-installed wordpress-importer', $importer_missing );
-	if ( $importer_missing ) {
-		exec( 'wp --allow-root plugin install wordpress-importer --activate' );
-	}
 }
 
 /**
