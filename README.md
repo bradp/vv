@@ -41,7 +41,7 @@
   - [Options for Deployment Setup](#options-for-deployment-setup)
 - [.vv-config](#vv-config)
 - [vv Hooks](#vv-hooks)
-- [Questions / Thanks](#thanks)
+- [Thanks](#thanks)
 
 ## Installation
 
@@ -582,9 +582,6 @@ Make a file named post_site_creation_finished. This file gets 4 variables passed
     npm install
 ```
 
-## Questions?
-
-Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 
 ## Thanks
 
