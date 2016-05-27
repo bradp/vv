@@ -1,5 +1,10 @@
 ## Change Log
 
+
+#### 1.10.1 - *2016-5-19* ####
+
+ * Fix site creation errors
+
 #### 1.10.0 - *2016-5-16* ####
 
   * After vv-config gets created, display a command that will populate the file correctly in case it failed

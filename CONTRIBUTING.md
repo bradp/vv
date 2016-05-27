@@ -16,4 +16,5 @@ All contributions welcome. If you would like to submit a pull request, please fo
 1. Make sure you have a GitHub account.
 2. Fork the repository on GitHub.
 3. Make changes to your clone of the repository.
-4. [Submit a pull request](https://help.github.com/articles/creating-a-pull-request/).
+4. Verify your changes still pass [Shellcheck](http://shellcheck.net) and all functions are prefixed, such as: `__vv__my_function`.
+5. [Submit a pull request](https://help.github.com/articles/creating-a-pull-request/).

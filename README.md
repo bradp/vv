@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.10.0
+	░██   ░██░██   ░██     Variable VVV 1.10.2
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
@@ -13,6 +13,34 @@
 [![Travis](https://img.shields.io/travis/bradp/vv.svg)](https://travis-ci.org/bradp/vv)
 
 *Tired of the time it takes to do a `vagrant provision` or create new sites?* Check out [flip](https://github.com/bradp/vvv-provision-flipper), a simple utility to solve that issue.
+
+# Table of Contents
+
+- [Installation](#installation)
+  - [OS X Installation](#os-x-installation)
+  - [Windows Installation](#windows-installation)
+  - [Linux Installation](#linux-installation)
+- [Adding tab-completion to vv](#adding-tab-completion-to-vv)
+- [Updating](#updating)
+- [Usage](#usage)
+- [Site Creation](#site-creation)
+  - [Subdomain Multisite Installation](#subdomain-multisite-installation)
+- [Site Deletion](#site-deletion)
+- [Deployments](#deployments)
+- [Advanced Usage](#advanced-usage)
+  - [Airplane Mode](#airplane-mode)
+  - [Flags](#flags)
+- [Blueprints](#blueprints)
+  - [Blueprints for Multisite configurations](#blueprints-for-multisite-configurations)
+- [Vagrant Proxy](#vagrant-proxy)
+- [vv Options](#vv-options)
+  - [Commands](#commands)
+  - [Options for Site Creation](#options-for-site-creation)
+  - [Options for Site Removal](#options-for-site-removal)
+  - [Options for Deployment Setup](#options-for-deployment-setup)
+- [.vv-config](#vv-config)
+- [vv Hooks](#vv-hooks)
+- [Questions / Thanks](#thanks)
 
 ## Installation
 
@@ -149,6 +177,11 @@ When removing a deployment, your current Vagrantfile will be backed up as Vagran
 
 ## Advanced Usage
 
+### Airplane Mode
+
+Using `x` as the first argument with `vv` will force airplane mode. This will cut off update checks on usage. This is useful if you're using `vv` without an internet connection. The provision state of VVV will probably fail at some point, though.
+
+### Flags
 Anything that vv prompts you for, you can pass in as an argument. Most of this is realized in the site creation. In fact, there are a few arguments you can pass in that aren't prompted. This gives you total control over creating a new site.
 
 To create a new site named 'mysite' that has the domain 'mysite.dev' and is a multisite with subdomains, with `WP_Debug` turned on would be:
@@ -294,7 +327,7 @@ To add multisite support to your blueprint, add a `sites` key to a specific blue
 "sites": {
   "site2": {
     "plugins": [
-      ...(same as above)...
+      "...(same as above)..."
     ]
   }
 }
@@ -555,4 +588,4 @@ Ping me on Twitter at [@bradparbs](http://twitter.com/bradparbs).
 ## Thanks
 
 Forked and based off of [vvv-site-wizard from Alison Barrett](https://github.com/aliso/vvv-site-wizard).
-Also thanks to [creativecoder](https://github.com/creativecoder), [jtsternberg](https://github.com/jtsternberg), [tnorthcutt](https://github.com/tnorthcutt), [joehills](http;//github.com/joehills), [gregrickaby](https://github.com/gregrickaby), [leogopal](https://github.com/leogopal), [Mte90](https://github.com/Mte90), [Octopixell](https://github.com/Octopixell), [wpsmith](https://github.com/wpsmith), [WPProdigy](https://github.com/WPprodigy), [caseypatrickdriscoll](https://github.com/caseypatrickdriscoll), [michaelbeil](https://github.com/michaelbeil), [wesbos](https://github.com/wesbos), [Ipstenu](https://github.com/Ipstenu) for awesome contributions.
+Also thanks to [meitar](https://github.com/meitar), [creativecoder](https://github.com/creativecoder), [jtsternberg](https://github.com/jtsternberg), [caseypatrickdriscoll](https://github.com/caseypatrickdriscoll), [gregrickaby](https://github.com/gregrickaby), [leogopal](https://github.com/leogopal), [ajdruff](https://github.com/ajdruff), [schlessera](https://github.com/schlessera), [john-g-g](https://github.com/john-g-g), [tnorthcutt](https://github.com/tnorthcutt), [wpsmith](https://github.com/wpsmith), [wesbos](https://github.com/wesbos), [protechig](https://github.com/protechig), [Ipstenu](https://github.com/Ipstenu), [justintucker](https://github.com/justintucker), [michaelbeil](https://github.com/michaelbeil), [jb510](https://github.com/jb510), [neilgee](https://github.com/neilgee), [nanomoffet](https://github.com/nanomoffet), [joehills](https://github.com/joehills), [JeffMatson](https://github.com/JeffMatson), [greatislander](https://github.com/greatislander), [pelmered](https://github.com/pelmered), [gMagicScott](https://github.com/gMagicScott), [alexschlueter](https://github.com/alexschlueter), [eriktdesign](https://github.com/eriktdesign), [WPprodigy](https://github.com/WPprodigy), [michaelryanmcneill](https://github.com/michaelryanmcneill), [boborchard](https://github.com/boborchard) for their contributions.

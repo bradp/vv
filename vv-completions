@@ -8,7 +8,7 @@ _vv_zsh () {
 
   case $state in
     command)
-      compadd $(vv show_commands)
+      compadd $(vv x show_commands)
       ;;
 esac
 }
@@ -18,7 +18,7 @@ if [ -n "$ZSH_VERSION" ]; then
 elif [ -n "$BASH_VERSION" ]; then
    _vv()
    {
-     _vv_commands=$(vv show_commands)
+     _vv_commands=$(vv x show_commands)
 
      local cur prev
      COMPREPLY=()
