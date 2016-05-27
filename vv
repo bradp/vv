@@ -1072,11 +1072,23 @@ PHP"
 	if [ ! -z "$blueprint" ] && [[ $ms_type == "subdomain" ]]; then
 		__vv__info "Adding subdomains from $blueprint to vvv-hosts file..."
 		local subdomains
+		local subnetwork_domains
 		subdomains=$(grep "$blueprint::subdomains" "$path"/vv-blueprints.json | sed -e 's/"//g' | cut -d ':' -f 4)
 		subdomains=${subdomains%,}
+		subnetwork_domains=$(grep "$blueprint::subnetwork_domains" "$path"/vv-blueprints.json | sed -e 's/"//g' | cut -d ':' -f 4)
+		subnetwork_domains=${subnetwork_domains%,}
 		for subdomain in $subdomains; do
 			printf "%s\n" "$subdomain.$domain" >> vvv-hosts
 		done
+		if [ ! -z "$subnetwork_domains" ]; then
+			info "Adding subnetwork domains and subdomains to vvv-hosts file..."
+			for subnetwork_domain in $subnetwork_domains; do
+				printf "%s\n" "$subnetwork_domain" >> vvv-hosts
+				for subdomain in $subdomains; do
+					printf "%s\n" "$subdomain.$subnetwork_domain" >> vvv-hosts
+				done
+			done
+		fi
 	fi
 	__vv__hook "post_write_vvv_hosts"
 	echo "Done"
@@ -1093,6 +1105,11 @@ PHP"
 	nginx_domain_text="$domain"
 	if [[ $multisite = 'y' ]] && [[ $ms_type = 'subdomain' ]]; then
 		nginx_domain_text="$domain *.$domain"
+		if [ ! -z "$subnetwork_domains" ]; then
+			for subnetwork_domain in $subnetwork_domains; do
+				nginx_domain_text="$nginx_domain_text $subnetwork_domain *.$subnetwork_domain"
+			done
+		fi
 	fi
 	xip_domain=" ~^${site// /-}\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.\\\d+\\\.xip\\\.io$"
 	nginx_domain_text="$nginx_domain_text""$xip_domain"

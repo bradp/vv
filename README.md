@@ -32,6 +32,7 @@
   - [Flags](#flags)
 - [Blueprints](#blueprints)
   - [Blueprints for Multisite configurations](#blueprints-for-multisite-configurations)
+  - [Blueprints for Multi-Network configurations](#blueprints-for-multi-network-configurations)
 - [Vagrant Proxy](#vagrant-proxy)
 - [vv Options](#vv-options)
   - [Commands](#commands)
@@ -416,6 +417,52 @@ If your multisite network uses subdomains, you can include a blueprint-level key
 The above installs [BuddyPress](https://buddypress.org/) but activates it only for `site2`, enables the `_s` theme for the entire network but activates `anp-network-main-v2` for the network's main site and `anp-network-main-child` for `site3`, which is also given its own site admin user.
 
 Be sure to run `vv` with the `--multisite subdomain` option when you use a blueprint like this.
+
+### Blueprints for Multi-Network configurations
+
+In addition to a [multisite configuration](#blueprints-for-multisite-configurations), VV recognizes blueprints that will configure a WP Multi-Network (a network of WP Multisite networks). VV's Multi-Network blueprints work just like Multisite blueprints, but have the following required additions:
+
+* A `BLUEPRINT_NAME::subnetwork_domains` key must be present listing the root domains for each network.
+* A `networks` object must be present, whose keys match the domains listed in the `BLUEPRINT_NAME::subnetwork_domains` member.
+
+For example, this Multi-Network configuration defines two WP Multisite subnetworks (for a total of three WP Multisites) in the blueprint called `multinet`.
+
+```json
+{
+  "multinet": {
+    "multinet::subdomains": "site2 site3",
+    "multinet::subnetwork_domains": "wpsubnet1.dev wpsubnet2.dev",
+    "networks": {
+      "wpsubnet1.dev": {
+        "path": "/",
+        "site_name": "WP Subnetwork Example 1"
+      },
+      "wpsubnet2.dev": {
+        "path": "/",
+        "site_name": "WP Subnetwork Example 2"
+      }
+    }
+  }
+}
+```
+
+Note that empty network objects are allowed (i.e., `path` and `site_name` are optional), but not recommended.
+
+To associate a given subsite with a network, you can either use the `network_id` key or a `network_domain` key in the subsite object. A `network_domain` is recommended. For example, this object will associate the `site2` subsite with the main network (because no `network_domain` or `network_id` key is defined), and the subsite with slug `site3` with the network created at the given domain:
+
+```json
+{
+  "site2": {
+  },
+  "site3": {
+    "network_domain": "wpsubnet1.dev"
+  }
+}
+```
+
+The above will ultimately place `site3` at the `site3.wpsubnet1.dev` URL while `site2` will be created as a subdomain of whatever domain you chose when you invoked `vv create`.
+
+It is not an error for a WP network to be defined with no sites of its own.
 
 ## Vagrant Proxy
 
