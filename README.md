@@ -32,6 +32,7 @@
   - [Flags](#flags)
 - [Blueprints](#blueprints)
   - [Blueprints for Multisite configurations](#blueprints-for-multisite-configurations)
+  - [Blueprints for Multi-Network configurations](#blueprints-for-multi-network-configurations)
 - [Vagrant Proxy](#vagrant-proxy)
 - [vv Options](#vv-options)
   - [Commands](#commands)
