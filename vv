@@ -681,12 +681,21 @@ __vv__site_creation_questions() {
 			# Get local URL
 			if [ "$use_defaults" = "false" ]; then
 				if [ -z "$blueprint" ]; then
-					__vv__prompt "Blueprint to use (leave blank for none)"
+                                        if which python >/dev/null; then
+                                            first=$(python -c "import json,sys;obj=json.loads(open('$path/vv-blueprints.json').read());print ', '.join(obj.keys());")
+                                            prompt "Blueprint to use (leave blank for none or use $first)"
+                                            __vv__prompt "Blueprint to use (leave blank for none or use $first)"
+                                        elif which node 2>/dev/null; then
+                                            first=$(node -p "name='';for (var parent in JSON.parse(require('fs').readFileSync('$path/vv-blueprints.json').toString())){name += parent + ', '} name.slice(0,-2);")
+                                            __vv__prompt "Blueprint to use (leave blank for none or use $first)"
+                                        else
+                                            __vv__prompt "Blueprint to use (leave blank for none)"
+                                        fi
 					read -r blueprint
 					if [ -z "$blueprint" ]; then
 						unset blueprint
 					fi
-				fi
+                                fi
 			fi
 		fi
 	fi
