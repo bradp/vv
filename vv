@@ -425,7 +425,7 @@ __vv__create_config_file() {
 	__vv__info "If for some reason, vv still fails to find the path, please run the following command:"
 	__vv__info "	";
 	# shellcheck disable=SC2028
-	echo "	sudo printf \"{\\n\"\\tpath\": \"$path\"\\n}\" > ~/.vv-config"
+	echo "	sudo printf \"{\\n\"\\\\tpath\": \"$path\"\\n}\" > ~/.vv-config"
 	__vv__info "	";
 	__vv__hook "post_create_vv_config"
 }
