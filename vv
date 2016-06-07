@@ -59,7 +59,7 @@ if [ -z "$HOME" ]; then
 else
 	home="$HOME"
 fi
-eval HOME="$home"
+declare HOME="$home"
 
 # If we have tput, let's set our colors
 if [[ ! -z $(which tput 2>/dev/null) ]]; then
