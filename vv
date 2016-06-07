@@ -397,7 +397,7 @@ __vv__check_for_config_file() {
 	test -f "$home"/.vv-config && vv_config="${HOME}/.vv-config"
 	test -f ./.vv-config && vv_config="./.vv-config"
 
-	if [ ! -z $vv_config ]; then
+	if [ ! -z "$vv_config" ]; then
 		__vv__load_config_values
 	else
 		if [[ ! $showing_help = "true" ]]; then
