@@ -683,7 +683,7 @@ __vv__site_creation_questions() {
 				if [ -z "$blueprint" ]; then
                                         if which python >/dev/null; then
                                             first=$(python -c "import json,sys;obj=json.loads(open('$path/vv-blueprints.json').read());print ', '.join(obj.keys());")
-                                            prompt "Blueprint to use (leave blank for none or use $first)"
+                                            __vv__prompt "Blueprint to use (leave blank for none or use $first)"
                                             __vv__prompt "Blueprint to use (leave blank for none or use $first)"
                                         elif which node 2>/dev/null; then
                                             first=$(node -p "name='';for (var parent in JSON.parse(require('fs').readFileSync('$path/vv-blueprints.json').toString())){name += parent + ', '} name.slice(0,-2);")
@@ -1172,8 +1172,7 @@ __vv__vagrant_is_running() {
 	vvv_path="$(__vv__get_config_value path | tr -d '[:space:]')"
 	vvv_path=${vvv_path%/}
 	vvv_running="true"
-	curl --silent --head --connect-timeout 2 "http://vvv.dev/" | head -n 1 | grep "HTTP/1.[01] [23].." > /dev/null || vvv_running="false"
-	# vagrant global-status | grep "$vvv_path\s*"'$' | grep -q running || vvv_running="false"
+	vagrant global-status | grep "$vvv_path\s*"'$' | grep -q running || vvv_running="false"
 	echo "$vvv_running"
 }
 
