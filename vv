@@ -1591,6 +1591,7 @@ __vv__check_args() {
 				;;
 			-m|--multi-site|--multi_site|--multisite)
 				__vv__argument_expected "$1" "$2"
+				multisite=y
 				ms_type=$2
 				shift 2
 				;;
