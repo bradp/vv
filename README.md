@@ -1,7 +1,7 @@
 # Variable VVV - The Best VVV Site Wizard
 
 	 ██    ██ ██    ██
-	░██   ░██░██   ░██     Variable VVV 1.10.2
+	░██   ░██░██   ░██     Variable VVV 1.11
 	░░██ ░██ ░░██ ░██
 	 ░░████   ░░████       The easiest way to set up
 	  ░░██     ░░██        WordPress sites with VVV!
