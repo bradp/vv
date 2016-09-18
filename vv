@@ -1040,7 +1040,7 @@ PHP"
 		hooked_post_vvv_init=$(__vv__hook "hooked_post_vvv_init")
 
 		{
-			echo "$hooked_pre_vvv_init"
+			[ -z "${hooked_pre_vvv_init}" ] || echo "$hooked_pre_vvv_init"
 			echo "if [ ! -d \"$web_root/wp-admin\" ]; then"
 			echo "	echo 'Installing WordPress $version in $site/$web_root...'"
 
@@ -1051,20 +1051,19 @@ PHP"
 				echo "	cd ./$web_root" || __vv__error "Could not change directory."
 			fi
 
-			echo "	$install_method"
-			echo "	$config"
-			echo "	$core"
-			echo "	$add_placeholder_content"
-			echo "	$db_init"
-			echo "  $maybe_remove_defaults"
-			echo "  $maybe_download_search_and_replace"
-			echo "	$hooked_extra_wp_vvv_init"
-			echo "  $maybe_trunk"
-			echo "	"
+			[ -z "${install_method}" ] || echo "	$install_method"
+			[ -z "${config}" ] || echo "	$config"
+			[ -z "${core}" ] || echo "	$core"
+			[ -z "${add_placeholder_content}" ] || echo "	$add_placeholder_content"
+			[ -z "${db_init}" ] || echo "	$db_init"
+			[ -z "${maybe_remove_defaults}" ] || echo "  $maybe_remove_defaults"
+			[ -z "${maybe_download_search_and_replace}" ] || echo "  $maybe_download_search_and_replace"
+			[ -z "${hooked_extra_wp_vvv_init}" ] || echo "	$hooked_extra_wp_vvv_init"
+			[ -z "${maybe_trunk}" ] || echo "  $maybe_trunk"
 			echo "	cd -" || __vv__error "Could not change directory."
-			echo "$blueprint_text"
+			[ -z "${blueprint_text}" ] || echo "$blueprint_text"
 			echo "fi"
-			echo "$hooked_post_vvv_init"
+			[ -z "${hooked_post_vvv_init}" ] || echo "$hooked_post_vvv_init"
 		} >> vvv-init.sh
 		__vv__hook "post_write_vvv_init"
 	fi
