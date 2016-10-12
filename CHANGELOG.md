@@ -1,5 +1,29 @@
 ## Change Log
 
+#### 1.12 - *2016-10-12* ####
+
+ * Fix vagrant status not being detected correclty
+ * Fix prompt error
+ * Updated contributors list
+ * Eval replaced with declare
+ * Correctly quote vv_config variable
+ * Correctly escape tab character for fallback path setting
+ * Update README.md
+ * Add table of contents to docs
+ * Include TOC line for "Blueprints for Multi-Network configurations."
+ * Update contributors list
+ * Add airplane mode docs
+ * Organize the README header
+ * Force vv-completions to toggle airplane mode to skip update chekcs
+ * Prefix all functions to allow for better sourcing of vv externally
+ * Add in airplane mode
+ * Correctly escape server var for xip.io support in wpconf
+ * Ping local vvv quicker than usual, timeout after 2 secs
+ * Fix trunk install
+ * Also add xip.io support to non debug
+ * Provide better xip.io support in wp-config.php
+ * Document Multi-Network blueprints.
+ * Add WP Multi-Network domain configuration from a blueprint file.
 
 #### 1.10.1 - *2016-5-19* ####
 

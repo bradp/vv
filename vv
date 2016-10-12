@@ -5,7 +5,7 @@
 # By Brad Parbs <brad@bradparbs.com>
 # Originally by Alison Barrett <alison@barre.tt>
 #
-# Version 1.11
+# Version 1.12
 #
 # Varying Vagrant Vagrants (https://github.com/Varying-Vagrant-Vagrants/VVV).
 #
@@ -35,7 +35,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.1.6.0
 #
-version_number=1.11
+version_number=1.12
 
 if [[ "$1" == "vv_internal_debug" ]]; then
 	# We check this before anything else, so we can debug all of vv
