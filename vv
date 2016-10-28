@@ -891,7 +891,7 @@ __vv__create_site_files(){
 	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
 	__vv__info "Creating site directory, wp-cli.yml, and vvv-init.sh file... "
 	if [ ! -d "$site" ]; then
-		mkdir "$site"
+		mkdir -p "$site"
 	fi
 	cd "$site" || __vv__error "Could not change directory."
 
