@@ -1131,6 +1131,12 @@ PHP"
 		mv tmp.conf "$site".conf
 	fi
 
+	# Add site to vvv-config.yml
+	# =============================================================================
+	cd "$path" || __vv__error "Could not change directory."
+	__vv__info "Adding $site to vvv-config.yml... "
+	echo -e "\n  $site:" >> vvv-config.yml
+
 	echo "Done"
 }
 
