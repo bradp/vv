@@ -318,11 +318,14 @@ __vv__install_update() {
 __vv__sites_upgrade() {
 	__vv__hook "pre_upgrade"
 	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
-	find . -maxdepth 2 -mindepth 1 -type d -print0 | while IFS= read -r -d '' filename; do
-		filename=${filename:2}
+	for filename in */; do
+                # Cut the end slash
+ 		filename=${filename::-1}
 		if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
                     echo "Upgrade in progress on $filename.dev"
-                    vagrant ssh --command "cd /srv/www/$filename; wp core update; wp plugin update --all" &> /dev/null
+                    # Wait for the process else will execute the command and the loop will continue to run the command outside the script
+                    vagrant ssh --command "cd /srv/www/$filename; wp core update; wp plugin update --all" > /dev/null 2>&1 &
+                    wait $!
                     echo "Upgrade done for $filename.dev"
                 fi
         done
