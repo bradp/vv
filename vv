@@ -116,6 +116,7 @@ ${bold} COMMANDS: ${normal}
     deployment-remove 		Remove a deployment
     deployment-config 		Manually configure deployment
     blueprint-init 		Initialize blueprint file
+    upgrade 		        Update all the site of VV
 
 ${bold} SITE OPTIONS: ${normal}
     --domain, -d 		Domain of new site
@@ -174,6 +175,7 @@ deployment-create
 deployment-remove
 deployment-config
 blueprint-init
+upgrade
 --domain
 -d
 --live-url
@@ -311,6 +313,24 @@ __vv__install_update() {
 	__vv__check_how_installed
 	__vv__update_vv
 	__vv__hook "post_install_update"
+}
+
+__vv__sites_upgrade() {
+	__vv__hook "pre_upgrade"
+	cd "$path"/"$sites_folder" || __vv__error "Could not change directory."
+	for filename in */; do
+                # Cut the end slash
+ 		filename=${filename::-1}
+		if [[ -f "$path"/"$sites_folder"/"$filename"/vvv-hosts ]]; then
+                    echo "Upgrade in progress on $filename.dev"
+                    # Wait for the process else will execute the command and the loop will continue to run the command outside the script
+                    vagrant ssh --command "cd /srv/www/$filename; wp core update; wp plugin update --all" > /dev/null 2>&1 &
+                    wait $!
+                    echo "Upgrade done for $filename.dev"
+                fi
+        done
+	__vv__hook "post_upgrade"
+	exit
 }
 
 __vv__update_vv() {
@@ -683,7 +703,6 @@ __vv__site_creation_questions() {
 				if [ -z "$blueprint" ]; then
                                         if which python >/dev/null; then
                                             first=$(python -c "import json,sys;obj=json.loads(open('$path/vv-blueprints.json').read());print ', '.join(obj.keys());")
-                                            __vv__prompt "Blueprint to use (leave blank for none or use $first)"
                                             __vv__prompt "Blueprint to use (leave blank for none or use $first)"
                                         elif which node 2>/dev/null; then
                                             first=$(node -p "name='';for (var parent in JSON.parse(require('fs').readFileSync('$path/vv-blueprints.json').toString())){name += parent + ', '} name.slice(0,-2);")
@@ -1526,6 +1545,9 @@ __vv__parse_the_args() {
 	if [ ! -z "$lets_update" ]; then
 		__vv__install_update
 	fi
+	if [ ! -z "$lets_upgrade" ]; then
+		__vv__sites_upgrade
+	fi
 	if [ ! -z "$force_update" ]; then
 		__vv__vv_bootstrap_update
 	fi
@@ -1742,6 +1764,10 @@ __vv__check_args() {
 				;;
 			update|--update)
 				lets_update="true"
+				shift
+				;;
+			upgrade|--upgrade)
+				lets_upgrade="true"
 				shift
 				;;
 			--force-update|--force_update|--forceupdate)
