@@ -1153,10 +1153,13 @@ PHP"
 	# Add site to vvv-config.yml
 	# =============================================================================
 	cd "$path" || __vv__error "Could not change directory."
-	__vv__info "Adding $site to vvv-config.yml... "
-	echo -e "\n  $site:" >> vvv-config.yml
+	if [ ! -f vvv-custom.yml ]; then
+		__vv__info "copying vvv-config.yml to vvv-custom.yml"
+	fi
+	__vv__info "Adding $site to vvv-custom.yml... "
+	sed -i '' -e '/sites:/a\'$'\n'"\  $site:"$'\n' vvv-custom.yml
 
-	echo "Done"
+	echo "Done, remember to vagrant reload --provision for changes to take effect"
 }
 
 __vv__run_vagrant_up() {
