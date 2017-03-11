@@ -1155,6 +1155,7 @@ PHP"
 	cd "$path" || __vv__error "Could not change directory."
 	if [ ! -f vvv-custom.yml ]; then
 		__vv__info "copying vvv-config.yml to vvv-custom.yml"
+		cp vvv-config.yml vvv-custom.yml
 	fi
 	__vv__info "Adding $site to vvv-custom.yml... "
 	sed -i '' -e '/sites:/a\'$'\n'"\  $site:"$'\n' vvv-custom.yml
