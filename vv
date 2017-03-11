@@ -1666,7 +1666,7 @@ __vv__check_args() {
 				__vv__argument_expected "$1" "$2"
 				__vv__get_vvv_path
 				cd "$path" || __vv__error "Could not change directory."
-				echo "$(vagrant "$2");"
+				exec vagrant "${@:2}"
 				exit
 				shift 2
 				;;
