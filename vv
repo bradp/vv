@@ -977,6 +977,7 @@ PHP"
 			echo "$hooked_extra_wp_vvv_init_no_wp"
 			echo "$hooked_post_vvv_init_no_wp"
 		} >> vvv-init.sh
+		chmod +x vvv-init.sh
 	fi
 
 	if [ "$no_wp_with_db" = "true" ]; then
@@ -1002,6 +1003,7 @@ PHP"
 				echo "fi"
 				echo "$hooked_post_vvv_init_no_wp"
 			} >> vvv-init.sh
+			chmod +x vvv-init.sh
 		fi
 	fi
 
@@ -1672,7 +1674,7 @@ __vv__check_args() {
 				__vv__argument_expected "$1" "$2"
 				__vv__get_vvv_path
 				cd "$path" || __vv__error "Could not change directory."
-				echo "$(vagrant "$2");"
+				exec vagrant "${@:2}"
 				exit
 				shift 2
 				;;
