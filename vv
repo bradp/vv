@@ -1158,8 +1158,8 @@ PHP"
 		cp vvv-config.yml vvv-custom.yml
 	fi
 	__vv__info "Adding $site to vvv-custom.yml... "
-	sed -i '' -e '/sites:/a\
-  $site:\
+	sed -i '' -e "/sites:/a\\
+\  $site:\
 " vvv-custom.yml
 
 	echo "Done, remember to vagrant reload --provision for changes to take effect"
