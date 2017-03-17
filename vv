@@ -1178,7 +1178,7 @@ __vv__run_vagrant_up() {
 }
 
 __vv__creation_success_message() {
-	# OMG we're done.
+	# OMG we are done.
 	# =============================================================================
 	if [[ "$files_only" = "true" ]]; then
 		__vv__info "\nRemember to run \`vagrant up --provision\` to initialize the new site."
